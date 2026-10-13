@@ -84,3 +84,23 @@ Ver `docs/CHECKLIST.md`.
 - **Coste medido:** `POST /api/v1/ai-tools/translate/run` con body `{"text", "options": {"target": "es", "style"}}`
   → 200 en 3,0 s, `creditsConsumed` = **1,358** por una frase de 85 caracteres (`data/runs/evolus/prueba_translate_2026-10-12.json`).
   Con 50.000 créditos el presupuesto de Evolus no es una restricción.
+- **Decisión de Diego:** no se rota la API key de Evolus (riesgo aceptado: workspace del evento, créditos gratuitos).
+- Premio de Google: nada en Discord a la fecha. **Supuesto de trabajo:** Gemma cuenta. Sin confirmar.
+- Hardware local: GTX 1060 6 GB, 16 GB RAM. Ollama corre en Windows y desde WSL no es accesible por HTTP
+  (escucha en 127.0.0.1), pero sí por interop (`ollama.exe`). Se baja `gemma4:e2b-it-qat` solo para probar la tubería.
+- Gemini API ofrece `gemma-4-31b-it` y `gemma-4-26b-a4b-it` (ai.google.dev/gemma/docs/core/gemma_on_gemini_api):
+  mismo modelo que la campaña en AMD → **solo para depurar prompts**; ningún número reportado sale de ahí.
+
+## 2026-10-12 (noche) — Calibración resuelta, cliente Evolus
+- **Hipótesis confirmada (medida, `scripts/medir_calibracion.py` → `data/processed/calibracion.json`):** calibrando con
+  `normal_ampliado()` (d00 + muestras 0–19 de d01..d21 de *entrenamiento*, 920×52; ningún `_te`), en d00_te:
+  SPE > límite 15,0% → **2,6%**; eventos de alarma 178 → **49** (≈1 por hora en 48 h; EEMUA admite ≤6 por hora en régimen);
+  A 31 → 28. Persiste una falsa alarma T² sostenida en la muestra 826 de d00_te.
+  Límite SPE empírico p99 vs Jackson-Mudholkar: no cambia qué fallas se detectan → se queda Jackson-Mudholkar.
+- Detección con ampliado: T² 17/21 (faltan 3, 4, 9, 19), SPE 16/21 (faltan 3, 4, 9, 15, 19).
+- **Decisión:** dos calibraciones, cada una en su brazo.
+  · Réplica FaultExplainer → T² entrenado con d00 (análogo de su protocolo). No se toca.
+  · Copiloto, alarmas, SPE y versión robusta → `normal_ampliado()`.
+  El test xfail se sustituye por uno sobre la calibración ampliada.
+- `evolus/cliente.py` + `evolus/replay.py`: reintentos, throttle 1 s, `ErrorEvolus` con errorCode/traceId, grabación JSONL
+  sin cabeceras y `ClienteReplay` para la demo sin GPU. Esquemas de workflow (body de execute, campo de estado) **sin verificar**.

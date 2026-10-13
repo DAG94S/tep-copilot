@@ -26,3 +26,14 @@ def cargar(falla: int, prueba: bool = False) -> np.ndarray:
     if datos.shape[1] != N_VARIABLES:
         raise ValueError(f"{nombre}: forma inesperada {datos.shape}")
     return datos
+
+
+def normal_ampliado() -> np.ndarray:
+    """Datos normales ampliados para calibrar: d00.dat (500) + tramo previo a la falla de d01..d21.dat.
+
+    De cada archivo de ENTRENAMIENTO dXX.dat (XX=1..21) se toman las muestras 0..INICIO_FALLA_TRAIN-1
+    (20 por archivo, aún sin falla). Total: 500 + 21*20 = 920 muestras x 52 variables.
+    No usa ningún *_te.dat: el conjunto de prueba queda intacto.
+    """
+    tramos = [cargar(0)] + [cargar(f)[:INICIO_FALLA_TRAIN] for f in range(1, 22)]
+    return np.vstack(tramos)

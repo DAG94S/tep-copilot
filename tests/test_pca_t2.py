@@ -39,10 +39,10 @@ def test_limite_spe_positivo_y_finito(modelo):
     assert np.isfinite(modelo.limite_spe) and modelo.limite_spe > 0
 
 
-@pytest.mark.xfail(strict=True, reason="abierto (STATE 2026-10-12): SPE da 15% de falsas alarmas en d00_te con d00 de entrenamiento")
-def test_spe_pocas_falsas_alarmas_en_normal(modelo):
-    q = pca_t2.spe(modelo, datos.cargar(0, prueba=True))
-    frac = float(np.mean(q > modelo.limite_spe))
+def test_spe_pocas_falsas_alarmas_con_calibracion_ampliada():
+    # Con d00 solo (500 muestras) da 15%; con normal_ampliado (920) 2,6%. Ver STATE.md y data/processed/calibracion.json.
+    m = pca_t2.ajustar(datos.normal_ampliado())
+    frac = float(np.mean(pca_t2.spe(m, datos.cargar(0, prueba=True)) > m.limite_spe))
     assert frac < 0.05, f"fracción SPE > límite en d00_te: {frac}"
 
 
@@ -57,3 +57,9 @@ def test_contribuciones_spe_suman_spe(modelo):
     c = pca_t2.contribuciones_spe(modelo, obs)
     assert c.shape == (52,)
     assert np.allclose(c.sum(), pca_t2.spe(modelo, obs[None, :])[0])
+
+
+def test_normal_ampliado_forma_y_sin_nan():
+    x = datos.normal_ampliado()
+    assert x.shape == (920, 52)
+    assert not np.isnan(x).any()
