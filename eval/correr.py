@@ -12,7 +12,7 @@ from eval import pipeline
 from llm import cliente as cliente_llm
 
 RAIZ_RUNS = datos.RAIZ / "data" / "runs"
-BACKENDS = ("simulado", "AMD_VLLM", "OLLAMA", "GOOGLE")
+BACKENDS = ("simulado", "AMD_TF", "AMD_VLLM", "OLLAMA", "GOOGLE")
 
 
 def _rango(texto: str) -> list[int]:

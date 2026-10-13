@@ -162,3 +162,13 @@ Ver `docs/CHECKLIST.md`.
   · Track Evolus: ANTECEDENTES dice "modelo servido en nuestro propio vLLM en AMD Developer Cloud" → **riesgo**
     hasta que respondan la pregunta de Rajesh.
   · Si Token Factory permite apagar el thinking (`chat_template_kwargs`), depurar y medir directamente ahí.
+- **Token Factory configurado** (manual en `api_documentation.txt`, no versionado). Base `https://developer.amd.com.cn/radeon/api/v1`
+  (OpenAI-compatible), `AMD_TF_*` en `.env`, modelo `Gemma-4-31B-IT`: no piensa por defecto, `response_format` solo
+  `json_object`, `seed` se descarta. Límites: 20 RPM, 8 concurrentes, tope diario 1 (USD/pts) que se reinicia a las
+  16:00 UTC = **11:00 Ecuador** (según `/v1/usage`). Precio Gemma 0,50/3,00 por 1M tokens → ~0,002 por caso.
+- **Esquema externo (verificado por Diego con `scripts/diagnosticar_token_factory.py`):** con `temperature=0` Gemma
+  **degenera** ("```/////…" hasta max_tokens; incluso un saludo se corrompe tras "Hello."). Con temperatura por defecto
+  o 0,7 → JSON válido en 4–6 s. Config elegida: `temperature 0.7` + `AMD_TF_EXTRA_BODY={"response_format":{"type":"json_object"}}`.
+  IDV1 nivel 2 → top-1 correcto en 3/4 variantes. ⇒ No hay brazo determinista (T=0) en Token Factory: todo con k≥5 y voto.
+- El clasificador de permisos de Claude Code bloquea las llamadas al dominio `.com.cn` ("data exfiltration"); Diego
+  ejecuta los scripts con `!` mientras decide si lo autoriza.
