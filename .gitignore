@@ -6,3 +6,4 @@ data/raw/*
 !data/raw/.gitkeep
 .streamlit/secrets.toml
 data/dev/
+api_documentation.txt
