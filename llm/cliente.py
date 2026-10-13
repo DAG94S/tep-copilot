@@ -28,12 +28,14 @@ class ClienteLLM:
     REINTENTOS = 3
 
     def __init__(self, base_url: str, modelo: str, api_key: str | None = None, timeout: float = 120.0,
-                 extra_body: dict | None = None, esperar=time.sleep):
+                 extra_body: dict | None = None, esperar=time.sleep,
+                 soporta_n: bool = True):
         self.base_url = base_url.rstrip("/")
         self.modelo = modelo
         self.api_key = api_key
         self.timeout = timeout
         self.extra_body = extra_body or {}
+        self.soporta_n = soporta_n  # Token Factory (Gemma) rechaza n>1: "Send n separate requests instead"
         self.esperar = esperar
 
     def _post(self, cuerpo: dict) -> dict:
@@ -62,8 +64,10 @@ class ClienteLLM:
         t0 = time.perf_counter()
         textos, crudo, uso = [], [], {"prompt_tokens": 0, "completion_tokens": 0}
         while len(textos) < n:
-            cuerpo = {"model": self.modelo, "messages": mensajes, "n": n - len(textos),
+            cuerpo = {"model": self.modelo, "messages": mensajes,
                       "temperature": temperatura, "max_tokens": max_tokens}
+            if self.soporta_n and n - len(textos) > 1:
+                cuerpo["n"] = n - len(textos)
             if semilla is not None:
                 cuerpo["seed"] = semilla + len(textos)
             if esquema is not None:
@@ -98,7 +102,7 @@ def desde_env(prefijo: str = "AMD_VLLM", ruta_env: str = ".env", **kwargs) -> Cl
     """Construye el cliente desde {prefijo}_ENDPOINT/_API_KEY/_MODEL (entorno primero, luego .env).
 
     Opcionales: {prefijo}_EXTRA_BODY (JSON, p. ej. {"chat_template_kwargs": {"enable_thinking": false}}) y
-    {prefijo}_TIMEOUT (segundos). Los kwargs explícitos tienen prioridad.
+    {prefijo}_TIMEOUT (segundos) y {prefijo}_SOPORTA_N (false si el servidor rechaza n>1). Los kwargs explícitos tienen prioridad.
     """
     archivo = _leer_env(ruta_env)
 
@@ -111,6 +115,8 @@ def desde_env(prefijo: str = "AMD_VLLM", ruta_env: str = ".env", **kwargs) -> Cl
         raise KeyError(f"faltan {prefijo}_ENDPOINT y/o {prefijo}_MODEL en el entorno o en {ruta_env}")
     if valor("EXTRA_BODY") and "extra_body" not in kwargs:
         kwargs["extra_body"] = json.loads(valor("EXTRA_BODY"))
+    if valor("SOPORTA_N") and "soporta_n" not in kwargs:
+        kwargs["soporta_n"] = valor("SOPORTA_N").strip().lower() not in ("false", "0", "no")
     if valor("TIMEOUT") and "timeout" not in kwargs:
         kwargs["timeout"] = float(valor("TIMEOUT"))
     return ClienteLLM(endpoint, modelo, valor("API_KEY"), **kwargs)

@@ -172,3 +172,7 @@ Ver `docs/CHECKLIST.md`.
   IDV1 nivel 2 → top-1 correcto en 3/4 variantes. ⇒ No hay brazo determinista (T=0) en Token Factory: todo con k≥5 y voto.
 - El clasificador de permisos de Claude Code bloquea las llamadas al dominio `.com.cn` ("data exfiltration"); Diego
   ejecuta los scripts con `!` mientras decide si lo autoriza.
+- **Esquema externo (13 oct):** Token Factory/Gemma rechaza `n>1` → 400 "Model Gemma-4-31B-IT with provider self-dploy
+  does not support the n parameter for multiple choices. Send n separate requests instead." Primer intento de campaña
+  `tf_gemma31b_k5_v2` abortado (todo ERROR_LLM, carpeta borrada). Arreglo: `ClienteLLM(soporta_n=False)` /
+  `AMD_TF_SOPORTA_N=false` → k llamadas separadas.

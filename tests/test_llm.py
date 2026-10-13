@@ -199,3 +199,18 @@ def test_desde_env_lee_extra_body_y_timeout(tmp_path, monkeypatch):
     env.write_text('X_ENDPOINT=http://h/v1\nX_MODEL=m\nX_EXTRA_BODY={"chat_template_kwargs": {"enable_thinking": false}}\nX_TIMEOUT=300\n')
     c = desde_env(prefijo="X", ruta_env=str(env))
     assert c.extra_body == {"chat_template_kwargs": {"enable_thinking": False}} and c.timeout == 300.0
+
+
+def test_sin_soporte_de_n_pide_de_a_una(monkeypatch):
+    import llm.cliente as cl
+    cuerpos = []
+
+    class R:
+        status_code = 200
+        def json(self):
+            return {"choices": [{"message": {"content": "{}"}}], "usage": {"prompt_tokens": 1, "completion_tokens": 1}}
+
+    monkeypatch.setattr(cl.requests, "post", lambda url, json, headers, timeout: (cuerpos.append(json), R())[1])
+    c = cl.ClienteLLM("http://h/v1", "m", soporta_n=False)
+    assert len(c.completar([{"role": "user", "content": "x"}], n=3, temperatura=0.7).textos) == 3
+    assert len(cuerpos) == 3 and all("n" not in b for b in cuerpos)
