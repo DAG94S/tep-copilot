@@ -47,3 +47,16 @@ Ver `docs/CHECKLIST.md`.
   No detectadas: IDV 3, 9, 15 y 19. FaultExplainer reporta 3, 4, 9, 15 (usa otros datos: Rieth). **Aún no es una réplica**;
   falta correr con Rieth y fijar el protocolo exacto antes de comparar con su 7/11.
 - Entorno: `.venv` (ignorado por git), `pytest` en `requirements.txt`.
+
+## 2026-10-12 — Kickoff · planta gemela (`twin/`)
+- Crédito AMD: el portal no muestra el estado de la solicitud; solo llega por correo. Sin aprobación a la fecha.
+  Corte del plan B sigue siendo el martes 13.
+- `core/tep.py`: variables, unidades, 15 causas y descripción del proceso **como plantillas** (Downs & Vogel 1993).
+- `twin/gemela.py`: tres niveles anidados de disfraz (semilla 20261012):
+  0 = TEP original · 1 = sin nombre/tags XMEAS/IDV, variables reordenadas, catálogo barajado con códigos ·
+  2 = además componentes (K–U), corrientes de 3 dígitos, equipos (converter, flash drum…) y unidades (°F, psig, lb/h…).
+- **Decisión de protocolo:** la sonda compara niveles 0/1/2 renderizados desde la *misma* plantilla propia, así el contenido
+  físico es idéntico por construcción. La réplica de FaultExplainer es un brazo aparte con su `prompts.py` (MIT) tal cual.
+- Garantía verificada por test: los datos gemelos son afines por columna + permutación → T², primera alarma y contribuciones
+  idénticas a TEP (rtol 1e-6) en IDV 1, 6 y 14. Detector de fugas (regex) bloquea cualquier vista que deje ver TEP.
+- 23 tests en verde.
