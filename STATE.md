@@ -70,3 +70,12 @@ Ver `docs/CHECKLIST.md`.
   Hipótesis sin verificar: 500 muestras no bastan para el percentil 99,9 ni para el subespacio residual.
   Opción: calibrar límites con los tramos normales previos a la falla (índices 0–159) de los 21 `dXX_te`, o con
   FaultFree_Training de Rieth. Test marcado `xfail(strict=True)` hasta resolverlo.
+
+## 2026-10-12 (noche) — Workspace de Evolus creado desde el evento
+- Workspace `TEP_copilot` creado en app.evolus.ai con el código de evento **AMDACT3**: 50.000 créditos, activo hasta el
+  **15 nov 2026, 17:59** (la página de lablab decía 31 oct; vale lo que muestra Evolus). Sin tarjeta.
+- API key guardada en `.env` (ignorado por git, chmod 600). Se mostró en el chat de la sesión → **rotarla**.
+- **Esquema externo (verificado):** `GET /api/v1/ai-tools` solo con `X-ApiKey` → `401 auth.unauthorized`.
+  Según evolus.ai/developers, también hace falta `X-Application-Id` (ID del espacio, en la página "API keys").
+  El chat del agente usa otra base: `https://api.evolus.ai/v1` con `Authorization: Bearer`.
+  Las llamadas a un modelo propio (vLLM) no consumen créditos de Evolus.
