@@ -146,3 +146,19 @@ Ver `docs/CHECKLIST.md`.
   señal física es clara y se apoya en la memoria de TEP cuando es sutil. Medir también tokens de razonamiento por nivel.
 - **Aclaración de presupuesto:** "≤3 GPU-h" es un diseño conservador propio (por si había que pagar), no un límite del
   crédito: $100 ≈ 50 GPU-h. Si llega el crédito: apuntar a ~10–15 GPU-h (k=10, thinking on/off, un segundo modelo).
+
+## 2026-10-13 — CAMBIO DE PLAN: AMD Token Factory en lugar de crédito de GPU
+- Discord, Maharshi [AMD], 13 oct 7:58 (texto pegado por Diego): en el ACT III **AMD no da crédito de GPU**; entrega
+  **1 API key por equipo registrado** en lablab para modelos alojados en GPUs de AMD. Portal:
+  `notebooks.amd.com/tokenfactory` (NO `notebooks.amd.com/hackathon`, que es de la AMD AI League). Sin tarjeta.
+  Manual de usuario dentro del portal. "Gemma is also one of the models hosted".
+- Discord, Rajesh [HACK], 12 oct 23:13 (pregunta, **sin respuesta conocida**): menciona `Gemma-4-31B-IT` y
+  `DeepSeek-V4-Flash` en Token Factory y pregunta (a) si para Evolus cuenta un agente cuyo modelo es el endpoint de Token
+  Factory conectado en "Your models" o hace falta vLLM propio; (b) si el premio de Google exige Gemma o Gemini API.
+- Consecuencias (pendientes de verificar con el manual de Token Factory):
+  · La campaña ya no necesita droplet ni `deploy/` (se conserva por si llega el crédito de $100).
+  · El requisito "corre en AMD" se cumple con Token Factory (hardware AMD), pero se pierde evidencia propia
+    (`rocm-smi`, logs de vLLM, benchmark de MI300X). Medir latencia/tok/s del lado cliente.
+  · Track Evolus: ANTECEDENTES dice "modelo servido en nuestro propio vLLM en AMD Developer Cloud" → **riesgo**
+    hasta que respondan la pregunta de Rajesh.
+  · Si Token Factory permite apagar el thinking (`chat_template_kwargs`), depurar y medir directamente ahí.
