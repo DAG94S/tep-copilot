@@ -115,3 +115,17 @@ Ver `docs/CHECKLIST.md`.
 - **Gemma 4 E2B en Ollama local** (GTX 1060, `OLLAMA_HOST=0.0.0.0` en Windows; se llega por el gateway de WSL):
   ~35 s por caso, agota 1.500 tokens; 2/4 JSON inválidos, 0/4 aciertos. Sirve solo como humo del pipeline.
 - `eval.correr`: nuevos `--max-tokens` y `--dev` (escribe en `data/dev/`, ignorado por git).
+
+## 2026-10-12 (noche) — Réplica FaultExplainer documentada y despliegue AMD preparado
+- `third_party/faultexplainer/` (MIT, commit `2fcfee97…`, pineado en SHA256SUMS) + `docs/REPLICA_FAULTEXPLAINER.md`
+  (protocolo con archivo:línea). Hallazgos: su repo trae **sus propios CSV `fault0..20`** (500 filas, 52 variables);
+  contribuciones en **un solo punto** (6.ª alarma) truncando por componente antes de sumar, escalado `ddof=0`; el LLM ve
+  último valor, media normal y % de cambio (sin z); un solo mensaje user en prosa; acierto = causa o alias en top-3,
+  puntuado a mano. Derivado de su Tabla 1 (confirmar con el PDF): GPT-4o acierta 2, 6, 7, 11, 12, 13, 14 (7/11);
+  o1-preview 1, 2, 6, 7, 8, 11, 12, 13, 14 (9/11); PCA no detecta 3, 4, 9, 15.
+  **Decisión pendiente:** la réplica debe usar SUS CSV y SU fórmula/prompt, no Braatz. Se implementa como brazo aparte.
+- `deploy/` (levantar_vllm.sh, campana.sh, traer_resultados.sh) + `docs/CAMPANA_AMD.md`. Verificado: imagen
+  `vllm/vllm-openai-rocm:v0.31.0` digest `sha256:749f6f3f…b1f`; modelos `google/gemma-4-31B-it` y `google/gemma-4-26B-A4B-it`
+  (Apache-2.0, no gated); thinking se apaga con `chat_template_kwargs.enable_thinking=false` (y flag de servidor
+  `--default-chat-template-kwargs`). **Sin verificar:** fp8 y TRITON_ATTN con Gemma 4 en ROCm (fallback bf16/auto).
+- `desde_env` lee `{PREFIJO}_EXTRA_BODY` (JSON) y `{PREFIJO}_TIMEOUT`. `pytest.ini` limita la colección a `tests/`.

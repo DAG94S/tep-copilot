@@ -191,3 +191,11 @@ def test_extraer_json_ignora_bloques_de_pensamiento():
     assert extraer_json(texto) == {"causes": ["C1"]}
     with pytest.raises(ValueError):
         extraer_json('<thought>cortado por max_tokens {"ok": true}')
+
+
+def test_desde_env_lee_extra_body_y_timeout(tmp_path, monkeypatch):
+    from llm.cliente import desde_env
+    env = tmp_path / ".env"
+    env.write_text('X_ENDPOINT=http://h/v1\nX_MODEL=m\nX_EXTRA_BODY={"chat_template_kwargs": {"enable_thinking": false}}\nX_TIMEOUT=300\n')
+    c = desde_env(prefijo="X", ruta_env=str(env))
+    assert c.extra_body == {"chat_template_kwargs": {"enable_thinking": False}} and c.timeout == 300.0

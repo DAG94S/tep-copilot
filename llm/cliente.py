@@ -1,4 +1,5 @@
 """Cliente para endpoints OpenAI-compatibles (vLLM en AMD, Ollama local) y un simulado para tests y replay sin GPU."""
+import json
 import os
 import time
 from dataclasses import dataclass, field
@@ -94,7 +95,11 @@ def _leer_env(ruta: str) -> dict[str, str]:
 
 
 def desde_env(prefijo: str = "AMD_VLLM", ruta_env: str = ".env", **kwargs) -> ClienteLLM:
-    """Construye el cliente desde {prefijo}_ENDPOINT/_API_KEY/_MODEL (entorno primero, luego .env)."""
+    """Construye el cliente desde {prefijo}_ENDPOINT/_API_KEY/_MODEL (entorno primero, luego .env).
+
+    Opcionales: {prefijo}_EXTRA_BODY (JSON, p. ej. {"chat_template_kwargs": {"enable_thinking": false}}) y
+    {prefijo}_TIMEOUT (segundos). Los kwargs explícitos tienen prioridad.
+    """
     archivo = _leer_env(ruta_env)
 
     def valor(sufijo: str) -> str | None:
@@ -104,6 +109,10 @@ def desde_env(prefijo: str = "AMD_VLLM", ruta_env: str = ".env", **kwargs) -> Cl
     endpoint, modelo = valor("ENDPOINT"), valor("MODEL")
     if not endpoint or not modelo:
         raise KeyError(f"faltan {prefijo}_ENDPOINT y/o {prefijo}_MODEL en el entorno o en {ruta_env}")
+    if valor("EXTRA_BODY") and "extra_body" not in kwargs:
+        kwargs["extra_body"] = json.loads(valor("EXTRA_BODY"))
+    if valor("TIMEOUT") and "timeout" not in kwargs:
+        kwargs["timeout"] = float(valor("TIMEOUT"))
     return ClienteLLM(endpoint, modelo, valor("API_KEY"), **kwargs)
 
 
