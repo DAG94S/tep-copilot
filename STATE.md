@@ -139,3 +139,10 @@ Ver `docs/CHECKLIST.md`.
   por ahora. Gemma casi siempre da UNA sola causa → la métrica top-3 queda castigada.
 - **Cambio de prompt (v2):** regla 1 → "List exactly 3 different causes…" (alineado con el top-3 de FaultExplainer).
   dev2 corre con la key de pago, un proceso por nivel (`data/dev/google_31b_dev2_n{0,1,2}`).
+- **dev2 final** (prompt v2, k=1, Gemini de pago con thinking forzado; reintentos con max_tokens 16000; NO reportable):
+  top-3 nivel 0/1/2 = **11/12, 8/12, 7/11**; top-1 = 6/12, 4/12, 3/11. Caen en la gemela: IDV5 (✅→❌ en n1 y n2,
+  siempre [7,1,2]), IDV13 (✅→❌), IDV14 (🟡→❌, n2 BLOQUEADO por la compuerta). IDV2 n2: ReadTimeout 3×300 s (no responde).
+  Los casos que se cuelgan pensando son siempre disfrazados. Hipótesis para la campaña AMD (k≥5): Gemma razona cuando la
+  señal física es clara y se apoya en la memoria de TEP cuando es sutil. Medir también tokens de razonamiento por nivel.
+- **Aclaración de presupuesto:** "≤3 GPU-h" es un diseño conservador propio (por si había que pagar), no un límite del
+  crédito: $100 ≈ 50 GPU-h. Si llega el crédito: apuntar a ~10–15 GPU-h (k=10, thinking on/off, un segundo modelo).
