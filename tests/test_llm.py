@@ -183,3 +183,11 @@ def test_humo_simulado_parseo_compuerta():
     v = compuerta.verificar(diag, tags=[x.tag for x in vista.variables],
                             codigos={c.codigo for c in vista.catalogo}, z=z)
     assert v.estado == "VERIFICADO"
+
+
+def test_extraer_json_ignora_bloques_de_pensamiento():
+    from llm.parseo import extraer_json
+    texto = '<thought>The user wants {"ok": true} ...</thought>\n{"causes": ["C1"]}'
+    assert extraer_json(texto) == {"causes": ["C1"]}
+    with pytest.raises(ValueError):
+        extraer_json('<thought>cortado por max_tokens {"ok": true}')

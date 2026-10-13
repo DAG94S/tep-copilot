@@ -104,3 +104,14 @@ Ver `docs/CHECKLIST.md`.
   El test xfail se sustituye por uno sobre la calibración ampliada.
 - `evolus/cliente.py` + `evolus/replay.py`: reintentos, throttle 1 s, `ErrorEvolus` con errorCode/traceId, grabación JSONL
   sin cabeceras y `ClienteReplay` para la demo sin GPU. Esquemas de workflow (body de execute, campo de estado) **sin verificar**.
+
+## 2026-10-12 (noche) — Primeras corridas reales (DEPURACIÓN, no reportables; `data/dev/`, no versionado)
+- **Gemma 4 31B vía API de Gemini** (`GOOGLE_*` en `.env`): IDV1 e IDV6 aciertan top-1 en nivel 0 **y** nivel 2
+  (compuerta: 2 VERIFICADO, 2 PARCIAL). 67–109 s por llamada, ~2.100 tokens de prompt.
+- **Esquema externo (Gemini OpenAI-compat):** rechaza `seed` (400 "Unknown name seed") → `--semilla` ahora es opcional.
+  No permite apagar el *thinking* de Gemma 4: `reasoning_effort` y `thinking_budget` → 400 "Thinking budget is not
+  supported for this model". La salida trae `<thought>…</thought>` → `llm/parseo.py` lo descarta antes de extraer el JSON.
+  **Desviación de protocolo:** en Gemini el modelo piensa; en la campaña de vLLM irá con `enable_thinking=False`.
+- **Gemma 4 E2B en Ollama local** (GTX 1060, `OLLAMA_HOST=0.0.0.0` en Windows; se llega por el gateway de WSL):
+  ~35 s por caso, agota 1.500 tokens; 2/4 JSON inválidos, 0/4 aciertos. Sirve solo como humo del pipeline.
+- `eval.correr`: nuevos `--max-tokens` y `--dev` (escribe en `data/dev/`, ignorado por git).

@@ -31,7 +31,7 @@ def _leer(ruta: Path) -> list[dict]:
 def correr(campana: str, backend: str, fallas: list[int], niveles: list[int], k: int = 1, temperatura: float = 0.0,
            semilla: int | None = 0, calibracion: str = "d00", estadistico: str = "t2", usar_esquema: bool = True,
            fusionar_system: bool = False, continuar: bool = False, raiz_runs: Path = RAIZ_RUNS,
-           argumentos: dict | None = None, cliente=None) -> list[dict]:
+           argumentos: dict | None = None, cliente=None, max_tokens: int = 800) -> list[dict]:
     """Corre la campaña y devuelve todos los registros de la carpeta."""
     carpeta = raiz_runs / campana
     ruta_reg, ruta_man = carpeta / "registros.jsonl", carpeta / "manifiesto.json"
@@ -60,7 +60,7 @@ def correr(campana: str, backend: str, fallas: list[int], niveles: list[int], k:
                     reg = pipeline.registro_no_detectado(caso)
                 else:
                     c = pipeline.ClienteEco(caso) if backend == "simulado" else cliente
-                    reg = pipeline.diagnosticar(caso, c, k, temperatura, semilla, usar_esquema)
+                    reg = pipeline.diagnosticar(caso, c, k, temperatura, semilla, usar_esquema, max_tokens)
                 f.write(json.dumps(reg, ensure_ascii=False) + "\n")
                 f.flush()
     manifiesto["fin"] = datetime.now(timezone.utc).isoformat()
@@ -94,16 +94,19 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--niveles", default="0,1,2")
     p.add_argument("--k", type=int, default=1)
     p.add_argument("--temperatura", type=float, default=0.0)
-    p.add_argument("--semilla", type=int, default=0)
+    p.add_argument("--semilla", type=int, default=None, help="la API de Gemini no acepta seed")
     p.add_argument("--calibracion", default="d00", choices=("d00", "ampliado"))
     p.add_argument("--estadistico", default="t2", choices=("t2", "spe", "cualquiera"))
     p.add_argument("--sin-esquema", action="store_true")
     p.add_argument("--fusionar-system", action="store_true")
     p.add_argument("--continuar", action="store_true")
+    p.add_argument("--max-tokens", type=int, default=800)
+    p.add_argument("--dev", action="store_true", help="guarda en data/dev (no versionado): corridas de depuración")
     a = p.parse_args(argv)
     registros = correr(a.campana, a.backend, _rango(a.fallas), _rango(a.niveles), a.k, a.temperatura, a.semilla,
                        a.calibracion, a.estadistico, not a.sin_esquema, a.fusionar_system, a.continuar,
-                       argumentos=vars(a))
+                       raiz_runs=RAIZ_RUNS.parent / "dev" if a.dev else RAIZ_RUNS,
+                       argumentos=vars(a), max_tokens=a.max_tokens)
     print(tabla(registros))
 
 

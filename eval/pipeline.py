@@ -103,13 +103,14 @@ def registro_no_detectado(caso: Caso) -> dict:
 
 
 def diagnosticar(caso: Caso, cliente, k: int = 1, temperatura: float = 0.0, semilla: int | None = None,
-                 usar_esquema: bool = True) -> dict:
+                 usar_esquema: bool = True, max_tokens: int = 800) -> dict:
     """Pide k diagnósticos al LLM, los pasa por la compuerta y puntúa con el mapeo privado. Devuelve un registro JSON."""
     reg = _base_registro(caso)
-    reg |= {"parametros": {"k": k, "temperatura": temperatura, "semilla": semilla, "usar_esquema": usar_esquema},
+    reg |= {"parametros": {"k": k, "temperatura": temperatura, "semilla": semilla, "usar_esquema": usar_esquema,
+                                "max_tokens": max_tokens},
             "sha256_mensajes": hashlib.sha256(json.dumps(caso.mensajes, sort_keys=True).encode()).hexdigest()}
     try:
-        resp = cliente.completar(caso.mensajes, n=k, temperatura=temperatura, semilla=semilla,
+        resp = cliente.completar(caso.mensajes, n=k, temperatura=temperatura, semilla=semilla, max_tokens=max_tokens,
                                  esquema=esquema_json() if usar_esquema else None)
     except ErrorLLM as e:
         return reg | {"estado": "ERROR_LLM", "error": str(e)}

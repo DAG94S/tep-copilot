@@ -9,8 +9,18 @@ from core.esquema import Diagnostico
 _CERCO = re.compile(r"```(?:json)?\s*(.*?)```", re.DOTALL | re.IGNORECASE)
 
 
+# Bloques de razonamiento que algunos endpoints no permiten apagar (Gemma 4 en la API de Gemini). Si el bloque no
+# se cierra (se cortó por max_tokens), todo lo que sigue es razonamiento y no hay respuesta.
+_PENSAMIENTO = re.compile(r"<(thought|think)>.*?(?:</\1>|$)", re.DOTALL)
+
+
+def quitar_pensamiento(texto: str) -> str:
+    return _PENSAMIENTO.sub("", texto)
+
+
 def extraer_json(texto: str) -> dict:
-    """Primer objeto {...} balanceado del texto (sin cercos de código). ValueError si no hay JSON."""
+    """Primer objeto {...} balanceado de la respuesta, sin razonamiento ni cercos de código. ValueError si no hay JSON."""
+    texto = quitar_pensamiento(texto)
     m = _CERCO.search(texto)
     if m and "{" in m.group(1):
         texto = m.group(1)
