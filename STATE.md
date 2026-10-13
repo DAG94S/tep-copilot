@@ -129,3 +129,13 @@ Ver `docs/CHECKLIST.md`.
   (Apache-2.0, no gated); thinking se apaga con `chat_template_kwargs.enable_thinking=false` (y flag de servidor
   `--default-chat-template-kwargs`). **Sin verificar:** fp8 y TRITON_ATTN con Gemma 4 en ROCm (fallback bf16/auto).
 - `desde_env` lee `{PREFIJO}_EXTRA_BODY` (JSON) y `{PREFIJO}_TIMEOUT`. `pytest.ini` limita la colección a `tests/`.
+
+## 2026-10-12 (noche) — Depuración 1 con Gemini gratis (interrumpida en 31/45) y cambio de prompt
+- Capa gratuita de Gemini: 4 errores de servidor (500 y ReadTimeout a 120 s) en 20 casos; latencias de 51 a 243 s.
+  Key de pago (proyecto con facturación de Diego): 2/2 llamadas en ~52 s sin errores → `GOOGLE_API_KEY`
+  (la gratuita queda como `GOOGLE_FREE_API_KEY`), `GOOGLE_TIMEOUT=300`.
+- Resultado parcial dev1 (prompt "1 to 3 causes", k=1, sin reportar): aciertos top-1 en IDV 1, 2, 4, 6, 7 en todos
+  los niveles disponibles; errores **idénticos entre niveles** (IDV5→7, IDV8→7, IDV10→1, IDV11→4). Sin caída en la gemela
+  por ahora. Gemma casi siempre da UNA sola causa → la métrica top-3 queda castigada.
+- **Cambio de prompt (v2):** regla 1 → "List exactly 3 different causes…" (alineado con el top-3 de FaultExplainer).
+  dev2 corre con la key de pago, un proceso por nivel (`data/dev/google_31b_dev2_n{0,1,2}`).

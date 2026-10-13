@@ -9,7 +9,7 @@ SISTEMA = (
     "You receive a process description, a table of process variables, the variables that deviate most at the moment "
     "an anomaly was detected, and a catalog of possible root causes.\n"
     "Rules:\n"
-    "1. Choose 1 to 3 causes, only by their catalog code, from most to least probable.\n"
+    "1. List exactly 3 different causes, only by their catalog code, ranked from most to least probable.\n"
     "2. Cite 1 to 6 evidence sensors by their exact tag, each with direction \"up\" or \"down\" relative to normal.\n"
     "3. The explanation must describe what is happening and why. Never order actions and never use control "
     "imperatives (open, close, set, start, stop, adjust, increase, decrease...).\n"
