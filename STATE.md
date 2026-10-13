@@ -79,3 +79,8 @@ Ver `docs/CHECKLIST.md`.
   Según evolus.ai/developers, también hace falta `X-Application-Id` (ID del espacio, en la página "API keys").
   El chat del agente usa otra base: `https://api.evolus.ai/v1` con `Authorization: Bearer`.
   Las llamadas a un modelo propio (vLLM) no consumen créditos de Evolus.
+- Con `X-ApiKey` + `X-Application-Id` → `GET /api/v1/ai-tools` 200: 11 herramientas (doc-structure, translate, summarize,
+  email, rewrite, simplify, anonymize, tables, minutes, sentiment, compare). `GET /v1/models` (Bearer) 200, sin agentes aún.
+- **Coste medido:** `POST /api/v1/ai-tools/translate/run` con body `{"text", "options": {"target": "es", "style"}}`
+  → 200 en 3,0 s, `creditsConsumed` = **1,358** por una frase de 85 caracteres (`data/runs/evolus/prueba_translate_2026-10-12.json`).
+  Con 50.000 créditos el presupuesto de Evolus no es una restricción.

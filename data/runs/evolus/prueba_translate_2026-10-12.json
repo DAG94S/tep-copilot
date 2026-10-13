@@ -1,0 +1,19 @@
+{
+ "peticion": {
+  "text": "Root cause: converter coolant inlet temperature step. Evidence verified on 3 sensors.",
+  "options": {
+   "target": "es",
+   "style": "natural"
+  }
+ },
+ "status": 200,
+ "segundos": 2.97,
+ "respuesta": {
+  "tool": "translate",
+  "output": "Causa raíz: cambio escalonado de la temperatura de entrada del refrigerante del convertidor. Evidencia verificada en 3 sensores.",
+  "totalTokenCount": null,
+  "creditsConsumed": 1.357958,
+  "sourceText": null,
+  "truncated": false
+ }
+}
