@@ -33,3 +33,27 @@ def test_contribuciones_no_negativas(modelo):
     x = datos.cargar(1, prueba=True)
     c = pca_t2.contribuciones(modelo, x[datos.INICIO_FALLA_TEST + 20])
     assert c.shape == (52,) and (c >= 0).all() and c.sum() > 0
+
+
+def test_limite_spe_positivo_y_finito(modelo):
+    assert np.isfinite(modelo.limite_spe) and modelo.limite_spe > 0
+
+
+@pytest.mark.xfail(strict=True, reason="abierto (STATE 2026-10-12): SPE da 15% de falsas alarmas en d00_te con d00 de entrenamiento")
+def test_spe_pocas_falsas_alarmas_en_normal(modelo):
+    q = pca_t2.spe(modelo, datos.cargar(0, prueba=True))
+    frac = float(np.mean(q > modelo.limite_spe))
+    assert frac < 0.05, f"fracción SPE > límite en d00_te: {frac}"
+
+
+def test_spe_detecta_idv1_despues_de_la_falla(modelo):
+    i = pca_t2.primera_alarma(modelo, datos.cargar(1, prueba=True), estadistico="spe")
+    assert i is not None and i >= datos.INICIO_FALLA_TEST
+
+
+def test_contribuciones_spe_suman_spe(modelo):
+    x = datos.cargar(1, prueba=True)
+    obs = x[datos.INICIO_FALLA_TEST + 20]
+    c = pca_t2.contribuciones_spe(modelo, obs)
+    assert c.shape == (52,)
+    assert np.allclose(c.sum(), pca_t2.spe(modelo, obs[None, :])[0])

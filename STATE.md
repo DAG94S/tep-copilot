@@ -60,3 +60,13 @@ Ver `docs/CHECKLIST.md`.
 - Garantía verificada por test: los datos gemelos son afines por columna + permutación → T², primera alarma y contribuciones
   idénticas a TEP (rtol 1e-6) en IDV 1, 6 y 14. Detector de fugas (regex) bloquea cualquier vista que deje ver TEP.
 - 23 tests en verde.
+- `core/compuerta.py` + `core/esquema.py`: contrato JSON (claves en inglés, sin campo de acciones), verificación de causas
+  contra el catálogo, órdenes de control (regex de imperativos; lo descriptivo pasa), evidencia con |z| mediano ≥ 3 y signo
+  coherente, voto entre k muestras (acuerdo < 60% → INCIERTO). Estados: VERIFICADO / PARCIAL / BLOQUEADO / INCIERTO.
+- `core/pca_t2.py`: SPE con límite de Jackson & Mudholkar (extensión nuestra; el protocolo FaultExplainer sigue en T²).
+  `core/alarmas.py`: límites por percentil 99,9 de d00, solo XMEAS, retardo 2, inundación EEMUA (>10 en 10 min).
+- **Problema abierto (medido):** con d00 (500 muestras) como entrenamiento, SPE > límite en el **15%** de d00_te
+  (límite 11,61) y hay **178** eventos de alarma en d00_te. d01_te sí inunda (máx. 12 en 10 min; 2 antes de la falla).
+  Hipótesis sin verificar: 500 muestras no bastan para el percentil 99,9 ni para el subespacio residual.
+  Opción: calibrar límites con los tramos normales previos a la falla (índices 0–159) de los 21 `dXX_te`, o con
+  FaultFree_Training de Rieth. Test marcado `xfail(strict=True)` hasta resolverlo.

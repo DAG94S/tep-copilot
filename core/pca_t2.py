@@ -4,6 +4,10 @@ Protocolo replicado: PCA con 90% de varianza acumulada sobre datos normales esta
 límite T² con α=0,01 (distribución F) y alarma tras 6 observaciones consecutivas sobre el límite.
 La contribución por variable es la de Kourti & MacGregor (1996) para T².
 
+Extensión nuestra (no parte del protocolo de FaultExplainer): estadístico SPE (Q) sobre el
+subespacio residual, con límite de Jackson & Mudholkar (1979) y el mismo α. `primera_alarma`
+usa T² por defecto, que es el protocolo replicado.
+
 Este módulo es determinista: no usa ningún LLM.
 """
 from dataclasses import dataclass
@@ -24,6 +28,8 @@ class ModeloPCA:
     autovalores: np.ndarray  # (A,)
     limite_t2: float
     n_entrenamiento: int
+    autovalores_residuales: np.ndarray  # autovalores de las componentes NO retenidas
+    limite_spe: float
 
     @property
     def componentes(self) -> int:
@@ -42,7 +48,20 @@ def ajustar(normal: np.ndarray, varianza: float = VARIANZA, alfa: float = ALFA) 
     acumulada = np.cumsum(autoval) / autoval.sum()
     a = int(np.searchsorted(acumulada, varianza) + 1)
     limite = a * (n**2 - 1) / (n * (n - a)) * stats.f.ppf(1 - alfa, a, n - a)
-    return ModeloPCA(media, desv, vt[:a].T, autoval[:a], float(limite), n)
+    residuales = autoval[a:]
+    return ModeloPCA(media, desv, vt[:a].T, autoval[:a], float(limite), n,
+                     residuales, _limite_spe(residuales, alfa))
+
+
+def _limite_spe(residuales: np.ndarray, alfa: float) -> float:
+    """Límite Q de Jackson & Mudholkar (1979) a partir de los autovalores residuales."""
+    if residuales.size == 0:
+        return 0.0
+    th1, th2, th3 = (np.sum(residuales**i) for i in (1, 2, 3))
+    h0 = 1 - 2 * th1 * th3 / (3 * th2**2)
+    c = stats.norm.ppf(1 - alfa)
+    base = c * np.sqrt(2 * th2 * h0**2) / th1 + 1 + th2 * h0 * (h0 - 1) / th1**2
+    return float(th1 * base ** (1 / h0))
 
 
 def t2(modelo: ModeloPCA, x: np.ndarray) -> np.ndarray:
@@ -52,9 +71,27 @@ def t2(modelo: ModeloPCA, x: np.ndarray) -> np.ndarray:
     return np.sum(scores**2 / modelo.autovalores, axis=1)
 
 
-def primera_alarma(modelo: ModeloPCA, x: np.ndarray, consecutivas: int = CONSECUTIVAS):
-    """Índice de la observación que cumple `consecutivas` alarmas seguidas (None si no hay)."""
-    sobre = t2(modelo, x) > modelo.limite_t2
+def spe(modelo: ModeloPCA, x: np.ndarray) -> np.ndarray:
+    """SPE (Q) de cada observación (m, p) → (m,): ‖z − z·P·Pᵀ‖²."""
+    z = (x - modelo.media) / modelo.desv
+    resid = z - z @ modelo.cargas @ modelo.cargas.T
+    return np.sum(resid**2, axis=1)
+
+
+def primera_alarma(modelo: ModeloPCA, x: np.ndarray, consecutivas: int = CONSECUTIVAS,
+                   estadistico: str = "t2"):
+    """Índice de la observación que cumple `consecutivas` alarmas seguidas (None si no hay).
+
+    `estadistico`: "t2" (protocolo FaultExplainer), "spe" o "cualquiera" (T² o SPE sobre su límite).
+    """
+    if estadistico == "t2":
+        sobre = t2(modelo, x) > modelo.limite_t2
+    elif estadistico == "spe":
+        sobre = spe(modelo, x) > modelo.limite_spe
+    elif estadistico == "cualquiera":
+        sobre = (t2(modelo, x) > modelo.limite_t2) | (spe(modelo, x) > modelo.limite_spe)
+    else:
+        raise ValueError(f"estadistico desconocido: {estadistico!r}")
     racha = 0
     for i, flag in enumerate(sobre):
         racha = racha + 1 if flag else 0
@@ -69,3 +106,9 @@ def contribuciones(modelo: ModeloPCA, observacion: np.ndarray) -> np.ndarray:
     scores = z @ modelo.cargas
     c = (scores / modelo.autovalores) * modelo.cargas * z[:, None]
     return np.clip(c.sum(axis=1), 0.0, None)
+
+
+def contribuciones_spe(modelo: ModeloPCA, observacion: np.ndarray) -> np.ndarray:
+    """Contribución de cada variable al SPE de una observación (p,): residuo al cuadrado."""
+    z = (observacion - modelo.media) / modelo.desv
+    return (z - z @ modelo.cargas @ modelo.cargas.T) ** 2
