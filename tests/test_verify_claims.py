@@ -111,3 +111,55 @@ def test_alarmas_por_tarjeta_mediana(tmp_path):
     (tmp_path / "al.json").write_text(json.dumps(aux), encoding="utf-8")
     res = vc.verificar_afirmaciones(tmp_path, _un_claim(tmp_path, "alarmas_por_tarjeta_mediana", "3.5", auxiliar="al.json"))
     assert res[0][1] == "FALLA"
+
+
+# ---------- fuente-lista, pareado/McNemar y bootstrap por clusters ----------
+
+def _rieth(falla, corrida, nivel, top3, estado="VERIFICADO"):
+    return {"falla": falla, "corrida": corrida, "nivel": nivel, "estado": estado,
+            "acierto_top1": False, "acierto_top3": top3}
+
+
+def test_fuente_lista_concatena_y_falla_si_falta(tmp_path):
+    _escribir(tmp_path / "a.jsonl", [_reg(1, 0, "VERIFICADO", True, True)])
+    _escribir(tmp_path / "b.jsonl", [_reg(2, 0, "VERIFICADO", False, True), _reg(3, 0, "VERIFICADO", False, False)])
+    c = {"id": "campana_v2_n0_top3", "valor": "2/3", "fuente": ["a.jsonl", "b.jsonl"], "descripcion": "x"}
+    ruta = tmp_path / "claims.json"
+    ruta.write_text(json.dumps([c]), encoding="utf-8")
+    assert vc.verificar_afirmaciones(tmp_path, ruta)[0][1] == "OK"
+    c["fuente"] = ["a.jsonl", "falta.jsonl"]
+    ruta.write_text(json.dumps([c]), encoding="utf-8")
+    res = vc.verificar_afirmaciones(tmp_path, ruta)
+    assert res[0][1] == "FALLA" and "falta.jsonl" in res[0][3]
+
+
+def _pareado_sintetico():
+    # 3 fallas x 2 corridas. n0 acierta en 5 de 6; n2 en 2 de 6. Discordantes: 3 (solo n0) vs 0.
+    n0 = {(1, 1): 1, (1, 2): 1, (2, 1): 1, (2, 2): 1, (3, 1): 1, (3, 2): 0}
+    n2 = {(1, 1): 1, (1, 2): 0, (2, 1): 0, (2, 2): 0, (3, 1): 1, (3, 2): 0}
+    return ([_rieth(f, c, 0, bool(v)) for (f, c), v in n0.items()] +
+            [_rieth(f, c, 2, bool(v)) for (f, c), v in n2.items()])
+
+
+def test_pareado_y_mcnemar(tmp_path):
+    regs = _pareado_sintetico()
+    assert vc.METRICAS["rieth_top3_pareado_n0_n2"](regs) == "3 vs 0"
+    assert vc.METRICAS["rieth_top3_mcnemar_p_n0_n2"](regs) == "0.25"      # binomial exacta 2*0.5^3
+    # un caso no evaluable en n2 sale del emparejamiento
+    regs.append(_rieth(4, 1, 0, True))
+    regs.append(_rieth(4, 1, 2, False, "ERROR_LLM"))
+    assert vc.METRICAS["rieth_top3_pareado_n0_n2"](regs) == "3 vs 0"
+
+
+def test_bootstrap_por_clusters_determinista():
+    par = vc._pareado(_pareado_sintetico(), 0, 2)
+    r1, r2 = vc.caida_bootstrap(par), vc.caida_bootstrap(par)
+    assert r1 == r2                                   # misma semilla, mismo resultado
+    caida, lo, hi = r1
+    assert caida == 50.0                              # 3 de 6 casos
+    assert lo <= caida <= hi
+    assert lo >= 0 and hi <= 100                      # la caída por falla va de 0 a 100 pp
+    # sin variación entre fallas, el IC colapsa en el punto
+    plano = [(f, True, False) for f in (1, 2, 3) for _ in range(2)]
+    assert vc.caida_bootstrap(plano) == (100.0, 100.0, 100.0)
+    assert vc.METRICAS["rieth_top3_caida_ic95_n0_n2"](_pareado_sintetico()).startswith("50 pp [")

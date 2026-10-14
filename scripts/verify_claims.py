@@ -1,7 +1,7 @@
 """Verifica la integridad de los datos (SHA256SUMS) y las afirmaciones cuantitativas (claims.json).
 
 Cada afirmación de `claims.json` ({id, valor, fuente, descripcion[, reintentos][, auxiliar]}) se RECALCULA con código desde su `fuente`
-(JSONL pineado) y se compara con `valor`. Si trae `reintentos` (JSONL), cada INVALIDO de la fuente se sustituye por el reintento de su (falla, nivel). Si trae `auxiliar` (JSON o JSONL), la métrica lo recibe como segundo argumento (FALLA si falta). Nada se copia: si el dato cambia, la afirmación falla.
+(JSONL pineado, o lista de JSONL que se concatenan) y se compara con `valor`. Si trae `reintentos` (JSONL), cada INVALIDO de la fuente se sustituye por el reintento de su (falla, nivel). Si trae `auxiliar` (JSON o JSONL), la métrica lo recibe como segundo argumento (FALLA si falta). Nada se copia: si el dato cambia, la afirmación falla.
 
 Uso:
     python3 scripts/verify_claims.py
@@ -13,6 +13,7 @@ import re
 import statistics
 import sys
 from pathlib import Path
+
 
 RAIZ = Path(__file__).resolve().parent.parent
 NO_VERSIONADO = "data/raw/"          # AGENTS.md regla 2: no se versiona; puede faltar en un clon
@@ -144,6 +145,79 @@ def combinar_reintentos(regs: list[dict], reintentos: list[dict]) -> list[dict]:
     return [por_caso.get((r["falla"], r["nivel"]), r) if r["estado"] == "INVALIDO" else r for r in regs]
 
 
+# ---------- campañas Rieth (10 corridas por falla) y Braatz con razonamiento ----------
+
+EXCLUIDOS = ("NO_DETECTADO", "INVALIDO", "ERROR_LLM")
+
+
+def _ev(regs: list[dict], nivel: int) -> list[dict]:
+    return [r for r in regs if r["nivel"] == nivel and r["estado"] not in EXCLUIDOS]
+
+
+def _top_ev(regs: list[dict], nivel: int, clave: str) -> str:
+    ev = _ev(regs, nivel)
+    return _fraccion(sum(bool(r[clave]) for r in ev), len(ev))
+
+
+def _pareado(regs: list[dict], a: int, b: int, clave: str = "acierto_top3"):
+    """Casos emparejados por (falla, corrida), evaluables en ambos niveles: [(falla, acierto_a, acierto_b)]."""
+    pa = {(r["falla"], r["corrida"]): bool(r[clave]) for r in _ev(regs, a)}
+    pb = {(r["falla"], r["corrida"]): bool(r[clave]) for r in _ev(regs, b)}
+    return [(k[0], pa[k], pb[k]) for k in sorted(pa.keys() & pb.keys())]
+
+
+def _discordantes(par) -> tuple[int, int]:
+    """(solo acierta el primer nivel, solo acierta el segundo)."""
+    return sum(x and not y for _, x, y in par), sum(y and not x for _, x, y in par)
+
+
+def _pareado_txt(a: int, b: int):
+    def f(regs):
+        d1, d2 = _discordantes(_pareado(regs, a, b))
+        return f"{d1} vs {d2}"
+    return f
+
+
+def _mcnemar_p(a: int, b: int):
+    def f(regs):
+        from scipy.stats import binomtest  # perezoso
+        d1, d2 = _discordantes(_pareado(regs, a, b))
+        return f"{binomtest(d1, d1 + d2, 0.5).pvalue:.2f}" if d1 + d2 else "1.00"
+    return f
+
+
+def caida_bootstrap(par, replicas: int = 5000, semilla: int = 0) -> tuple[float, float, float]:
+    """Caída media (primer nivel menos segundo, en puntos porcentuales) con IC95 bootstrap por clusters de falla:
+    se remuestrean las fallas con reemplazo y se promedia sobre todos los casos de las fallas elegidas.
+    Devuelve (caída, p2.5, p97.5). Determinista (default_rng(semilla))."""
+    import numpy as np  # perezoso: solo las métricas Rieth lo necesitan
+    fallas = sorted({f for f, _, _ in par})
+    dif = np.array([[int(x) - int(y) for g, x, y in par if g == f] for f in fallas], dtype=object)
+    sumas = np.array([sum(d) for d in dif], dtype=float)
+    cuentas = np.array([len(d) for d in dif], dtype=float)
+    rng = np.random.default_rng(semilla)
+    idx = rng.integers(0, len(fallas), size=(replicas, len(fallas)))
+    est = sumas[idx].sum(axis=1) / cuentas[idx].sum(axis=1) * 100
+    return float(sumas.sum() / cuentas.sum() * 100), float(np.percentile(est, 2.5)), float(np.percentile(est, 97.5))
+
+
+def _caida_txt(a: int, b: int):
+    def f(regs):
+        c, lo, hi = caida_bootstrap(_pareado(regs, a, b))
+        return f"{c:.0f} pp [{lo:.0f}, {hi:.0f}]"
+    return f
+
+
+def _idv8_top3(regs: list[dict]) -> str:
+    return "/".join(str(sum(bool(r["acierto_top3"]) for r in _ev(regs, n) if r["falla"] == 8)) for n in range(3))
+
+
+def _por_nivel_mediana(valor, redondeo=lambda x: f"{x:.0f}"):
+    def f(regs):
+        return " / ".join(redondeo(_mediana([valor(r) for r in _ev(regs, n)])) for n in range(3))
+    return f
+
+
 METRICAS = {
     "replica_gemma_top3": _replica_top3,
     "replica_gemma_fallas": lambda regs: _lista(r["falla"] for r in regs if r["detectada"] and not r.get("acierto_top3")),
@@ -160,6 +234,20 @@ METRICAS = {
     "latencia_p50_s": _latencia(50),
     "latencia_p95_s": _latencia(95),
     "tokens_por_caso_mediana": _tokens_por_caso_mediana,
+    **{f"rieth_n{n}_top1": (lambda regs, n=n: _top_ev(regs, n, "acierto_top1")) for n in range(3)},
+    **{f"rieth_n{n}_top3": (lambda regs, n=n: _top_ev(regs, n, "acierto_top3")) for n in range(3)},
+    "rieth_top3_pareado_n0_n2": _pareado_txt(0, 2),
+    "rieth_top3_mcnemar_p_n0_n2": _mcnemar_p(0, 2),
+    "rieth_top3_caida_ic95_n0_n2": _caida_txt(0, 2),
+    "rieth_top3_pareado_n0_n1": _pareado_txt(0, 1),
+    "rieth_top3_mcnemar_p_n0_n1": _mcnemar_p(0, 1),
+    "rieth_top3_caida_ic95_n0_n1": _caida_txt(0, 1),
+    "rieth_idv8_top3": _idv8_top3,
+    **{f"think_n{n}_top1": (lambda regs, n=n: _top_ev(regs, n, "acierto_top1")) for n in range(3)},
+    **{f"think_n{n}_top3": (lambda regs, n=n: _top_ev(regs, n, "acierto_top3")) for n in range(3)},
+    # mediana por caso; las medianas con .5 se truncan (16750.5 -> 16750) para no depender del redondeo bancario
+    "think_razonamiento_mediana": _por_nivel_mediana(lambda r: r["uso"]["reasoning_tokens"], lambda x: f"{int(x)}"),
+    "think_segundos_mediana": _por_nivel_mediana(lambda r: r["segundos"]),
     "evolus_latencia_max_s": lambda regs: f"{max(r['segundos'] for r in regs):.0f} s",
 }
 # métricas que además reciben el archivo `auxiliar` del claim
@@ -187,12 +275,13 @@ def verificar_afirmaciones(raiz: Path, claims_path: Path) -> list[tuple[str, str
         if f is None:
             res.append((c["id"], "FALLA", esperado, "id sin métrica definida"))
             continue
-        fuente = raiz / c["fuente"]
-        if not fuente.exists():
-            res.append((c["id"], "FALLA", esperado, f"fuente ausente: {c['fuente']}"))
+        fuentes = c["fuente"] if isinstance(c["fuente"], list) else [c["fuente"]]
+        ausente = next((x for x in fuentes if not (raiz / x).exists()), None)
+        if ausente is not None:
+            res.append((c["id"], "FALLA", esperado, f"fuente ausente: {ausente}"))
             continue
         try:
-            regs = leer_jsonl(fuente)
+            regs = [r for x in fuentes for r in leer_jsonl(raiz / x)]
             if c.get("reintentos"):
                 rei = raiz / c["reintentos"]
                 if not rei.exists():

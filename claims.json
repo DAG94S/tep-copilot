@@ -168,5 +168,215 @@
     "valor": "30 s",
     "fuente": "data/runs/evolus/agente_2026-10-14_sinrazonamiento/resultados.jsonl",
     "descripcion": "Latencia máxima (segundos) de las llamadas al agente de Evolus sin razonamiento (Model default)."
+  },
+  {
+    "id": "rieth_n0_top1",
+    "valor": "45/100",
+    "fuente": [
+      "data/runs/tf_rieth_k5_n0/registros.jsonl",
+      "data/runs/tf_rieth_k5_n1/registros.jsonl",
+      "data/runs/tf_rieth_k5_n2/registros.jsonl"
+    ],
+    "descripcion": "Datos Rieth et al. 2017 (10 fallas x 10 simulaciones independientes por nivel, 100 casos por nivel), Gemma-4-31B sin razonamiento, k=5. Nivel 0: aciertos top-1 sobre casos evaluables (estado distinto de NO_DETECTADO, INVALIDO y ERROR_LLM); denominador = casos evaluables. El tamaño efectivo es ~10 fallas, no 100 casos: las corridas de una misma falla se comportan casi igual."
+  },
+  {
+    "id": "rieth_n0_top3",
+    "valor": "74/100",
+    "fuente": [
+      "data/runs/tf_rieth_k5_n0/registros.jsonl",
+      "data/runs/tf_rieth_k5_n1/registros.jsonl",
+      "data/runs/tf_rieth_k5_n2/registros.jsonl"
+    ],
+    "descripcion": "Datos Rieth et al. 2017 (10 fallas x 10 simulaciones independientes por nivel, 100 casos por nivel), Gemma-4-31B sin razonamiento, k=5. Nivel 0: aciertos top-3 sobre casos evaluables (estado distinto de NO_DETECTADO, INVALIDO y ERROR_LLM). El tamaño efectivo es ~10 fallas, no 100 casos: las corridas de una misma falla se comportan casi igual."
+  },
+  {
+    "id": "rieth_n1_top1",
+    "valor": "46/100",
+    "fuente": [
+      "data/runs/tf_rieth_k5_n0/registros.jsonl",
+      "data/runs/tf_rieth_k5_n1/registros.jsonl",
+      "data/runs/tf_rieth_k5_n2/registros.jsonl"
+    ],
+    "descripcion": "Datos Rieth et al. 2017 (10 fallas x 10 simulaciones independientes por nivel, 100 casos por nivel), Gemma-4-31B sin razonamiento, k=5. Nivel 1: aciertos top-1 sobre casos evaluables (estado distinto de NO_DETECTADO, INVALIDO y ERROR_LLM); denominador = casos evaluables. El tamaño efectivo es ~10 fallas, no 100 casos: las corridas de una misma falla se comportan casi igual."
+  },
+  {
+    "id": "rieth_n1_top3",
+    "valor": "67/100",
+    "fuente": [
+      "data/runs/tf_rieth_k5_n0/registros.jsonl",
+      "data/runs/tf_rieth_k5_n1/registros.jsonl",
+      "data/runs/tf_rieth_k5_n2/registros.jsonl"
+    ],
+    "descripcion": "Datos Rieth et al. 2017 (10 fallas x 10 simulaciones independientes por nivel, 100 casos por nivel), Gemma-4-31B sin razonamiento, k=5. Nivel 1: aciertos top-3 sobre casos evaluables (estado distinto de NO_DETECTADO, INVALIDO y ERROR_LLM). El tamaño efectivo es ~10 fallas, no 100 casos: las corridas de una misma falla se comportan casi igual."
+  },
+  {
+    "id": "rieth_n2_top1",
+    "valor": "44/100",
+    "fuente": [
+      "data/runs/tf_rieth_k5_n0/registros.jsonl",
+      "data/runs/tf_rieth_k5_n1/registros.jsonl",
+      "data/runs/tf_rieth_k5_n2/registros.jsonl"
+    ],
+    "descripcion": "Datos Rieth et al. 2017 (10 fallas x 10 simulaciones independientes por nivel, 100 casos por nivel), Gemma-4-31B sin razonamiento, k=5. Nivel 2: aciertos top-1 sobre casos evaluables (estado distinto de NO_DETECTADO, INVALIDO y ERROR_LLM); denominador = casos evaluables. El tamaño efectivo es ~10 fallas, no 100 casos: las corridas de una misma falla se comportan casi igual."
+  },
+  {
+    "id": "rieth_n2_top3",
+    "valor": "69/100",
+    "fuente": [
+      "data/runs/tf_rieth_k5_n0/registros.jsonl",
+      "data/runs/tf_rieth_k5_n1/registros.jsonl",
+      "data/runs/tf_rieth_k5_n2/registros.jsonl"
+    ],
+    "descripcion": "Datos Rieth et al. 2017 (10 fallas x 10 simulaciones independientes por nivel, 100 casos por nivel), Gemma-4-31B sin razonamiento, k=5. Nivel 2: aciertos top-3 sobre casos evaluables (estado distinto de NO_DETECTADO, INVALIDO y ERROR_LLM). El tamaño efectivo es ~10 fallas, no 100 casos: las corridas de una misma falla se comportan casi igual."
+  },
+  {
+    "id": "rieth_top3_pareado_n0_n2",
+    "valor": "7 vs 2",
+    "fuente": [
+      "data/runs/tf_rieth_k5_n0/registros.jsonl",
+      "data/runs/tf_rieth_k5_n1/registros.jsonl",
+      "data/runs/tf_rieth_k5_n2/registros.jsonl"
+    ],
+    "descripcion": "Datos Rieth et al. 2017 (10 fallas x 10 simulaciones independientes por nivel, 100 casos por nivel), Gemma-4-31B sin razonamiento, k=5. Niveles 0 y 2. Emparejado por (falla, corrida): se cuentan los casos discordantes ('solo acierta el nivel 0' vs 'solo acierta el nivel 2') en top-3."
+  },
+  {
+    "id": "rieth_top3_mcnemar_p_n0_n2",
+    "valor": "0.18",
+    "fuente": [
+      "data/runs/tf_rieth_k5_n0/registros.jsonl",
+      "data/runs/tf_rieth_k5_n1/registros.jsonl",
+      "data/runs/tf_rieth_k5_n2/registros.jsonl"
+    ],
+    "descripcion": "Datos Rieth et al. 2017 (10 fallas x 10 simulaciones independientes por nivel, 100 casos por nivel), Gemma-4-31B sin razonamiento, k=5. p-valor de McNemar exacto (binomial bilateral, scipy.stats.binomtest, p=0.5) sobre los discordantes top-3 n0 vs n2, 2 decimales. Trata los casos como independientes, lo que sobreestima la evidencia dado el tamaño efectivo de ~10 fallas."
+  },
+  {
+    "id": "rieth_top3_caida_ic95_n0_n2",
+    "valor": "5 pp [-4, 17]",
+    "fuente": [
+      "data/runs/tf_rieth_k5_n0/registros.jsonl",
+      "data/runs/tf_rieth_k5_n1/registros.jsonl",
+      "data/runs/tf_rieth_k5_n2/registros.jsonl"
+    ],
+    "descripcion": "Datos Rieth et al. 2017 (10 fallas x 10 simulaciones independientes por nivel, 100 casos por nivel), Gemma-4-31B sin razonamiento, k=5. Caída media de top-3 (nivel 0 menos nivel 2) en puntos porcentuales, enteros redondeados, con IC95 bootstrap POR CLUSTERS DE FALLA: se remuestrean las 10 fallas con reemplazo, 5000 réplicas, numpy.random.default_rng(0), percentiles 2.5 y 97.5. El tamaño efectivo es ~10 fallas, no 100 casos: las corridas de una misma falla se comportan casi igual."
+  },
+  {
+    "id": "rieth_top3_pareado_n0_n1",
+    "valor": "8 vs 1",
+    "fuente": [
+      "data/runs/tf_rieth_k5_n0/registros.jsonl",
+      "data/runs/tf_rieth_k5_n1/registros.jsonl",
+      "data/runs/tf_rieth_k5_n2/registros.jsonl"
+    ],
+    "descripcion": "Datos Rieth et al. 2017 (10 fallas x 10 simulaciones independientes por nivel, 100 casos por nivel), Gemma-4-31B sin razonamiento, k=5. Niveles 0 y 1. Emparejado por (falla, corrida): se cuentan los casos discordantes ('solo acierta el nivel 0' vs 'solo acierta el nivel 1') en top-3."
+  },
+  {
+    "id": "rieth_top3_mcnemar_p_n0_n1",
+    "valor": "0.04",
+    "fuente": [
+      "data/runs/tf_rieth_k5_n0/registros.jsonl",
+      "data/runs/tf_rieth_k5_n1/registros.jsonl",
+      "data/runs/tf_rieth_k5_n2/registros.jsonl"
+    ],
+    "descripcion": "Datos Rieth et al. 2017 (10 fallas x 10 simulaciones independientes por nivel, 100 casos por nivel), Gemma-4-31B sin razonamiento, k=5. p-valor de McNemar exacto (binomial bilateral, scipy.stats.binomtest, p=0.5) sobre los discordantes top-3 n0 vs n1, 2 decimales. Trata los casos como independientes, lo que sobreestima la evidencia dado el tamaño efectivo de ~10 fallas."
+  },
+  {
+    "id": "rieth_top3_caida_ic95_n0_n1",
+    "valor": "7 pp [0, 18]",
+    "fuente": [
+      "data/runs/tf_rieth_k5_n0/registros.jsonl",
+      "data/runs/tf_rieth_k5_n1/registros.jsonl",
+      "data/runs/tf_rieth_k5_n2/registros.jsonl"
+    ],
+    "descripcion": "Datos Rieth et al. 2017 (10 fallas x 10 simulaciones independientes por nivel, 100 casos por nivel), Gemma-4-31B sin razonamiento, k=5. Caída media de top-3 (nivel 0 menos nivel 1) en puntos porcentuales, enteros redondeados, con IC95 bootstrap POR CLUSTERS DE FALLA: se remuestrean las 10 fallas con reemplazo, 5000 réplicas, numpy.random.default_rng(0), percentiles 2.5 y 97.5. El tamaño efectivo es ~10 fallas, no 100 casos: las corridas de una misma falla se comportan casi igual."
+  },
+  {
+    "id": "rieth_idv8_top3",
+    "valor": "10/5/5",
+    "fuente": [
+      "data/runs/tf_rieth_k5_n0/registros.jsonl",
+      "data/runs/tf_rieth_k5_n1/registros.jsonl",
+      "data/runs/tf_rieth_k5_n2/registros.jsonl"
+    ],
+    "descripcion": "Datos Rieth et al. 2017 (10 fallas x 10 simulaciones independientes por nivel, 100 casos por nivel), Gemma-4-31B sin razonamiento, k=5. Aciertos top-3 de IDV8 (composición de la alimentación A/B/C) en los niveles 0/1/2, sobre 10 corridas cada uno."
+  },
+  {
+    "id": "think_n0_top1",
+    "valor": "5/12",
+    "fuente": [
+      "data/runs/tf_gemma31b_k5_think_n0/registros.jsonl",
+      "data/runs/tf_gemma31b_k5_think_n1/registros.jsonl",
+      "data/runs/tf_gemma31b_k5_think_n2/registros.jsonl"
+    ],
+    "descripcion": "Datos Braatz d00-d21 con razonamiento (thinking minimal), Gemma-4-31B, k=5, una corrida por falla; 12 casos evaluables por nivel (3 NO_DETECTADO excluidos de 15). Nivel 0: aciertos top-1 sobre casos evaluables."
+  },
+  {
+    "id": "think_n0_top3",
+    "valor": "8/12",
+    "fuente": [
+      "data/runs/tf_gemma31b_k5_think_n0/registros.jsonl",
+      "data/runs/tf_gemma31b_k5_think_n1/registros.jsonl",
+      "data/runs/tf_gemma31b_k5_think_n2/registros.jsonl"
+    ],
+    "descripcion": "Datos Braatz d00-d21 con razonamiento (thinking minimal), Gemma-4-31B, k=5, una corrida por falla; 12 casos evaluables por nivel (3 NO_DETECTADO excluidos de 15). Nivel 0: aciertos top-3 sobre casos evaluables."
+  },
+  {
+    "id": "think_n1_top1",
+    "valor": "5/12",
+    "fuente": [
+      "data/runs/tf_gemma31b_k5_think_n0/registros.jsonl",
+      "data/runs/tf_gemma31b_k5_think_n1/registros.jsonl",
+      "data/runs/tf_gemma31b_k5_think_n2/registros.jsonl"
+    ],
+    "descripcion": "Datos Braatz d00-d21 con razonamiento (thinking minimal), Gemma-4-31B, k=5, una corrida por falla; 12 casos evaluables por nivel (3 NO_DETECTADO excluidos de 15). Nivel 1: aciertos top-1 sobre casos evaluables."
+  },
+  {
+    "id": "think_n1_top3",
+    "valor": "9/12",
+    "fuente": [
+      "data/runs/tf_gemma31b_k5_think_n0/registros.jsonl",
+      "data/runs/tf_gemma31b_k5_think_n1/registros.jsonl",
+      "data/runs/tf_gemma31b_k5_think_n2/registros.jsonl"
+    ],
+    "descripcion": "Datos Braatz d00-d21 con razonamiento (thinking minimal), Gemma-4-31B, k=5, una corrida por falla; 12 casos evaluables por nivel (3 NO_DETECTADO excluidos de 15). Nivel 1: aciertos top-3 sobre casos evaluables."
+  },
+  {
+    "id": "think_n2_top1",
+    "valor": "5/12",
+    "fuente": [
+      "data/runs/tf_gemma31b_k5_think_n0/registros.jsonl",
+      "data/runs/tf_gemma31b_k5_think_n1/registros.jsonl",
+      "data/runs/tf_gemma31b_k5_think_n2/registros.jsonl"
+    ],
+    "descripcion": "Datos Braatz d00-d21 con razonamiento (thinking minimal), Gemma-4-31B, k=5, una corrida por falla; 12 casos evaluables por nivel (3 NO_DETECTADO excluidos de 15). Nivel 2: aciertos top-1 sobre casos evaluables."
+  },
+  {
+    "id": "think_n2_top3",
+    "valor": "7/12",
+    "fuente": [
+      "data/runs/tf_gemma31b_k5_think_n0/registros.jsonl",
+      "data/runs/tf_gemma31b_k5_think_n1/registros.jsonl",
+      "data/runs/tf_gemma31b_k5_think_n2/registros.jsonl"
+    ],
+    "descripcion": "Datos Braatz d00-d21 con razonamiento (thinking minimal), Gemma-4-31B, k=5, una corrida por falla; 12 casos evaluables por nivel (3 NO_DETECTADO excluidos de 15). Nivel 2: aciertos top-3 sobre casos evaluables."
+  },
+  {
+    "id": "think_razonamiento_mediana",
+    "valor": "16750 / 21215 / 22528",
+    "fuente": [
+      "data/runs/tf_gemma31b_k5_think_n0/registros.jsonl",
+      "data/runs/tf_gemma31b_k5_think_n1/registros.jsonl",
+      "data/runs/tf_gemma31b_k5_think_n2/registros.jsonl"
+    ],
+    "descripcion": "Datos Braatz d00-d21 con razonamiento (thinking minimal), Gemma-4-31B, k=5, una corrida por falla; 12 casos evaluables por nivel (3 NO_DETECTADO excluidos de 15). Mediana por caso (suma de las k=5 llamadas) de uso.reasoning_tokens en los niveles 0 / 1 / 2; las medianas con .5 se truncan."
+  },
+  {
+    "id": "think_segundos_mediana",
+    "valor": "451 / 694 / 702",
+    "fuente": [
+      "data/runs/tf_gemma31b_k5_think_n0/registros.jsonl",
+      "data/runs/tf_gemma31b_k5_think_n1/registros.jsonl",
+      "data/runs/tf_gemma31b_k5_think_n2/registros.jsonl"
+    ],
+    "descripcion": "Datos Braatz d00-d21 con razonamiento (thinking minimal), Gemma-4-31B, k=5, una corrida por falla; 12 casos evaluables por nivel (3 NO_DETECTADO excluidos de 15). Mediana por caso de `segundos` (total de las k=5 llamadas secuenciales) en los niveles 0 / 1 / 2, redondeada a entero."
   }
 ]

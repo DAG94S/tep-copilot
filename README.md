@@ -16,7 +16,7 @@ Statistics detect → the LLM proposes → a deterministic gate verifies → a h
 The differentiator is the **disguised twin** (`twin/`): the same plant at three levels, 0 = original TEP names, 1 = anonymous tags, 2 = full disguise. If the model recites TEP from memory, accuracy should collapse as the disguise grows. If it reasons from signals, it should not.
 
 ## Results
-Gemma-4-31B-IT, thinking off, k=5 samples, T=0.7, majority vote, faults IDV 1-15 on the Rieth et al. (2017) data. PCA detects 12 of 15 faults (IDV 3, 4, 9 are never detected and are excluded); the denominator is the evaluable cases. Main campaign = original run re-gated plus retries of the invalid cases (see Limitations).
+Gemma-4-31B-IT, thinking off, k=5 samples, T=0.7, majority vote, faults IDV 1-15 on the classic Braatz TEP test set (`d01_te`–`d15_te`, one simulation per fault). PCA detects 12 of 15 faults (IDV 3, 4, 9 are never detected and are excluded); the denominator is the evaluable cases. Main campaign = original run re-gated plus retries of the invalid cases (see Limitations).
 
 | Disguise level | top-1 | top-3 |
 |---|---|---|
@@ -28,7 +28,31 @@ The gate rejected <!--claim:combinado_rechazo-->24%<!--/claim--> of the evidence
 
 **FaultExplainer replication.** We ran the FaultExplainer protocol (Khan et al. 2025): their data, their PCA (reproduced exactly) and their literal prompt. Top-3 on the faults their PCA detects: Gemma-4-31B <!--claim:replica_gemma_top3-->8/11<!--/claim-->, GPT-4o 7/11 and o1-preview 9/11 (their Table 1). Gemma misses IDV <!--claim:replica_gemma_fallas-->8,10,14<!--/claim-->; their PCA does not detect IDV <!--claim:replica_gemma_no_detectadas-->3,4,9,15<!--/claim-->. Protocol differences: they use n=1 with the API default temperature and hand-scored aliases; we use k=5 with majority vote at T=0.7.
 
-**Reasoning on vs off:** pending (campaign running; no numbers yet).
+## Robust results: does the disguise cost accuracy?
+**Robust check on Rieth et al. (thinking off).** 10 faults x 10 independent simulations per level (100 cases per level), same model and protocol as above.
+
+| Disguise level | top-1 | top-3 |
+|---|---|---|
+| 0 original names | <!--claim:rieth_n0_top1-->45/100<!--/claim--> | <!--claim:rieth_n0_top3-->74/100<!--/claim--> |
+| 1 anonymous tags | <!--claim:rieth_n1_top1-->46/100<!--/claim--> | <!--claim:rieth_n1_top3-->67/100<!--/claim--> |
+| 2 full disguise | <!--claim:rieth_n2_top1-->44/100<!--/claim--> | <!--claim:rieth_n2_top3-->69/100<!--/claim--> |
+
+- Top-1 does not change with the disguise. Top-3 drops a few points, almost entirely from IDV8 (feed A/B/C composition): its top-3 hits go <!--claim:rieth_idv8_top3-->10/5/5<!--/claim--> across levels 0/1/2 (out of 10 each). IDV8 is the one fault where TEP-specific memory seems to help.
+- Runs within a fault behave almost identically (a fault is mostly right or mostly wrong in all its runs), so the effective sample is about 10 faults, not 100 cases. The confidence interval therefore resamples whole faults (cluster bootstrap, 5000 replicates, fixed seed).
+- Paired by case, original vs full disguise, discordant top-3 cases (right only in the original vs right only in the disguise): <!--claim:rieth_top3_pareado_n0_n2-->7 vs 2<!--/claim-->; McNemar exact p = <!--claim:rieth_top3_mcnemar_p_n0_n2-->0.18<!--/claim-->. Mean top-3 drop <!--claim:rieth_top3_caida_ic95_n0_n2-->5 pp [-4, 17]<!--/claim--> (95% CI). The drop is not statistically significant.
+- Original vs anonymous tags: discordant <!--claim:rieth_top3_pareado_n0_n1-->8 vs 1<!--/claim-->, p = <!--claim:rieth_top3_mcnemar_p_n0_n1-->0.04<!--/claim-->, drop <!--claim:rieth_top3_caida_ic95_n0_n1-->7 pp [0, 18]<!--/claim-->. This p-value treats cases as independent and so overstates the evidence; the cluster CI touches zero.
+
+**Thinking on (Braatz data, 12 evaluable cases per level; 3 of 15 faults are never detected).** Accuracy barely moves with the disguise, but reasoning effort rises.
+
+| Disguise level | top-1 | top-3 |
+|---|---|---|
+| 0 original names | <!--claim:think_n0_top1-->5/12<!--/claim--> | <!--claim:think_n0_top3-->8/12<!--/claim--> |
+| 1 anonymous tags | <!--claim:think_n1_top1-->5/12<!--/claim--> | <!--claim:think_n1_top3-->9/12<!--/claim--> |
+| 2 full disguise | <!--claim:think_n2_top1-->5/12<!--/claim--> | <!--claim:think_n2_top3-->7/12<!--/claim--> |
+
+Median reasoning tokens per case (k=5 calls) at levels 0 / 1 / 2: <!--claim:think_razonamiento_mediana-->16750 / 21215 / 22528<!--/claim-->. Median seconds per case: <!--claim:think_segundos_mediana-->451 / 694 / 702<!--/claim-->.
+
+**The disguise costs the model effort, not accuracy, except on IDV8.** The Rieth arm with thinking is pending (runs on 15-16 Oct); no numbers yet.
 
 ## How we keep it honest
 - `SHA256SUMS` pins every file under `data/`, the recorded runs and the vendored FaultExplainer commit.
@@ -64,13 +88,15 @@ The TEP data download (`python3 scripts/descargar_datos.py`) is only needed for 
 - A copilot with a human in the loop is not novel by itself. What we add is the disguised-twin probe, which we have not found in prior work, and a verification pipeline for every number.
 
 ## Data
-Tennessee Eastman Process, Rieth et al. (2017), Harvard Dataverse, doi:10.7910/DVN/6C3JR1 (public domain). The replication uses the CSVs shipped with FaultExplainer.
+- Main campaign and thinking arm: Braatz TEP data (Russell, Chiang & Braatz 2000; Downs & Vogel 1993 simulator), mirror github.com/jkitchin/tennessee-eastman-profbraatz at a pinned commit (license in `data/raw/braatz/LICENSE`).
+- Robust check: Rieth et al. (2017), Harvard Dataverse, doi:10.7910/DVN/6C3JR1 (public domain), training files, simulation runs 1-10 per fault (`data/processed/rieth/PROCEDENCIA.md`).
+- FaultExplainer replication: the CSVs shipped with FaultExplainer.
 
 ## Limitations
 - Without thinking, Gemma performs modestly: top-1 stays at 3-4 of 12 and its errors fall mostly on the feed faults (IDV 7, 8, 1). IDV 15 is always misattributed to them.
 - Detection is not ours to claim: the PCA misses IDV 3, 4 and 9.
 - Token Factory's experimental Gemma deployment sometimes degenerated into garbage output ("y_y_y...") even at T=0.7, and did so in every T=0 test. Invalid cases (IDV 14-15) were retried after the server recovered; the combination rule is in `scripts/verify_claims.py`. No deterministic (T=0) arm exists.
-- Small samples: 12 cases per level, one simulation run per fault, no confidence intervals.
+- Small samples: the main and thinking campaigns have 12 cases per level (one run per fault, no confidence intervals). The Rieth check has 100 cases per level but only 10 faults, and runs of one fault are nearly identical, so its effective size is about 10; the McNemar p-values ignore that clustering, the bootstrap CI does not. Thinking-on results are not yet replicated on Rieth.
 - We have no `rocm-smi` or server logs of our own; AMD hardware use rests on the Token Factory endpoint and its usage record.
 - The gate was changed after the first run (oscillating evidence is judged by RMS); both versions are in `claims.json`/STATE.md.
 
