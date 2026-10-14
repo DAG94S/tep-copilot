@@ -38,24 +38,34 @@ class Caso:
     top: list[int] = field(default_factory=list)        # índices en la vista
     columnas_tep_top: list[int] = field(default_factory=list)  # auditoría; NO va al prompt
     falsa_alarma_previa: bool = False
+    fuente: str = "braatz"
+    corrida: int | None = None   # solo Rieth (1..20); None = Braatz d{falla}_te
 
 
 def preparar_caso(falla: int, nivel: int, calibracion: str = "d00", estadistico: str = "t2",
-                  n_top: int = 6, fusionar_system: bool = False) -> Caso:
-    """Detecta la falla en d{falla}_te y construye el prompt con la vista del nivel dado."""
+                  n_top: int = 6, fusionar_system: bool = False, corrida: int | None = None) -> Caso:
+    """Detecta la falla y construye el prompt con la vista del nivel dado.
+
+    corrida=None: Braatz d{falla}_te (inicio INICIO_FALLA_TEST). Con corrida (1..20): simulación Rieth
+    independiente (inicio INICIO_FALLA_RIETH_TRAIN). La calibración es la misma en ambos casos."""
     if calibracion not in ("d00", "ampliado"):
         raise ValueError(f"calibracion desconocida: {calibracion!r}")
     vista = gemela.construir(nivel)
     normal = datos.cargar(0) if calibracion == "d00" else datos.normal_ampliado()
     n_mat = vista.transformar(normal)
-    x = vista.transformar(datos.cargar(falla, prueba=True))
+    if corrida is None:
+        x_crudo, inicio = datos.cargar(falla, prueba=True), datos.INICIO_FALLA_TEST
+    else:
+        x_crudo, inicio = datos.cargar_rieth(falla, corrida), datos.INICIO_FALLA_RIETH_TRAIN
+    x = vista.transformar(x_crudo)
     modelo = pca_t2.ajustar(n_mat)
     i = pca_t2.primera_alarma(modelo, x, estadistico=estadistico)
     tags = [v.tag for v in vista.variables]
     codigos = [c.codigo for c in vista.catalogo]
     base = dict(falla=falla, nivel=nivel, calibracion=calibracion, estadistico=estadistico,
-                vista=vista, tags=tags, codigos=codigos)
-    if i is None or i < datos.INICIO_FALLA_TEST:
+                vista=vista, tags=tags, codigos=codigos,
+                fuente="braatz" if corrida is None else "rieth", corrida=corrida)
+    if i is None or i < inicio:
         return Caso(detectado=False, indice_alarma=i, falsa_alarma_previa=i is not None, **base)
 
     ventana = x[i - VENTANA + 1: i + 1]
@@ -95,9 +105,12 @@ class ClienteEco:
 
 
 def _base_registro(caso: Caso) -> dict:
-    return {"ts": datetime.now(timezone.utc).isoformat(), "falla": caso.falla, "nivel": caso.nivel,
-            "calibracion": caso.calibracion, "estadistico": caso.estadistico,
-            "indice_alarma": caso.indice_alarma, "columnas_tep_top": caso.columnas_tep_top}
+    reg = {"ts": datetime.now(timezone.utc).isoformat(), "falla": caso.falla, "nivel": caso.nivel,
+           "calibracion": caso.calibracion, "estadistico": caso.estadistico,
+           "indice_alarma": caso.indice_alarma, "columnas_tep_top": caso.columnas_tep_top}
+    if caso.corrida is not None:  # solo Rieth: los registros Braatz existentes no cambian de esquema
+        reg |= {"fuente": caso.fuente, "corrida": caso.corrida}
+    return reg
 
 
 def registro_no_detectado(caso: Caso) -> dict:

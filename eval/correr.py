@@ -1,5 +1,6 @@
 """CLI de campañas: python3 -m eval.correr --campana NOMBRE --backend {simulado,AMD_VLLM,OLLAMA,GOOGLE} ..."""
 import argparse
+import itertools
 import json
 import sys
 from collections import Counter
@@ -32,14 +33,17 @@ def correr(campana: str, backend: str, fallas: list[int], niveles: list[int], k:
            semilla: int | None = 0, calibracion: str = "d00", estadistico: str = "t2", usar_esquema: bool = True,
            fusionar_system: bool = False, continuar: bool = False, raiz_runs: Path = RAIZ_RUNS,
            argumentos: dict | None = None, cliente=None, max_tokens: int = 800,
-           razonamiento: str | None = None, sin_json: bool = False) -> list[dict]:
-    """Corre la campaña y devuelve todos los registros de la carpeta."""
+           razonamiento: str | None = None, sin_json: bool = False,
+           corridas: list[int] | None = None) -> list[dict]:
+    """Corre la campaña y devuelve todos los registros de la carpeta.
+
+    corridas=None: Braatz. Con lista de corridas (1..20): Rieth, bucle falla x corrida x nivel."""
     carpeta = raiz_runs / campana
     ruta_reg, ruta_man = carpeta / "registros.jsonl", carpeta / "manifiesto.json"
     if ruta_man.exists() and not continuar:
         raise SystemExit(f"la campaña {campana!r} ya existe en {carpeta}; usa --continuar o cambia el nombre")
     carpeta.mkdir(parents=True, exist_ok=True)
-    hechos = {(r["falla"], r["nivel"]) for r in _leer(ruta_reg)}
+    hechos = {(r["falla"], r["nivel"], r.get("corrida")) for r in _leer(ruta_reg)}
     if backend != "simulado" and cliente is None:
         cliente = cliente_llm.desde_env(prefijo=backend)
         if razonamiento:  # p. ej. Token Factory: reasoning_effort enciende el thinking de Gemma
@@ -57,10 +61,11 @@ def correr(campana: str, backend: str, fallas: list[int], niveles: list[int], k:
 
     with ruta_reg.open("a", encoding="utf-8") as f:
         for falla in fallas:
-            for nivel in niveles:
-                if (falla, nivel) in hechos:
+            for corrida, nivel in itertools.product(corridas if corridas is not None else [None], niveles):
+                if (falla, nivel, corrida) in hechos:
                     continue
-                caso = pipeline.preparar_caso(falla, nivel, calibracion, estadistico, fusionar_system=fusionar_system)
+                caso = pipeline.preparar_caso(falla, nivel, calibracion, estadistico, fusionar_system=fusionar_system,
+                                              corrida=corrida)
                 if not caso.detectado:
                     reg = pipeline.registro_no_detectado(caso)
                 else:
@@ -97,6 +102,8 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--backend", required=True, choices=BACKENDS)
     p.add_argument("--fallas", default="1-15")
     p.add_argument("--niveles", default="0,1,2")
+    p.add_argument("--fuente", default="braatz", choices=("braatz", "rieth"))
+    p.add_argument("--corridas", default=None, help="solo con --fuente rieth: rango \"1-10\" o lista \"1,3,5\" (1..20)")
     p.add_argument("--k", type=int, default=1)
     p.add_argument("--temperatura", type=float, default=0.0)
     p.add_argument("--semilla", type=int, default=None, help="la API de Gemini no acepta seed")
@@ -110,11 +117,21 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--razonamiento", default=None, help="valor de reasoning_effort (enciende el thinking si el backend lo admite)")
     p.add_argument("--dev", action="store_true", help="guarda en data/dev (no versionado): corridas de depuración")
     a = p.parse_args(argv)
+    if a.fuente == "rieth":
+        corridas = _rango(a.corridas or "1-20")
+        if not all(1 <= c <= 20 for c in corridas):
+            p.error("--corridas debe estar en 1..20")
+        if not all(1 <= f <= 20 for f in _rango(a.fallas)):
+            p.error("con rieth las fallas van de 1 a 20")
+    elif a.corridas:
+        p.error("--corridas solo aplica con --fuente rieth")
+    else:
+        corridas = None
     registros = correr(a.campana, a.backend, _rango(a.fallas), _rango(a.niveles), a.k, a.temperatura, a.semilla,
                        a.calibracion, a.estadistico, not a.sin_esquema, a.fusionar_system, a.continuar,
                        raiz_runs=RAIZ_RUNS.parent / "dev" if a.dev else RAIZ_RUNS,
                        argumentos=vars(a), max_tokens=a.max_tokens, razonamiento=a.razonamiento,
-                       sin_json=a.sin_json)
+                       sin_json=a.sin_json, corridas=corridas)
     print(tabla(registros))
 
 
