@@ -1,0 +1,99 @@
+{
+ "detector": "T2 (core.pca_t2, 6 consecutivas, alfa 0.01) calibrado con datos.normal_ampliado() (Braatz)",
+ "inicio_falla_indice": 20,
+ "retardo_desde_indice_falla_en_muestras_de_3min": true,
+ "faultfree_corridas_con_alarma": 4,
+ "faultfree_corridas": 20,
+ "fallas": {
+  "1": {
+   "detectadas": 20,
+   "de": 20,
+   "retardo_mediano_muestras": 15.5,
+   "alarmas_antes_de_falla": 0
+  },
+  "2": {
+   "detectadas": 20,
+   "de": 20,
+   "retardo_mediano_muestras": 19.0,
+   "alarmas_antes_de_falla": 0
+  },
+  "3": {
+   "detectadas": 4,
+   "de": 20,
+   "retardo_mediano_muestras": 306.5,
+   "alarmas_antes_de_falla": 0
+  },
+  "4": {
+   "detectadas": 4,
+   "de": 20,
+   "retardo_mediano_muestras": 304.0,
+   "alarmas_antes_de_falla": 0
+  },
+  "5": {
+   "detectadas": 20,
+   "de": 20,
+   "retardo_mediano_muestras": 21.0,
+   "alarmas_antes_de_falla": 0
+  },
+  "6": {
+   "detectadas": 20,
+   "de": 20,
+   "retardo_mediano_muestras": 13.0,
+   "alarmas_antes_de_falla": 0
+  },
+  "7": {
+   "detectadas": 20,
+   "de": 20,
+   "retardo_mediano_muestras": 5.0,
+   "alarmas_antes_de_falla": 0
+  },
+  "8": {
+   "detectadas": 20,
+   "de": 20,
+   "retardo_mediano_muestras": 43.5,
+   "alarmas_antes_de_falla": 0
+  },
+  "9": {
+   "detectadas": 4,
+   "de": 20,
+   "retardo_mediano_muestras": 308.5,
+   "alarmas_antes_de_falla": 0
+  },
+  "10": {
+   "detectadas": 20,
+   "de": 20,
+   "retardo_mediano_muestras": 179.0,
+   "alarmas_antes_de_falla": 0
+  },
+  "11": {
+   "detectadas": 4,
+   "de": 20,
+   "retardo_mediano_muestras": 305.5,
+   "alarmas_antes_de_falla": 0
+  },
+  "12": {
+   "detectadas": 20,
+   "de": 20,
+   "retardo_mediano_muestras": 31.5,
+   "alarmas_antes_de_falla": 0
+  },
+  "13": {
+   "detectadas": 20,
+   "de": 20,
+   "retardo_mediano_muestras": 62.5,
+   "alarmas_antes_de_falla": 0
+  },
+  "14": {
+   "detectadas": 20,
+   "de": 20,
+   "retardo_mediano_muestras": 17.5,
+   "alarmas_antes_de_falla": 0
+  },
+  "15": {
+   "detectadas": 2,
+   "de": 20,
+   "retardo_mediano_muestras": 218.0,
+   "alarmas_antes_de_falla": 0
+  }
+ }
+}

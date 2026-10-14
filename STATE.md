@@ -271,3 +271,15 @@ Ver `docs/CHECKLIST.md`.
   En la gemela (n2) piensa más y tarda más: IDV1 3.320 tokens/125 s vs 1.859/59 s; IDV6 2.052/130 s vs 1.380/46 s.
 - **Campaña reportable `data/runs/tf_gemma31b_k5_think_n{0,1,2}`**: mismos parámetros que `tf_gemma31b_k5_v2`
   (k=5, T=0,7, ampliado, t2, sin esquema) salvo `--razonamiento minimal` y `--max-tokens 8000`; un proceso por nivel.
+
+## 2026-10-14 — Datos de Rieth para la versión robusta (20 simulaciones por falla)
+- `scripts/descargar_rieth.py`: Dataverse doi:10.7910/DVN/6C3JR1, solo `TEP_FaultFree_Training` y `TEP_Faulty_Training`
+  (MD5 publicado verificado; **Dataverse da 403 sin User-Agent**). pyreadr superó 5,9 GB de RAM al cargar
+  Faulty_Training (WSL 7,9 GB) → abortado; **R base** lo carga con pico 3,1 GB (`scripts/extraer_rieth.R` →
+  `scripts/convertir_rieth.py`). Faulty_Training trae **fallas 1–20** (no la 21).
+- `data/processed/rieth/`: corridas 1–20 por falla, (20, 500, 52) float32, pineadas. `core/datos.cargar_rieth`.
+  Orden de columnas = Braatz (test con medias de la normal vs d00). Falla en la muestra 20.
+- Detección T² (calibración `normal_ampliado` de Braatz; `data/processed/rieth/deteccion_t2.json`): 20/20 en
+  1, 2, 5, 6, 7, 8, 10, 12, 13, 14 (10 tarde: mediana 179 muestras); 3, 4, 9, 11, 15 ≤4/20 con retardos ~305
+  ≈ falsas alarmas tardías (4/20 corridas normales también alarman en 500 muestras). 0/300 alarmas antes de la falla.
+  ⚠ IDV11 se detecta en Braatz pero no en Rieth-train con T².

@@ -37,3 +37,19 @@ def normal_ampliado() -> np.ndarray:
     """
     tramos = [cargar(0)] + [cargar(f)[:INICIO_FALLA_TRAIN] for f in range(1, 22)]
     return np.vstack(tramos)
+
+
+# --- Rieth et al. (2017): 20 simulaciones independientes por falla (ENTRENAMIENTO, fallas 1..20) ---
+# Mismo orden de columnas que `cargar` (Braatz): XMEAS 1-41 y XMV 1-11 (52). Derivado de data/raw/rieth
+# con scripts/extraer_rieth.R + scripts/convertir_rieth.py. La falla entra en la muestra 21 (índice 20).
+RIETH = RAIZ / "data" / "processed" / "rieth"
+INICIO_FALLA_RIETH_TRAIN = 20
+
+
+def cargar_rieth(falla: int, corrida: int) -> np.ndarray:
+    """Simulación `corrida` (1..20) de la falla `falla` (0 = normal, 1..20) de Rieth: (500, 52) float32."""
+    if not 1 <= corrida <= 20:
+        raise ValueError(f"corrida fuera de 1..20: {corrida}")
+    nombre = "faultfree_train.npz" if falla == 0 else f"faulty_train_f{falla:02d}.npz"
+    with np.load(RIETH / nombre) as z:
+        return z["x"][list(z["runs"]).index(corrida)]
