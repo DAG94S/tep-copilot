@@ -1,0 +1,68 @@
+[
+  {
+    "id": "replica_gemma_top3",
+    "valor": "8/11",
+    "fuente": "data/runs/tf_replica_fe_k5/registros.jsonl",
+    "descripcion": "Réplica FaultExplainer con Gemma-4-31B: aciertos top-3 sobre las fallas detectadas por su PCA"
+  },
+  {
+    "id": "replica_gemma_fallas",
+    "valor": "8,10,14",
+    "fuente": "data/runs/tf_replica_fe_k5/registros.jsonl",
+    "descripcion": "Fallas detectadas donde la réplica no acierta top-3"
+  },
+  {
+    "id": "replica_gemma_no_detectadas",
+    "valor": "3,4,9,15",
+    "fuente": "data/runs/tf_replica_fe_k5/registros.jsonl",
+    "descripcion": "Fallas que la PCA de FaultExplainer no detecta (coincide con Tabla 1 del paper)"
+  },
+  {
+    "id": "campana_v2_n0_top1",
+    "valor": "3/11",
+    "fuente": "data/runs/tf_gemma31b_k5_v2/registros.jsonl",
+    "descripcion": "Campaña tf_gemma31b_k5_v2, nivel 0: top-1 sobre casos evaluables (sin INVALIDO ni NO_DETECTADO)"
+  },
+  {
+    "id": "campana_v2_n0_top3",
+    "valor": "7/11",
+    "fuente": "data/runs/tf_gemma31b_k5_v2/registros.jsonl",
+    "descripcion": "Campaña tf_gemma31b_k5_v2, nivel 0: top-3 sobre casos evaluables"
+  },
+  {
+    "id": "campana_v2_n1_top1",
+    "valor": "4/10",
+    "fuente": "data/runs/tf_gemma31b_k5_v2/registros.jsonl",
+    "descripcion": "Campaña tf_gemma31b_k5_v2, nivel 1: top-1 sobre casos evaluables (sin INVALIDO ni NO_DETECTADO)"
+  },
+  {
+    "id": "campana_v2_n1_top3",
+    "valor": "5/10",
+    "fuente": "data/runs/tf_gemma31b_k5_v2/registros.jsonl",
+    "descripcion": "Campaña tf_gemma31b_k5_v2, nivel 1: top-3 sobre casos evaluables"
+  },
+  {
+    "id": "campana_v2_n2_top1",
+    "valor": "4/10",
+    "fuente": "data/runs/tf_gemma31b_k5_v2/registros.jsonl",
+    "descripcion": "Campaña tf_gemma31b_k5_v2, nivel 2: top-1 sobre casos evaluables (sin INVALIDO ni NO_DETECTADO)"
+  },
+  {
+    "id": "campana_v2_n2_top3",
+    "valor": "5/10",
+    "fuente": "data/runs/tf_gemma31b_k5_v2/registros.jsonl",
+    "descripcion": "Campaña tf_gemma31b_k5_v2, nivel 2: top-3 sobre casos evaluables"
+  },
+  {
+    "id": "campana_v2_rechazo_antes",
+    "valor": "28%",
+    "fuente": "data/runs/tf_gemma31b_k5_v2/registros.jsonl",
+    "descripcion": "Afirmaciones de evidencia rechazadas por la compuerta original (35/126)"
+  },
+  {
+    "id": "campana_v2_rechazo_despues",
+    "valor": "24%",
+    "fuente": "data/runs/tf_gemma31b_k5_v2/recompuertado.jsonl",
+    "descripcion": "Tras recompuertar con evidencia oscilante por RMS (30/126)"
+  }
+]

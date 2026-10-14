@@ -209,3 +209,13 @@ Ver `docs/CHECKLIST.md`.
   "revisión de alias" solo porque el texto menciona más IDV; las 5 muestras aciertan en ambas → no cambia el conteo.
 - Diferencias de protocolo a declarar: ellos n=1 (temperatura por defecto de la API); nosotros k=5 mayoría, T=0,7
   (T=0 degenera en Token Factory); su acierto con alias se puntuó a mano.
+
+## 2026-10-14 — Evolus acepta Token Factory como modelo propio (captura de Diego)
+- Asistente "Your models" de Evolus, paso 4/4: conexión `amd`, base `https://developer.amd.com.cn/radeon/api/v1`.
+  Prueba con `Gemma-4-31B-IT`: responde (1035 ms), **tool calling OK** (1108 ms), streaming OK (920 ms),
+  razonamiento OK con herramientas en todos los niveles off→very high (6178 ms), `/models` lista **12** modelos.
+- Se marcaron 15 modelos pero el servidor lista 12 → al menos 3 de los elegidos no existen allí (sospechosos:
+  `gpt-oss-120b`, `deepseek-v4p1-flash`, `glm-5p3-flash`, en minúsculas). Dejar solo los que lista `/models`.
+- Consecuencia: el agente de Evolus puede correr sobre hardware AMD sin vLLM propio. Sigue sin respuesta oficial si
+  eso cuenta para el premio de Evolus (pregunta de Rajesh, 12 oct); ajustar ANTECEDENTES ("nuestro propio vLLM").
+- Evidencia: captura en el chat, no versionada. Pendiente: grabar una llamada real del agente en `data/runs/evolus/`.
