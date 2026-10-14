@@ -293,3 +293,11 @@ Ver `docs/CHECKLIST.md`.
   diario de 1 USD. Sin thinking ~0,0002 por caso. **Corrección de Diego: no se recorta B, se reparte en dos días**
   (el tope se reinicia a diario y la entrega es el dom 18): jue 15 niveles 0 y 2 (200 casos), vie 16 nivel 1
   (100 casos), sáb 17 margen para reintentos.
+
+## 2026-10-14 (tarde) — 429 por exceso de concurrencia; reanudación
+- Con 6 procesos a la vez (3 thinking + 3 Rieth) se superaron los límites de Token Factory: **161 casos ERROR_LLM**
+  (429), dos tipos: `rate_limit_exceeded` "maximum 20 requests per minute for this OneClick user" y
+  `token_rate_limit_exceeded` "Model API rate limit exceeded". No hubo salidas degeneradas. Fallo propio: el cliente
+  solo esperaba 1/2/4 s. Arreglo (`f6d0ae2`): ante 429 espera 10/20/40/60/60/60 s (o `Retry-After`).
+- Los registros ERROR_LLM se movieron a `errores_429.jsonl` en cada carpeta (conservados) y los casos se reanudan con
+  `--continuar` y menos concurrencia: 1 proceso para Rieth (n0→n1→n2 en serie) + 3 para thinking.
