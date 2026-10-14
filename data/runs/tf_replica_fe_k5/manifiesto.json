@@ -1,0 +1,27 @@
+{
+  "campana": "tf_replica_fe_k5",
+  "tipo": "replica_faultexplainer",
+  "argumentos": {
+    "campana": "tf_replica_fe_k5",
+    "backend": "AMD_TF",
+    "fallas": "1-15",
+    "k": 5,
+    "temperatura": 0.7,
+    "max_tokens": 1500,
+    "razonamiento": null,
+    "continuar": false,
+    "dev": false
+  },
+  "commit": "6d8bda4b64798365a29623f1c540ac6399860b2b",
+  "inicio": "2026-10-14T02:07:12.376395+00:00",
+  "backend": "AMD_TF",
+  "modelo": "Gemma-4-31B-IT",
+  "host_endpoint": "developer.amd.com.cn",
+  "faultexplainer_commit": "2fcfee975a687c350f10909eeccd1ecdd60340be",
+  "pca": {
+    "componentes": 30,
+    "umbral_t2": 55.4620400206456,
+    "n": 500
+  },
+  "fin": "2026-10-14T02:19:09.674357+00:00"
+}

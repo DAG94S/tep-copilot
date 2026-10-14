@@ -199,3 +199,13 @@ Ver `docs/CHECKLIST.md`.
   prosa libre → ahora lo elimina siempre.
 - **Plan:** reintentar mañana tras el reinicio del tope (11:00 Ecuador): chequeo de salud → réplica k=5 → reintentos
   de inválidos. Si el servidor sigue inestable, preguntar en Discord y usar Google (Gemma 31B) como respaldo de desarrollo.
+
+## 2026-10-13 (noche) — RÉPLICA FaultExplainer en AMD: `data/runs/tf_replica_fe_k5` (pineada)
+- Token Factory volvió a responder bien (chequeo `data/dev/tf_salud_idv6_b`: IDV6 n0 VERIFICADO, top-1).
+- Sus datos (42 CSV pineados), su PCA (reproduce exactamente: detecta 1,2,5,6,7,8,10,11,12,13,14; no 3,4,9,15) y su
+  prompt literal (un mensaje user, prosa). Gemma-4-31B-IT, thinking OFF, k=5, T=0,7, acierto top-3 por mayoría de muestras.
+- **Gemma 4 31B: 8/11** (aciertos 1, 2, 5, 6, 7, 11, 12, 13; falla 8, 10, 14) vs **GPT-4o 7/11** y **o1-preview 9/11**
+  (línea base derivada de su Tabla 1; confirmar contra el PDF antes de citar por falla). Fallas 5 y 6 marcadas
+  "revisión de alias" solo porque el texto menciona más IDV; las 5 muestras aciertan en ambas → no cambia el conteo.
+- Diferencias de protocolo a declarar: ellos n=1 (temperatura por defecto de la API); nosotros k=5 mayoría, T=0,7
+  (T=0 degenera en Token Factory); su acierto con alias se puntuó a mano.
