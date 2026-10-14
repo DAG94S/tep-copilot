@@ -26,6 +26,7 @@ class Respuesta:
 
 class ClienteLLM:
     REINTENTOS = 3
+    ESPERAS_429 = (10, 20, 40, 60, 60, 60)  # s; total ~4 min antes de rendirse
 
     def __init__(self, base_url: str, modelo: str, api_key: str | None = None, timeout: float = 120.0,
                  extra_body: dict | None = None, esperar=time.sleep,
@@ -43,7 +44,9 @@ class ClienteLLM:
         if self.api_key:
             cabeceras["Authorization"] = f"Bearer {self.api_key}"
         ultimo: ErrorLLM | None = None
-        for intento in range(self.REINTENTOS + 1):
+        intento = n_429 = 0
+        while True:
+            espera_429 = None
             try:
                 r = requests.post(f"{self.base_url}/chat/completions", json=cuerpo, headers=cabeceras,
                                   timeout=self.timeout)
@@ -53,11 +56,25 @@ class ClienteLLM:
                 if r.status_code == 200:
                     return r.json()
                 ultimo = ErrorLLM(r.status_code, r.text)
-                if r.status_code != 429 and r.status_code < 500:
+                if r.status_code == 429:
+                    # Límites por minuto (Token Factory: 20 RPM y tokens/min, STATE 14 oct): esperas largas aparte.
+                    if n_429 >= len(self.ESPERAS_429):
+                        raise ultimo
+                    espera_429 = self.ESPERAS_429[n_429]
+                    try:
+                        espera_429 = max(espera_429, float((getattr(r, "headers", None) or {}).get("Retry-After", 0)))
+                    except (TypeError, ValueError):
+                        pass
+                    n_429 += 1
+                elif r.status_code < 500:
                     raise ultimo
-            if intento < self.REINTENTOS:
-                self.esperar(2 ** intento)  # 1, 2, 4 s
-        raise ultimo
+            if espera_429 is not None:
+                self.esperar(espera_429)
+                continue
+            if intento >= self.REINTENTOS:
+                raise ultimo
+            self.esperar(2 ** intento)  # 1, 2, 4 s
+            intento += 1
 
     def completar(self, mensajes: list[dict], n: int = 1, temperatura: float = 0.0, max_tokens: int = 800,
                   semilla: int | None = None, esquema: dict | None = None) -> Respuesta:

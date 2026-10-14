@@ -108,6 +108,33 @@ def test_error_tras_agotar_reintentos(monkeypatch):
     assert e.value.status == 503 and len(llamadas) == 4 and esperas == [1, 2, 4]
 
 
+def test_429_espera_largo_y_se_recupera(monkeypatch):
+    respuestas = [FakeResp(429, "rpm"), FakeResp(429, "rpm"), _ok("bien")]
+    esperas = []
+    monkeypatch.setattr(cl.requests, "post", lambda *a, **k: respuestas.pop(0))
+    r = ClienteLLM("http://h/v1", "m", esperar=esperas.append).completar([])
+    assert r.textos == ["bien"] and esperas == [10, 20]
+
+
+def test_429_respeta_retry_after(monkeypatch):
+    lento = FakeResp(429, "rpm")
+    lento.headers = {"Retry-After": "45"}
+    respuestas = [lento, _ok("bien")]
+    esperas = []
+    monkeypatch.setattr(cl.requests, "post", lambda *a, **k: respuestas.pop(0))
+    ClienteLLM("http://h/v1", "m", esperar=esperas.append).completar([])
+    assert esperas == [45.0]
+
+
+def test_429_se_rinde_tras_sus_esperas(monkeypatch):
+    llamadas, esperas = [], []
+    monkeypatch.setattr(cl.requests, "post", lambda *a, **k: llamadas.append(1) or FakeResp(429, "rpm"))
+    with pytest.raises(ErrorLLM) as e:
+        ClienteLLM("http://h/v1", "m", esperar=esperas.append).completar([])
+    assert e.value.status == 429 and esperas == list(ClienteLLM.ESPERAS_429)
+    assert len(llamadas) == len(ClienteLLM.ESPERAS_429) + 1
+
+
 def test_error_400_no_reintenta(monkeypatch):
     llamadas = []
     monkeypatch.setattr(cl.requests, "post", lambda *a, **k: llamadas.append(1) or FakeResp(400, "mal"))
