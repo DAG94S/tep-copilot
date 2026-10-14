@@ -131,3 +131,10 @@ def test_replay(tmp_path):
     assert r2["texto"] == r["texto"] and r2["conversacion"] == "conv-1"
     with pytest.raises(KeyError, match="grabaci"):
         rp.chat("otro")
+
+
+def test_error_del_modelo_como_texto():
+    texto = "Your model 'gemma-4-31b-it' could not answer: The model endpoint could not be reached or did not answer in time."
+    c, _ = cliente([Resp(200, {"choices": [{"message": {"content": texto}}]})], modelo="a:b")
+    with pytest.raises(ErrorEvolus, match="no respondió"):
+        c.chat("x")

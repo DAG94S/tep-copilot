@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import time
 
 import requests
@@ -120,6 +121,9 @@ def _respuesta(cuerpo, modelo, conv, seg):
     except (KeyError, IndexError, TypeError):
         raise ErrorEvolus("Respuesta de /chat/completions sin choices[0].message.content",
                           cuerpo=cuerpo)
+    # Evolus devuelve 200 con el fallo del modelo propio como texto del asistente (STATE.md, 14 oct).
+    if re.match(r"Your model '[^']*' could not answer", contenido or ""):
+        raise ErrorEvolus(f"El modelo del agente no respondió: {contenido}", status=200, cuerpo=cuerpo)
     return {"texto": contenido, "modelo": cuerpo.get("model") or modelo,
             "conversacion": conv, "segundos": round(seg, 3), "uso": cuerpo.get("usage")}
 
