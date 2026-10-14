@@ -176,3 +176,16 @@ Ver `docs/CHECKLIST.md`.
   does not support the n parameter for multiple choices. Send n separate requests instead." Primer intento de campaña
   `tf_gemma31b_k5_v2` abortado (todo ERROR_LLM, carpeta borrada). Arreglo: `ClienteLLM(soporta_n=False)` /
   `AMD_TF_SOPORTA_N=false` → k llamadas separadas.
+
+## 2026-10-13 — PRIMERA CAMPAÑA REPORTABLE EN AMD: `data/runs/tf_gemma31b_k5_v2` (pineada en SHA256SUMS)
+- Gemma-4-31B-IT en Token Factory, thinking OFF, k=5 (llamadas separadas), T=0,7, json_object, calibración ampliado,
+  prompt v2 (3 causas), fallas 1–15 × niveles 0/1/2. ~25 s por caso. Tokens: 375.625 prompt + 71.648 completion (≈0,40 pts).
+- Detectadas 12/15 por nivel (faltan 3, 4, 9; la 15 se detecta tarde). Resultados (evaluables = sin INVALIDO):
+  nivel 0: top-1 3/11, top-3 7/11 · nivel 1: top-1 4/10, top-3 5/10 · nivel 2: top-1 4/10, top-3 5/10.
+  Compuerta: rechazo de afirmaciones 25–30%; 1 BLOQUEADO (IDV14 n0).
+- Sesgo: sin thinking, los errores caen casi siempre en IDV 7/8/1 (alimentación). Comparado con dev2 (Gemini, thinking
+  forzado, top-3 n0 11/12), **el razonamiento importa mucho**.
+- Acuerdo top-1 entre las 5 muestras ≈100%, pero los textos SÍ varían (solo 2/36 casos con 5 textos idénticos) →
+  el muestreo funciona; el modelo es consistente en la causa principal.
+- INVALIDO: IDV14 n1/n2 e IDV15 n0/n1/n2 → salidas degeneradas ("y_y_y…", "____") incluso con T=0,7. El despliegue
+  *experimental* de Gemma en Token Factory degenera a veces → reintentar inválidos.
