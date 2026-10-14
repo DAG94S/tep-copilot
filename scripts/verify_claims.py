@@ -1,7 +1,7 @@
 """Verifica la integridad de los datos (SHA256SUMS) y las afirmaciones cuantitativas (claims.json).
 
-Cada afirmación de `claims.json` ({id, valor, fuente, descripcion}) se RECALCULA con código desde su `fuente`
-(JSONL pineado) y se compara con `valor`. Nada se copia: si el dato cambia, la afirmación falla.
+Cada afirmación de `claims.json` ({id, valor, fuente, descripcion[, reintentos]}) se RECALCULA con código desde su `fuente`
+(JSONL pineado) y se compara con `valor`. Si trae `reintentos` (JSONL), cada INVALIDO de la fuente se sustituye por el reintento de su (falla, nivel). Nada se copia: si el dato cambia, la afirmación falla.
 
 Uso:
     python3 scripts/verify_claims.py
@@ -83,12 +83,21 @@ def _replica_top3(regs):
     return _fraccion(sum(bool(r.get("acierto_top3")) for r in det), len(det))
 
 
+def combinar_reintentos(regs: list[dict], reintentos: list[dict]) -> list[dict]:
+    """Sustituye cada registro INVALIDO por el reintento con la misma (falla, nivel); el resto no se toca."""
+    por_caso = {(r["falla"], r["nivel"]): r for r in reintentos}
+    return [por_caso.get((r["falla"], r["nivel"]), r) if r["estado"] == "INVALIDO" else r for r in regs]
+
+
 METRICAS = {
     "replica_gemma_top3": _replica_top3,
     "replica_gemma_fallas": lambda regs: _lista(r["falla"] for r in regs if r["detectada"] and not r.get("acierto_top3")),
     "replica_gemma_no_detectadas": lambda regs: _lista(r["falla"] for r in regs if not r["detectada"]),
     **{f"campana_v2_n{n}_top1": (lambda regs, n=n: _top(regs, n, "acierto_top1")) for n in range(3)},
     **{f"campana_v2_n{n}_top3": (lambda regs, n=n: _top(regs, n, "acierto_top3")) for n in range(3)},
+    **{f"combinado_n{n}_top1": (lambda regs, n=n: _top(regs, n, "acierto_top1")) for n in range(3)},
+    **{f"combinado_n{n}_top3": (lambda regs, n=n: _top(regs, n, "acierto_top3")) for n in range(3)},
+    "combinado_rechazo": _tasa_rechazo,
     "campana_v2_rechazo_antes": _tasa_rechazo,
     "campana_v2_rechazo_despues": _tasa_rechazo,
 }
@@ -112,7 +121,14 @@ def verificar_afirmaciones(raiz: Path, claims_path: Path) -> list[tuple[str, str
             res.append((c["id"], "FALLA", esperado, f"fuente ausente: {c['fuente']}"))
             continue
         try:
-            calculado = f(leer_jsonl(fuente))
+            regs = leer_jsonl(fuente)
+            if c.get("reintentos"):
+                rei = raiz / c["reintentos"]
+                if not rei.exists():
+                    res.append((c["id"], "FALLA", esperado, f"reintentos ausentes: {c['reintentos']}"))
+                    continue
+                regs = combinar_reintentos(regs, leer_jsonl(rei))
+            calculado = f(regs)
         except (KeyError, ValueError, TypeError) as e:
             res.append((c["id"], "FALLA", esperado, f"error al calcular: {e!r}"))
             continue

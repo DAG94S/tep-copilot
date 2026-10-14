@@ -63,3 +63,15 @@ def test_campanas_reales_coinciden_con_el_registro():
     if not regs:
         return
     assert [f["nivel"] for f in da.resumen_por_nivel(regs)] == [0, 1, 2]
+
+
+def test_combinar_reintentos_sustituye_solo_invalidos():
+    base = [_reg(14, 0, "VERIFICADO", True, True, verif=2), _reg(14, 1, "INVALIDO"), _reg(15, 2, "INVALIDO"),
+            _reg(1, 0, "PARCIAL", False, True, verif=1)]
+    rei = [_reg(14, 0, "BLOQUEADO", rech=1), _reg(14, 1, "VERIFICADO", False, True, verif=3)]
+    comb = da.combinar_reintentos(base, rei)
+    assert comb[0] is base[0]                      # no INVALIDO: intacto aunque haya reintento
+    assert comb[1] is rei[1]                       # INVALIDO: sustituido
+    assert comb[2]["estado"] == "INVALIDO"         # sin reintento: se queda INVALIDO
+    assert comb[3] is base[3] and len(comb) == len(base)
+    assert base[1]["estado"] == "INVALIDO"         # la entrada no se muta

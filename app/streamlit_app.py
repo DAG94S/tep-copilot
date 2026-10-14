@@ -28,6 +28,15 @@ def registros(campana: str) -> list[dict]:
 
 
 @st.cache_data
+def registros_combinados() -> tuple[list[dict], int]:
+    """Campaña principal con los INVALIDO sustituidos por sus reintentos (si existen) y cuántos se sustituyeron."""
+    base = registros(da.CAMPANA_PRINCIPAL)
+    rei = registros(da.CAMPANA_REINTENTOS) if (da.RUNS / da.CAMPANA_REINTENTOS).exists() else []
+    comb = da.combinar_reintentos(base, rei)
+    return comb, sum(1 for a, b in zip(base, comb) if a is not b)
+
+
+@st.cache_data
 def manifiesto(campana: str) -> dict:
     return da.leer_json(da.RUNS / campana / "manifiesto.json")
 
@@ -156,7 +165,7 @@ def tarjeta(r: dict, v) -> None:
 
 def pestana_audit() -> None:
     st.subheader("Main campaign: Gemma-4-31B-IT, k=5 samples per case, faults 1-15 x disguise levels 0/1/2")
-    regs = registros(da.CAMPANA_PRINCIPAL)
+    regs, n_sustituidos = registros_combinados()
     if not regs:
         st.warning(f"Recorded run not found: data/runs/{da.CAMPANA_PRINCIPAL}")
     else:
@@ -174,6 +183,13 @@ def pestana_audit() -> None:
         st.caption("Evaluable = detected and valid JSON. Level 0 = original TEP, 1 = anonymous tags, 2 = full disguise. "
                    "Rejection rate = claims removed by the gate / claims made.")
         procedencia(da.CAMPANA_PRINCIPAL)
+        ruta_rei = da.archivo_efectivo(da.RUNS / da.CAMPANA_REINTENTOS)
+        if n_sustituidos and ruta_rei.exists():
+            sha_rei = da.sha256_registrado(ruta_rei)
+            st.caption(f"Cases that came back INVALID (degenerate output from the server) were re-run with the same "
+                       f"parameters; {n_sustituidos} records were replaced by their retry. "
+                       f"Retries: `{ruta_rei.relative_to(da.RAIZ)}` · SHA-256 (from SHA256SUMS): "
+                       f"`{sha_rei or 'not registered'}`")
 
     st.subheader("FaultExplainer replication (their data, PCA and literal prompt)")
     from eval import replica_faultexplainer as rep

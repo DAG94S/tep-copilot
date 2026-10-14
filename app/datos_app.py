@@ -12,6 +12,7 @@ import numpy as np
 RAIZ = Path(__file__).resolve().parent.parent
 RUNS = RAIZ / "data" / "runs"
 CAMPANA_PRINCIPAL = "tf_gemma31b_k5_v2"
+CAMPANA_REINTENTOS = "tf_gemma31b_k5_v2_reintentos"
 CAMPANA_REPLICA = "tf_replica_fe_k5"
 ESTADOS = ["VERIFICADO", "PARCIAL", "BLOQUEADO", "INCIERTO", "INVALIDO", "NO_DETECTADO"]
 VISTAS = {"Original TEP": 0, "Disguised twin (level 1: anonymous tags)": 1, "Disguised twin (level 2: full disguise)": 2}
@@ -48,6 +49,13 @@ def sha256_registrado(ruta: Path, raiz: Path = RAIZ) -> str | None:
         if len(partes) == 2 and partes[1].strip().lstrip("*") == rel:
             return partes[0]
     return None
+
+
+def combinar_reintentos(registros: list[dict], reintentos: list[dict]) -> list[dict]:
+    """Sustituye cada registro INVALIDO por el reintento con la misma (falla, nivel); el resto no se toca.
+    Un INVALIDO sin reintento se queda INVALIDO."""
+    por_caso = {(r["falla"], r["nivel"]): r for r in reintentos}
+    return [por_caso.get((r["falla"], r["nivel"]), r) if r["estado"] == "INVALIDO" else r for r in registros]
 
 
 # ---------- agregación: campaña principal ----------
