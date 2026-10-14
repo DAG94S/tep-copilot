@@ -7,3 +7,4 @@ data/raw/*
 .streamlit/secrets.toml
 data/dev/
 api_documentation.txt
+.claude/settings.local.json
