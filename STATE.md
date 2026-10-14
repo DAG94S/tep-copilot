@@ -247,3 +247,16 @@ Ver `docs/CHECKLIST.md`.
   `DeepSeek-V4-Flash` 200 en 1,9 s. A las 15:41 UTC Gemma funcionaba. Los nombres de modelo distinguen mayúsculas
   (`gemma-4-31b-it` → 404 model_not_found); falta ver si Evolus envía el nombre en minúsculas o solo lo muestra así.
 - Tope diario: el período empieza 16:00 UTC (`daily_reset_timezone` Asia/Shanghai); uso ≈ 0.
+
+## 2026-10-14 — PRIMERA LLAMADA REAL AL AGENTE DE EVOLUS: `data/runs/evolus/agente_2026-10-14` (pineada)
+- Gemma de Token Factory volvió a las 16:06 UTC. `scripts/evolus_agente.py --casos 6:0,6:2` (16:06:48–16:09:33 UTC).
+- Las dos salidas siguen el formato (orden de trabajo + traspaso), **0 órdenes de control** (`ordenes_de_control`),
+  sin causas ni tags inventados; en nivel 2 conserva los tags disfrazados. 74 s y 76 s por llamada (TF directo: 4–6 s).
+- Calidad: superficial. Sin Knowledge Library no sabe qué es IDV(6) ("Inspect IDV(6)…"); en 6:2 dice que la hora de la
+  alarma "not provided" aunque el índice está en el mensaje. Dice "rejected evidence not provided" (correcto: no hubo).
+- **Evidencia de que corrió en AMD:** `uso_token_factory.json` (GET /v1/usage justo después): desde 16:00 UTC, 8
+  peticiones (4 errores = la caída previa), `last_request_at` 16:09:34 = fin de la corrida, modelo Gemma-4-31B-IT.
+- **Desviación:** `reasoning_tokens` hoy = 1.770 de 2.148 de completion → con "Reasoning: Model default", el agente de
+  Evolus **hace pensar a Gemma** (en llamada directa a TF no piensa). Explica los ~75 s. La UI no ofrece "Off".
+- `sha256_instrucciones` del manifiesto es del archivo `evolus/agente_instrucciones.md` completo (cabecera en
+  español + bloque pegado), no solo del bloque.
