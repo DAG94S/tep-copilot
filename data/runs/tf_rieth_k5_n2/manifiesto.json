@@ -1,0 +1,30 @@
+{
+  "campana": "tf_rieth_k5_n2",
+  "argumentos": {
+    "campana": "tf_rieth_k5_n2",
+    "backend": "AMD_TF",
+    "fallas": "1,2,5,6,7,8,10,12,13,14",
+    "niveles": "2",
+    "fuente": "rieth",
+    "corridas": "1-10",
+    "k": 5,
+    "temperatura": 0.7,
+    "semilla": null,
+    "calibracion": "ampliado",
+    "estadistico": "t2",
+    "sin_esquema": true,
+    "fusionar_system": false,
+    "continuar": true,
+    "max_tokens": 1500,
+    "sin_json": false,
+    "razonamiento": null,
+    "dev": false
+  },
+  "commit": "a50df89ee40f3bbf6b4168ee9ea76b587ceb1cd3",
+  "inicio": "2026-10-14T19:33:16.714698+00:00",
+  "backend": "AMD_TF",
+  "modelo": "Gemma-4-31B-IT",
+  "host_endpoint": "developer.amd.com.cn",
+  "inicio_original": "2026-10-14T17:13:55.119342+00:00",
+  "fin": "2026-10-14T19:52:55.577910+00:00"
+}

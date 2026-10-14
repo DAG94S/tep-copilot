@@ -301,3 +301,17 @@ Ver `docs/CHECKLIST.md`.
   solo esperaba 1/2/4 s. Arreglo (`f6d0ae2`): ante 429 espera 10/20/40/60/60/60 s (o `Retry-After`).
 - Los registros ERROR_LLM se movieron a `errores_429.jsonl` en cada carpeta (conservados) y los casos se reanudan con
   `--continuar` y menos concurrencia: 1 proceso para Rieth (n0→n1→n2 en serie) + 3 para thinking.
+
+## 2026-10-14 (noche) — RESULTADOS: Rieth sin thinking (300) y Braatz con thinking (45), pineados
+- Ambas terminaron con 0 ERROR_LLM y 0 INVALIDO tras la reanudación. Análisis exploratorio (aún NO en claims.json):
+- **Rieth sin thinking** (10 fallas × 10 corridas por nivel): top-1 45/46/44 de 100; top-3 74/67/69.
+  Pareado n0→n2 (mismo caso): top-1 2 vs 1 discordantes (sin cambio); top-3 7 vs 2, McNemar p=0,18, caída 5 pp,
+  IC95 bootstrap por falla [−4, 17]. n0→n1 top-3: 8 vs 1, p=0,039, caída 7 pp, IC [0, 18].
+  **La caída se concentra en IDV8** (top-3 10→5→5); el resto es casi idéntico entre niveles. Las corridas de una
+  misma falla se comportan casi igual (10/10 o 0/10: IDV10 0/10 en todo nivel) → el tamaño efectivo es ~10 fallas,
+  no 100 casos; por eso el IC se calcula por clusters de falla.
+- **Braatz con thinking minimal** (12 evaluables por nivel): top-1 5/5/5; top-3 8/9/7 (sin thinking: 3/4/4 y 7/6/6).
+  Tokens de razonamiento (mediana por caso, k=5): 16.750 → 21.215 → 22.528; segundos 451 → 694 → 702.
+  ⇒ El disfraz no baja el acierto con thinking, pero **sube el esfuerzo de razonamiento ~30 %**.
+- Lectura provisional: Gemma no "recita" TEP en general; la memoria de TEP solo pesa en IDV8 (variación de
+  composición A/B/C), que pierde la mitad de los aciertos top-3 al quitar los nombres.
