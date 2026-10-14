@@ -18,7 +18,7 @@ Orquestación de negocio: Evolus (REST API), con el agente corriendo sobre nuest
 ## Comandos (se crean a medida que avanza el proyecto)
 ```bash
 python3 scripts/descargar_datos.py             # pendiente: baja TEP y lo registra en SHA256SUMS
-python3 scripts/verify_claims.py               # verifica SHA256SUMS (y luego los números del README)
+.venv/bin/python scripts/verify_claims.py       # verifica SHA256SUMS, claims.json y los marcadores del README (necesita numpy/scipy)
 python3 -m streamlit run app/streamlit_app.py  # demo: replay de corridas grabadas / modo vivo
 docker compose up --build                      # réplica containerizada
 ```
