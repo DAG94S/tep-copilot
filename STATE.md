@@ -219,3 +219,16 @@ Ver `docs/CHECKLIST.md`.
 - Consecuencia: el agente de Evolus puede correr sobre hardware AMD sin vLLM propio. Sigue sin respuesta oficial si
   eso cuenta para el premio de Evolus (pregunta de Rajesh, 12 oct); ajustar ANTECEDENTES ("nuestro propio vLLM").
 - Evidencia: captura en el chat, no versionada. Pendiente: grabar una llamada real del agente en `data/runs/evolus/`.
+
+## 2026-10-14 — Reintentos de inválidos: `data/runs/tf_gemma31b_k5_v2_reintentos` (pineada)
+- Chequeo de salud previo (`data/dev/tf_salud_idv6_c`): IDV6 n0 VERIFICADO, top-1. Servidor sano a las 15:41 UTC
+  (antes del reinicio del tope de las 16:00 UTC).
+- Mismos parámetros que `tf_gemma31b_k5_v2` (k=5, T=0,7, ampliado, t2, sin esquema, max_tokens 1500) sobre fallas
+  14–15 × niveles 0/1/2, con la compuerta vigente (acepta oscilantes). **0 INVALIDO.** IDV14 n0 se repitió como control
+  (en la original, tras recompuertar, ya era VERIFICADO top-3; aquí también).
+- IDV14: top-3 ✅ en n1 y n2 (top-1 ❌). IDV15: top-3 ❌ en los 3 niveles (cae en IDV 7/1/8, el sesgo de alimentación).
+- **Regla de combinación:** registros efectivos de la original (`recompuertado.jsonl`) y cada INVALIDO sustituido por
+  su reintento. Resultado combinado (evaluables 12 por nivel; 3 NO_DETECTADO: 3, 4, 9):
+  top-1 n0/n1/n2 = **3/12, 4/12, 4/12**; top-3 = **7/12, 6/12, 6/12**; rechazo 23/24/26 %.
+  La caída top-3 entre el original y la gemela es de 1 caso.
+- Pendiente: llevar la combinación a `verify_claims.py`/`claims.json` antes de citar estas cifras.

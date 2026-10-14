@@ -1,0 +1,27 @@
+{
+  "campana": "tf_gemma31b_k5_v2_reintentos",
+  "argumentos": {
+    "campana": "tf_gemma31b_k5_v2_reintentos",
+    "backend": "AMD_TF",
+    "fallas": "14-15",
+    "niveles": "0,1,2",
+    "k": 5,
+    "temperatura": 0.7,
+    "semilla": null,
+    "calibracion": "ampliado",
+    "estadistico": "t2",
+    "sin_esquema": true,
+    "fusionar_system": false,
+    "continuar": false,
+    "max_tokens": 1500,
+    "sin_json": false,
+    "razonamiento": null,
+    "dev": false
+  },
+  "commit": "9deaff9a9eff331025d361e7fafe7c7f028a80b2",
+  "inicio": "2026-10-14T15:41:10.459101+00:00",
+  "backend": "AMD_TF",
+  "modelo": "Gemma-4-31B-IT",
+  "host_endpoint": "developer.amd.com.cn",
+  "fin": "2026-10-14T15:45:09.163668+00:00"
+}
