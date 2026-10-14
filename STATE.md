@@ -329,3 +329,10 @@ Ver `docs/CHECKLIST.md`.
   pero cita casi el doble de evidencia que los datos no respaldan: la compuerta importa más con modelos que razonan.
 - Pitch revisado: no "sabe cuándo confiar", sino "no deja que el modelo invente evidencia" + "el disfraz cuesta
   esfuerzo, no acierto (salvo IDV8)" + réplica 8/11 vs GPT-4o 7/11.
+
+## 2026-10-14 (noche) — Rieth con thinking adelantado a hoy
+- Diego: el presupuesto del período (hasta 16:00 UTC del 15) se pierde si no se usa. Gastado 0,161, restante 0,839.
+  Precios de `/v1/models`: Gemma-4-31B-IT 3,5e-8 prompt / 7e-8 completion por token → ~0,002 USD por caso con thinking.
+- Lanzado a las ~20:40 UTC: `data/runs/tf_rieth_k5_think_n{0,2}_{a,b,c}` (grupos de fallas a=1,2,5,6 b=7,8,10
+  c=12,13,14; corridas 1–10; mismos parámetros que el piloto: minimal, k=5, T=0,7, max_tokens 8000). 6 procesos.
+  Las 3 carpetas de cada nivel forman una campaña (verify_claims acepta `fuente` como lista). Nivel 1 después.
