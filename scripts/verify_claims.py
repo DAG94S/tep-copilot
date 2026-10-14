@@ -1,7 +1,7 @@
 """Verifica la integridad de los datos (SHA256SUMS) y las afirmaciones cuantitativas (claims.json).
 
-Cada afirmación de `claims.json` ({id, valor, fuente, descripcion[, reintentos]}) se RECALCULA con código desde su `fuente`
-(JSONL pineado) y se compara con `valor`. Si trae `reintentos` (JSONL), cada INVALIDO de la fuente se sustituye por el reintento de su (falla, nivel). Nada se copia: si el dato cambia, la afirmación falla.
+Cada afirmación de `claims.json` ({id, valor, fuente, descripcion[, reintentos][, auxiliar]}) se RECALCULA con código desde su `fuente`
+(JSONL pineado) y se compara con `valor`. Si trae `reintentos` (JSONL), cada INVALIDO de la fuente se sustituye por el reintento de su (falla, nivel). Si trae `auxiliar` (JSON o JSONL), la métrica lo recibe como segundo argumento (FALLA si falta). Nada se copia: si el dato cambia, la afirmación falla.
 
 Uso:
     python3 scripts/verify_claims.py
@@ -10,6 +10,7 @@ Código de salida: 0 si todo cuadra; 1 si un hash difiere, falta un archivo vers
 import hashlib
 import json
 import re
+import statistics
 import sys
 from pathlib import Path
 
@@ -84,6 +85,59 @@ def _replica_top3(regs):
     return _fraccion(sum(bool(r.get("acierto_top3")) for r in det), len(det))
 
 
+def _mediana(xs) -> float:
+    return float(statistics.median(xs))
+
+
+def _percentil(xs, q: float) -> float:
+    """Percentil q (0-100) por interpolación lineal (como numpy.percentile por defecto)."""
+    v = sorted(xs)
+    pos = (len(v) - 1) * q / 100
+    i = int(pos)
+    return v[i] + (v[min(i + 1, len(v) - 1)] - v[i]) * (pos - i)
+
+
+def _con_llm(regs: list[dict]) -> list[dict]:
+    """Casos en que se llamó al LLM (estado distinto de NO_DETECTADO)."""
+    return [r for r in regs if r["estado"] != "NO_DETECTADO"]
+
+
+def _latencia(q: float):
+    # cada caso = k=5 llamadas secuenciales; `segundos` es el total del caso
+    return lambda regs: f"{_percentil([r['segundos'] for r in _con_llm(regs)], q):.0f} s"
+
+
+def _tokens_caso(r: dict) -> int:
+    return r["uso"]["prompt_tokens"] + r["uso"]["completion_tokens"]
+
+
+def _tokens_por_caso_mediana(regs: list[dict]) -> str:
+    return f"{_mediana([_tokens_caso(r) for r in _con_llm(regs)]):.0f}"
+
+
+def _coste_por_incidente(regs: list[dict], uso_tf: dict) -> str:
+    """Coste medio por caso (USD estimados): tasas de entrada y salida de Gemma-4-31B-IT del registro de uso de Token Factory
+    (entrada = (input_cost + cached_input_cost) / prompt_tokens, tasa mezclada con su acierto de caché; salida = output_cost / completion_tokens)."""
+    m = next(x for x in uso_tf["by_model"] if x["model"] == "Gemma-4-31B-IT")
+    t_in = (m["input_cost"] + m["cached_input_cost"]) / m["prompt_tokens"]
+    t_out = m["output_cost"] / m["completion_tokens"]
+    casos = _con_llm(regs)
+    coste = sum(r["uso"]["prompt_tokens"] * t_in + r["uso"]["completion_tokens"] * t_out for r in casos) / len(casos)
+    return f"${coste:.5f}"
+
+
+def _alarmas_por_tarjeta_mediana(regs: list[dict], aux: dict) -> str:
+    """Mediana, sobre las fallas con caso LLM, de los eventos de alarma de proceso entre el inicio de la falla y la tarjeta
+    (scripts/medir_alarmas.py). Falla si falta una falla en el auxiliar o su indice_alarma no coincide."""
+    por_falla = {}
+    for r in _con_llm(regs):
+        a = aux["por_falla"][str(r["falla"])]
+        if a["indice_alarma"] != r["indice_alarma"]:
+            raise ValueError(f"falla {r['falla']}: indice_alarma {r['indice_alarma']} != auxiliar {a['indice_alarma']}")
+        por_falla[r["falla"]] = a["eventos"]
+    return f"{_mediana(por_falla.values()):g}"
+
+
 def combinar_reintentos(regs: list[dict], reintentos: list[dict]) -> list[dict]:
     """Sustituye cada registro INVALIDO por el reintento con la misma (falla, nivel); el resto no se toca."""
     por_caso = {(r["falla"], r["nivel"]): r for r in reintentos}
@@ -103,6 +157,15 @@ METRICAS = {
     "combinado_rechazo": _tasa_rechazo,
     "campana_v2_rechazo_antes": _tasa_rechazo,
     "campana_v2_rechazo_despues": _tasa_rechazo,
+    "latencia_p50_s": _latencia(50),
+    "latencia_p95_s": _latencia(95),
+    "tokens_por_caso_mediana": _tokens_por_caso_mediana,
+    "evolus_latencia_max_s": lambda regs: f"{max(r['segundos'] for r in regs):.0f} s",
+}
+# métricas que además reciben el archivo `auxiliar` del claim
+METRICAS_AUX = {
+    "coste_por_incidente": _coste_por_incidente,
+    "alarmas_por_tarjeta_mediana": _alarmas_por_tarjeta_mediana,
 }
 
 
@@ -110,12 +173,17 @@ def leer_jsonl(ruta: Path) -> list[dict]:
     return [json.loads(l) for l in ruta.read_text(encoding="utf-8").splitlines() if l.strip()]
 
 
+def leer_auxiliar(ruta: Path):
+    """JSON completo, o lista de registros si es .jsonl."""
+    return leer_jsonl(ruta) if ruta.suffix == ".jsonl" else json.loads(ruta.read_text(encoding="utf-8"))
+
+
 def verificar_afirmaciones(raiz: Path, claims_path: Path) -> list[tuple[str, str, str, str]]:
     """[(id, estado, esperado, calculado)] con estado OK | FALLA."""
     res = []
     for c in json.loads(claims_path.read_text(encoding="utf-8")):
         esperado = str(c["valor"])
-        f = METRICAS.get(c["id"])
+        f = METRICAS.get(c["id"]) or METRICAS_AUX.get(c["id"])
         if f is None:
             res.append((c["id"], "FALLA", esperado, "id sin métrica definida"))
             continue
@@ -131,8 +199,18 @@ def verificar_afirmaciones(raiz: Path, claims_path: Path) -> list[tuple[str, str
                     res.append((c["id"], "FALLA", esperado, f"reintentos ausentes: {c['reintentos']}"))
                     continue
                 regs = combinar_reintentos(regs, leer_jsonl(rei))
-            calculado = f(regs)
-        except (KeyError, ValueError, TypeError) as e:
+            if c["id"] in METRICAS_AUX:
+                if not c.get("auxiliar"):
+                    res.append((c["id"], "FALLA", esperado, "la métrica requiere `auxiliar`"))
+                    continue
+                aux = raiz / c["auxiliar"]
+                if not aux.exists():
+                    res.append((c["id"], "FALLA", esperado, f"auxiliar ausente: {c['auxiliar']}"))
+                    continue
+                calculado = f(regs, leer_auxiliar(aux))
+            else:
+                calculado = f(regs)
+        except (KeyError, ValueError, TypeError, StopIteration, ZeroDivisionError) as e:
             res.append((c["id"], "FALLA", esperado, f"error al calcular: {e!r}"))
             continue
         res.append((c["id"], "OK" if calculado == esperado else "FALLA", esperado, calculado))

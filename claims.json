@@ -125,5 +125,48 @@
     "valor": "0",
     "fuente": "data/runs/evolus/agente_2026-10-14_sinrazonamiento/resultados.jsonl",
     "descripcion": "Órdenes de control detectadas por el filtro de verbos en las salidas del agente de Evolus"
+  },
+  {
+    "id": "latencia_p50_s",
+    "valor": "22 s",
+    "fuente": "data/runs/tf_gemma31b_k5_v2/recompuertado.jsonl",
+    "descripcion": "Latencia mediana por caso (segundos). Campaña combinada (original recompuertada con los INVALIDO sustituidos por sus reintentos), solo casos con LLM (estado distinto de NO_DETECTADO; 36 casos). Cada caso son k=5 llamadas secuenciales a Gemma-4-31B en Token Factory.",
+    "reintentos": "data/runs/tf_gemma31b_k5_v2_reintentos/registros.jsonl"
+  },
+  {
+    "id": "latencia_p95_s",
+    "valor": "58 s",
+    "fuente": "data/runs/tf_gemma31b_k5_v2/recompuertado.jsonl",
+    "descripcion": "Latencia p95 por caso (segundos, interpolación lineal). Campaña combinada (original recompuertada con los INVALIDO sustituidos por sus reintentos), solo casos con LLM (estado distinto de NO_DETECTADO; 36 casos). Cada caso son k=5 llamadas secuenciales.",
+    "reintentos": "data/runs/tf_gemma31b_k5_v2_reintentos/registros.jsonl"
+  },
+  {
+    "id": "tokens_por_caso_mediana",
+    "valor": "11368",
+    "fuente": "data/runs/tf_gemma31b_k5_v2/recompuertado.jsonl",
+    "descripcion": "Mediana de tokens (prompt + completion) por caso, sumados sobre sus k=5 llamadas. Campaña combinada (original recompuertada con los INVALIDO sustituidos por sus reintentos), solo casos con LLM (estado distinto de NO_DETECTADO; 36 casos).",
+    "reintentos": "data/runs/tf_gemma31b_k5_v2_reintentos/registros.jsonl"
+  },
+  {
+    "id": "coste_por_incidente",
+    "valor": "$0.00015",
+    "fuente": "data/runs/tf_gemma31b_k5_v2/recompuertado.jsonl",
+    "descripcion": "Coste medio estimado por caso en USD (unidad de coste del registro de uso de Token Factory; estimación, no factura): tokens de prompt y completion de cada caso por las tasas medias de Gemma-4-31B-IT derivadas de by_model de uso_token_factory.json (entrada = (input_cost + cached_input_cost) / prompt_tokens, que mezcla el acierto de caché de esa sesión; salida = output_cost / completion_tokens). Campaña combinada (original recompuertada con los INVALIDO sustituidos por sus reintentos), solo casos con LLM (estado distinto de NO_DETECTADO; 36 casos).",
+    "reintentos": "data/runs/tf_gemma31b_k5_v2_reintentos/registros.jsonl",
+    "auxiliar": "data/runs/evolus/agente_2026-10-14_sinrazonamiento/uso_token_factory.json"
+  },
+  {
+    "id": "alarmas_por_tarjeta_mediana",
+    "valor": "5.5",
+    "fuente": "data/runs/tf_gemma31b_k5_v2/recompuertado.jsonl",
+    "descripcion": "Mediana, sobre las fallas con caso LLM, de eventos de alarma de proceso (límites p99.9, retardo 2, solo XMEAS) desde el inicio de la falla (muestra 160) hasta la muestra de la tarjeta (indice_alarma, inclusive), frente a 1 tarjeta. Calculado por scripts/medir_alarmas.py (12 fallas).",
+    "reintentos": "data/runs/tf_gemma31b_k5_v2_reintentos/registros.jsonl",
+    "auxiliar": "data/processed/alarmas_por_falla.json"
+  },
+  {
+    "id": "evolus_latencia_max_s",
+    "valor": "30 s",
+    "fuente": "data/runs/evolus/agente_2026-10-14_sinrazonamiento/resultados.jsonl",
+    "descripcion": "Latencia máxima (segundos) de las llamadas al agente de Evolus sin razonamiento (Model default)."
   }
 ]

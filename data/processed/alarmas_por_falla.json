@@ -1,0 +1,57 @@
+{
+ "definicion": "eventos de alarma de proceso con muestra en [160, indice_alarma] de d{falla}_te (limites p99.9 de normal_ampliado, retardo 2, solo XMEAS)",
+ "fuentes": [
+  "data/runs/tf_gemma31b_k5_v2/recompuertado.jsonl",
+  "data/runs/tf_gemma31b_k5_v2_reintentos/registros.jsonl"
+ ],
+ "por_falla": {
+  "1": {
+   "eventos": 0,
+   "indice_alarma": 173
+  },
+  "10": {
+   "eventos": 17,
+   "indice_alarma": 254
+  },
+  "11": {
+   "eventos": 9,
+   "indice_alarma": 359
+  },
+  "12": {
+   "eventos": 14,
+   "indice_alarma": 186
+  },
+  "13": {
+   "eventos": 11,
+   "indice_alarma": 213
+  },
+  "14": {
+   "eventos": 1,
+   "indice_alarma": 171
+  },
+  "15": {
+   "eventos": 32,
+   "indice_alarma": 930
+  },
+  "2": {
+   "eventos": 3,
+   "indice_alarma": 179
+  },
+  "5": {
+   "eventos": 3,
+   "indice_alarma": 178
+  },
+  "6": {
+   "eventos": 0,
+   "indice_alarma": 173
+  },
+  "7": {
+   "eventos": 2,
+   "indice_alarma": 165
+  },
+  "8": {
+   "eventos": 8,
+   "indice_alarma": 193
+  }
+ }
+}
