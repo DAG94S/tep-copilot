@@ -263,3 +263,11 @@ Ver `docs/CHECKLIST.md`.
 - **Repetición con "Reasoning: Model default"** → `data/runs/evolus/agente_2026-10-14_sinrazonamiento` (pineada; es la
   que cita el README): 7,3 s y 30,0 s (antes ~75 s), 0 órdenes de control, y ahora sí cita "sample index 173" en ambos
   niveles. Los `reasoning_tokens` de `/v1/usage` no sirven para aislarla: el piloto con thinking corría a la vez.
+
+## 2026-10-14 — Piloto con thinking (dev) y lanzamiento de la campaña con razonamiento
+- Piloto `data/dev/tf_think_piloto2_{minimal,low}` (IDV1/6 × n0/n2, k=1, max_tokens 8000). `minimal` y `low` dan
+  **los mismos tokens** (1.859 vs 1.858 en IDV1 n0) → Token Factory parece ignorar el nivel; `low` se detuvo.
+  minimal: 4/4 top-1. Sin thinking (campaña), IDV1 n0 fallaba top-1 ([7,8,1]); el resto ya acertaba.
+  En la gemela (n2) piensa más y tarda más: IDV1 3.320 tokens/125 s vs 1.859/59 s; IDV6 2.052/130 s vs 1.380/46 s.
+- **Campaña reportable `data/runs/tf_gemma31b_k5_think_n{0,1,2}`**: mismos parámetros que `tf_gemma31b_k5_v2`
+  (k=5, T=0,7, ampliado, t2, sin esquema) salvo `--razonamiento minimal` y `--max-tokens 8000`; un proceso por nivel.
