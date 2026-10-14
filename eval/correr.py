@@ -32,7 +32,7 @@ def correr(campana: str, backend: str, fallas: list[int], niveles: list[int], k:
            semilla: int | None = 0, calibracion: str = "d00", estadistico: str = "t2", usar_esquema: bool = True,
            fusionar_system: bool = False, continuar: bool = False, raiz_runs: Path = RAIZ_RUNS,
            argumentos: dict | None = None, cliente=None, max_tokens: int = 800,
-           razonamiento: str | None = None) -> list[dict]:
+           razonamiento: str | None = None, sin_json: bool = False) -> list[dict]:
     """Corre la campaña y devuelve todos los registros de la carpeta."""
     carpeta = raiz_runs / campana
     ruta_reg, ruta_man = carpeta / "registros.jsonl", carpeta / "manifiesto.json"
@@ -44,6 +44,8 @@ def correr(campana: str, backend: str, fallas: list[int], niveles: list[int], k:
         cliente = cliente_llm.desde_env(prefijo=backend)
         if razonamiento:  # p. ej. Token Factory: reasoning_effort enciende el thinking de Gemma
             cliente.extra_body = cliente.extra_body | {"reasoning_effort": razonamiento}
+        if sin_json:  # Token Factory: response_format json_object degenera a Gemma en algunos prompts ('{"////…')
+            cliente.extra_body = {k: v for k, v in cliente.extra_body.items() if k != "response_format"}
     endpoint = urlparse(cliente.base_url).netloc if cliente is not None and hasattr(cliente, "base_url") else None
     manifiesto = {"campana": campana, "argumentos": argumentos or {}, "commit": pipeline.commit_git(),
                   "inicio": datetime.now(timezone.utc).isoformat(), "backend": backend,
@@ -104,13 +106,15 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--fusionar-system", action="store_true")
     p.add_argument("--continuar", action="store_true")
     p.add_argument("--max-tokens", type=int, default=800)
+    p.add_argument("--sin-json", action="store_true", help="quita response_format del extra_body del backend")
     p.add_argument("--razonamiento", default=None, help="valor de reasoning_effort (enciende el thinking si el backend lo admite)")
     p.add_argument("--dev", action="store_true", help="guarda en data/dev (no versionado): corridas de depuración")
     a = p.parse_args(argv)
     registros = correr(a.campana, a.backend, _rango(a.fallas), _rango(a.niveles), a.k, a.temperatura, a.semilla,
                        a.calibracion, a.estadistico, not a.sin_esquema, a.fusionar_system, a.continuar,
                        raiz_runs=RAIZ_RUNS.parent / "dev" if a.dev else RAIZ_RUNS,
-                       argumentos=vars(a), max_tokens=a.max_tokens, razonamiento=a.razonamiento)
+                       argumentos=vars(a), max_tokens=a.max_tokens, razonamiento=a.razonamiento,
+                       sin_json=a.sin_json)
     print(tabla(registros))
 
 

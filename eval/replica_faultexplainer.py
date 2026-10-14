@@ -190,6 +190,8 @@ def correr(campana: str, backend: str, fallas: list[int], k: int = 1, temperatur
     hechos = {r["falla"] for r in _leer(ruta_reg)}
     if backend != "simulado" and cliente is None:
         cliente = cliente_llm.desde_env(prefijo=backend)
+        # Su prompt pide prosa libre: nunca forzar JSON aunque el backend lo tenga en EXTRA_BODY.
+        cliente.extra_body = {k: v for k, v in cliente.extra_body.items() if k != "response_format"}
         if razonamiento:
             cliente.extra_body = cliente.extra_body | {"reasoning_effort": razonamiento}
     endpoint = urlparse(cliente.base_url).netloc if cliente is not None and hasattr(cliente, "base_url") else None

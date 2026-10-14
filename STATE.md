@@ -189,3 +189,13 @@ Ver `docs/CHECKLIST.md`.
   el muestreo funciona; el modelo es consistente en la causa principal.
 - INVALIDO: IDV14 n1/n2 e IDV15 n0/n1/n2 → salidas degeneradas ("y_y_y…", "____") incluso con T=0,7. El despliegue
   *experimental* de Gemma en Token Factory degenera a veces → reintentar inválidos.
+- **Tarde del 13 oct — servidor de Token Factory degradado.** Tras la campaña, TODAS las salidas de Gemma degeneran
+  ('{"////…', 'y_y_y…'), incluso IDV6 n0, que en la campaña salió limpio (chequeo de salud en `data/dev/tf_salud_idv6`).
+  Sin modo json (`--sin-json`, nuevo) también degenera → fallo del despliegue *experimental*, no del prompt.
+  Se detuvieron todas las corridas; se borraron las carpetas abortadas (reintentos n0/n12 y réplica: todo INVALIDO).
+- Thinking ON (`--razonamiento high`): 8.000 tokens de razonamiento en 234 s sin llegar a responder (dev) → demasiado
+  caro para el tope diario (~0,024 pts/llamada); el piloto `low` se abortó con el servidor degradado.
+- Bug propio corregido: la réplica heredaba `response_format: json_object` de `AMD_TF_EXTRA_BODY` aunque su prompt es
+  prosa libre → ahora lo elimina siempre.
+- **Plan:** reintentar mañana tras el reinicio del tope (11:00 Ecuador): chequeo de salud → réplica k=5 → reintentos
+  de inválidos. Si el servidor sigue inestable, preguntar en Discord y usar Google (Gemma 31B) como respaldo de desarrollo.
