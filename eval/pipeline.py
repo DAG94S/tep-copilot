@@ -32,6 +32,7 @@ class Caso:
     vista: object = field(repr=False)
     mensajes: list[dict] = field(default_factory=list, repr=False)
     z: np.ndarray | None = field(default=None, repr=False)
+    z_rms: np.ndarray | None = field(default=None, repr=False)
     tags: list[str] = field(default_factory=list)
     codigos: list[str] = field(default_factory=list)    # orden del catálogo mostrado
     top: list[int] = field(default_factory=list)        # índices en la vista
@@ -62,6 +63,7 @@ def preparar_caso(falla: int, nivel: int, calibracion: str = "d00", estadistico:
     top = [int(j) for j in np.argsort(-contrib)[:n_top]]
     media, desv = n_mat.mean(0), n_mat.std(0, ddof=1)
     z = compuerta.desviacion_z(ventana, media, desv)
+    z_rms = compuerta.desviacion_rms(ventana, media, desv)
     filas = [Fila(indice=j, contribucion=float(contrib[j]), z=float(z[j]),
                   valor=float(ventana[:, j].mean()), media_normal=float(media[j])) for j in top]
     mensajes = construir_mensajes(vista, filas)
@@ -71,7 +73,7 @@ def preparar_caso(falla: int, nivel: int, calibracion: str = "d00", estadistico:
         if sistema and resto:
             resto[0]["content"] = "\n\n".join([m["content"] for m in sistema] + [resto[0]["content"]])
         mensajes = resto
-    return Caso(detectado=True, indice_alarma=int(i), mensajes=mensajes, z=z, top=top,
+    return Caso(detectado=True, indice_alarma=int(i), mensajes=mensajes, z=z, z_rms=z_rms, top=top,
                 columnas_tep_top=[int(c) for c in vista.origen[top]], **base)
 
 
@@ -122,7 +124,8 @@ def diagnosticar(caso: Caso, cliente, k: int = 1, temperatura: float = 0.0, semi
         return reg | {"estado": "INVALIDO", "motivos": ["ninguna muestra con JSON válido"], "causas": [],
                       "idv_predichos": [], "acierto_top1": False, "acierto_top3": False, "afirmaciones": 0,
                       "evidencia_verificada": [], "evidencia_rechazada": []}
-    v = compuerta.verificar_muestras(validos, tags=caso.tags, codigos=set(caso.codigos), z=caso.z)
+    v = compuerta.verificar_muestras(validos, tags=caso.tags, codigos=set(caso.codigos), z=caso.z,
+                                    z_rms=caso.z_rms)
     idv = [caso.vista.idv.get(c) for c in v.causas]
     return reg | {
         "estado": v.estado, "motivos": v.motivos, "confianza": v.confianza, "causas": v.causas,
@@ -130,6 +133,8 @@ def diagnosticar(caso: Caso, cliente, k: int = 1, temperatura: float = 0.0, semi
         "evidencia_verificada": [{"tag": e.tag, "direction": e.direccion} for e in v.evidencia_verificada],
         "evidencia_rechazada": [{"tag": e.tag, "direction": e.direccion, "motivo": m}
                                 for e, m in v.evidencia_rechazada],
+        "evidencia_oscilante": [{"tag": e.tag, "direction": e.direccion, "motivo": m}
+                                for e, m in v.evidencia_oscilante],
         "acierto_top1": idv[:1] == [caso.falla], "acierto_top3": caso.falla in idv[:3],
         "afirmaciones": v.afirmaciones,
     }

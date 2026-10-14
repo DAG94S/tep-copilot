@@ -6,7 +6,9 @@ Comprobaciones:
   1. Cada causa citada existe en el catálogo que vio el LLM. Si no → BLOQUEADO.
   2. La explicación no contiene órdenes de control (abrir, cerrar, fijar, arrancar, parar…). Si las hay → BLOQUEADO.
   3. Cada sensor de evidencia existe y se desvió de verdad, en la dirección que dice el LLM:
-     z mediano de la ventana ≥ umbral_z, con signo coherente. Las afirmaciones no respaldadas se retiran de la tarjeta
+     z mediano de la ventana ≥ umbral_z, con signo coherente. Si la mediana no llega al umbral pero la desviación
+     RMS de la ventana sí (variable oscilante: válvula pegada, variaciones aleatorias), la afirmación se acepta como
+     "oscila (dirección no verificable)" y cuenta como verificada. Las afirmaciones no respaldadas se retiran de la tarjeta
      y se cuentan. Si ninguna se sostiene → BLOQUEADO; si solo algunas → PARCIAL.
   4. Autoconsistencia: con k muestras del LLM, la confianza es la fracción que coincide en la causa principal.
      Por debajo de umbral_acuerdo → INCIERTO (escalar a supervisor).
@@ -42,11 +44,12 @@ class Veredicto:
     causas: list[str] = field(default_factory=list)
     evidencia_verificada: list[Evidencia] = field(default_factory=list)
     evidencia_rechazada: list[tuple[Evidencia, str]] = field(default_factory=list)
+    evidencia_oscilante: list[tuple[Evidencia, str]] = field(default_factory=list)  # aceptada sin dirección verificada
     confianza: float | None = None                # acuerdo entre muestras; None si k=1
 
     @property
     def afirmaciones(self) -> int:
-        return len(self.evidencia_verificada) + len(self.evidencia_rechazada)
+        return len(self.evidencia_verificada) + len(self.evidencia_oscilante) + len(self.evidencia_rechazada)
 
 
 def desviacion_z(ventana: np.ndarray, media: np.ndarray, desv: np.ndarray) -> np.ndarray:
@@ -55,13 +58,20 @@ def desviacion_z(ventana: np.ndarray, media: np.ndarray, desv: np.ndarray) -> np
     return np.median((ventana - media) / desv, axis=0)
 
 
+def desviacion_rms(ventana: np.ndarray, media: np.ndarray, desv: np.ndarray) -> np.ndarray:
+    """Desviación RMS por variable en la ventana (n, p): sqrt(mean(z²)) → (p,). Detecta oscilación que la mediana oculta."""
+    desv = np.where(desv == 0, 1.0, desv)
+    return np.sqrt(np.mean(((ventana - media) / desv) ** 2, axis=0))
+
+
 def ordenes_de_control(texto: str) -> list[str]:
     return [m.group(0).strip() for m in _ORDEN.finditer(texto)]
 
 
 def verificar(diag: Diagnostico, *, tags: list[str], codigos: set[str], z: np.ndarray,
-              umbral_z: float = UMBRAL_Z) -> Veredicto:
-    """Verifica una salida del LLM. `tags[j]` corresponde a `z[j]`; `codigos` es el catálogo mostrado."""
+              umbral_z: float = UMBRAL_Z, z_rms: np.ndarray | None = None) -> Veredicto:
+    """Verifica una salida del LLM. `tags[j]` corresponde a `z[j]`; `codigos` es el catálogo mostrado.
+    `z_rms` (opcional) permite aceptar variables oscilantes cuya mediana no llega al umbral."""
     v = Veredicto("VERIFICADO", causas=list(diag.causas))
     desconocidas = [c for c in diag.causas if c not in codigos]
     if desconocidas:
@@ -75,6 +85,8 @@ def verificar(diag: Diagnostico, *, tags: list[str], codigos: set[str], z: np.nd
         j = indice.get(ev.tag)
         if j is None:
             v.evidencia_rechazada.append((ev, "tag inexistente"))
+        elif abs(z[j]) < umbral_z and z_rms is not None and z_rms[j] >= umbral_z:
+            v.evidencia_oscilante.append((ev, f"oscila (dirección no verificable; RMS={z_rms[j]:.1f})"))
         elif abs(z[j]) < umbral_z:
             v.evidencia_rechazada.append((ev, f"sin desviación (|z|={abs(z[j]):.1f} < {umbral_z})"))
         elif (z[j] > 0) != (ev.direccion == "up"):
@@ -82,7 +94,7 @@ def verificar(diag: Diagnostico, *, tags: list[str], codigos: set[str], z: np.nd
         else:
             v.evidencia_verificada.append(ev)
 
-    if not v.evidencia_verificada:
+    if not v.evidencia_verificada and not v.evidencia_oscilante:
         v.motivos.append("ninguna evidencia respaldada por los datos")
     if v.motivos:
         v.estado = "BLOQUEADO"
@@ -101,10 +113,11 @@ def votar(diags: list[Diagnostico]) -> tuple[Diagnostico, float]:
 
 
 def verificar_muestras(diags: list[Diagnostico], *, tags: list[str], codigos: set[str], z: np.ndarray,
-                       umbral_z: float = UMBRAL_Z, umbral_acuerdo: float = UMBRAL_ACUERDO) -> Veredicto:
+                       umbral_z: float = UMBRAL_Z, umbral_acuerdo: float = UMBRAL_ACUERDO,
+                       z_rms: np.ndarray | None = None) -> Veredicto:
     """Vota entre k muestras y verifica la elegida. Bajo acuerdo → INCIERTO, salvo que ya esté BLOQUEADO."""
     elegido, acuerdo = votar(diags)
-    v = verificar(elegido, tags=tags, codigos=codigos, z=z, umbral_z=umbral_z)
+    v = verificar(elegido, tags=tags, codigos=codigos, z=z, umbral_z=umbral_z, z_rms=z_rms)
     if len(diags) > 1:
         v.confianza = acuerdo
         if v.estado != "BLOQUEADO" and acuerdo < umbral_acuerdo:

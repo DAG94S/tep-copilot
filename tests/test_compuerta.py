@@ -96,3 +96,35 @@ def test_desviacion_z_usa_mediana():
     ventana = np.array([[10.0, 0.0], [12.0, 0.0], [100.0, 0.0]])
     z = compuerta.desviacion_z(ventana, media=np.array([0.0, 0.0]), desv=np.array([2.0, 0.0]))
     np.testing.assert_allclose(z, [6.0, 0.0])
+
+
+# --- oscilación: z mediano bajo pero RMS alto -------------------------------------------------------------------
+Z_RMS = np.array([5.0, 4.0, 4.5, 3.2])   # FI-3: mediana 0.5 pero RMS 4.5 (oscila)
+
+
+def test_desviacion_rms():
+    ventana = np.array([[4.0], [-4.0], [4.0], [-4.0]])
+    z = compuerta.desviacion_z(ventana, np.array([0.0]), np.array([1.0]))
+    r = compuerta.desviacion_rms(ventana, np.array([0.0]), np.array([0.0 + 1.0]))
+    assert abs(z[0]) < 3 and r[0] == pytest.approx(4.0)
+
+
+def test_oscilacion_se_acepta_con_rms():
+    v = verificar(diag(evidencia=(("TI-1", "up"), ("FI-3", "up"))), z_rms=Z_RMS)
+    assert v.estado == "VERIFICADO" and not v.evidencia_rechazada
+    assert [e.tag for e, _ in v.evidencia_oscilante] == ["FI-3"] and "oscila" in v.evidencia_oscilante[0][1]
+    assert v.afirmaciones == 2
+
+
+def test_solo_oscilante_no_bloquea_y_contraria_sigue_rechazada():
+    assert verificar(diag(evidencia=(("FI-3", "down"),)), z_rms=Z_RMS).estado == "VERIFICADO"
+    v = verificar(diag(evidencia=(("TI-1", "up"), ("PI-2", "up"))), z_rms=Z_RMS)   # mediana fuerte, signo contrario
+    assert v.estado == "PARCIAL" and "contraria" in v.evidencia_rechazada[0][1] and not v.evidencia_oscilante
+
+
+def test_sin_z_rms_comportamiento_antiguo():
+    v = verificar(diag(evidencia=(("TI-1", "up"), ("FI-3", "up"))))
+    assert v.estado == "PARCIAL" and not v.evidencia_oscilante and "sin desviación" in v.evidencia_rechazada[0][1]
+    # RMS también bajo: sigue sin respaldo
+    v = verificar(diag(evidencia=(("TI-1", "up"), ("FI-3", "up"))), z_rms=np.array([5.0, 4.0, 1.0, 3.2]))
+    assert v.estado == "PARCIAL"
