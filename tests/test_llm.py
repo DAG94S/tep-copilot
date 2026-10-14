@@ -73,7 +73,7 @@ def test_completar_url_cabeceras_esquema_y_extra_body(monkeypatch):
     assert visto["json"]["response_format"]["json_schema"] == {"name": "diagnostico", "schema": {"type": "object"}, "strict": True}
     assert visto["json"]["chat_template_kwargs"] == {"enable_thinking": False}
     assert visto["json"]["seed"] == 7
-    assert r.textos == ["hola"] and r.uso == {"prompt_tokens": 10, "completion_tokens": 5}
+    assert r.textos == ["hola"] and r.uso == {"prompt_tokens": 10, "completion_tokens": 5, "reasoning_tokens": 0}
 
 
 def test_sin_api_key_ni_esquema(monkeypatch):

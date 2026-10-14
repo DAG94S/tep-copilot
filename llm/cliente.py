@@ -62,7 +62,7 @@ class ClienteLLM:
     def completar(self, mensajes: list[dict], n: int = 1, temperatura: float = 0.0, max_tokens: int = 800,
                   semilla: int | None = None, esquema: dict | None = None) -> Respuesta:
         t0 = time.perf_counter()
-        textos, crudo, uso = [], [], {"prompt_tokens": 0, "completion_tokens": 0}
+        textos, crudo, uso = [], [], {"prompt_tokens": 0, "completion_tokens": 0, "reasoning_tokens": 0}
         while len(textos) < n:
             cuerpo = {"model": self.modelo, "messages": mensajes,
                       "temperature": temperatura, "max_tokens": max_tokens}
@@ -76,8 +76,10 @@ class ClienteLLM:
             cuerpo |= self.extra_body
             datos = self._post(cuerpo)
             crudo.append(datos)
-            for k in uso:
-                uso[k] += (datos.get("usage") or {}).get(k, 0)
+            u = datos.get("usage") or {}
+            uso["prompt_tokens"] += u.get("prompt_tokens") or 0
+            uso["completion_tokens"] += u.get("completion_tokens") or 0
+            uso["reasoning_tokens"] += (u.get("completion_tokens_details") or {}).get("reasoning_tokens") or 0
             nuevos = [(c.get("message") or {}).get("content") or "" for c in datos.get("choices", [])]
             if not nuevos:
                 raise ErrorLLM(200, f"respuesta sin choices: {str(datos)[:300]}")
