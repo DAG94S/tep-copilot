@@ -42,3 +42,13 @@ def test_reintentos_ausentes_falla(tmp_path):
     _escribir(tmp_path / "base.jsonl", [_reg(1, 0, "VERIFICADO", True, True)])
     res = vc.verificar_afirmaciones(tmp_path, _claims(tmp_path, "1/1"))
     assert res[0][1] == "FALLA" and "reintentos ausentes" in res[0][3]
+
+
+def test_readme_marcadores(tmp_path):
+    claims = tmp_path / "claims.json"
+    claims.write_text(json.dumps([{"id": "a", "valor": "3/12", "fuente": "x", "descripcion": "x"}]), encoding="utf-8")
+    readme = tmp_path / "README.md"
+    readme.write_text("ok <!--claim:a-->3/12<!--/claim--> mal <!--claim:a-->4/12<!--/claim--> "
+                      "falta <!--claim:zzz-->1<!--/claim-->", encoding="utf-8")
+    res = vc.verificar_readme(readme, claims)
+    assert [(i, e) for i, e, _, _ in res] == [("a", "OK"), ("a", "FALLA"), ("zzz", "FALLA")]

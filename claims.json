@@ -113,5 +113,17 @@
     "fuente": "data/runs/tf_gemma31b_k5_v2/recompuertado.jsonl",
     "reintentos": "data/runs/tf_gemma31b_k5_v2_reintentos/registros.jsonl",
     "descripcion": "Afirmaciones de evidencia rechazadas por la compuerta vigente sobre la campaña combinada (35/143)"
+  },
+  {
+    "id": "evolus_llamadas",
+    "valor": "2",
+    "fuente": "data/runs/evolus/agente_2026-10-14/resultados.jsonl",
+    "descripcion": "Llamadas reales grabadas al agente de Evolus (IDV6 niveles 0 y 2)"
+  },
+  {
+    "id": "evolus_ordenes_control",
+    "valor": "0",
+    "fuente": "data/runs/evolus/agente_2026-10-14/resultados.jsonl",
+    "descripcion": "Órdenes de control detectadas por el filtro de verbos en las salidas del agente de Evolus"
   }
 ]

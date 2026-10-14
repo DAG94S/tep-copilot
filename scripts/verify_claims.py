@@ -9,6 +9,7 @@ Código de salida: 0 si todo cuadra; 1 si un hash difiere, falta un archivo vers
 """
 import hashlib
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -97,6 +98,8 @@ METRICAS = {
     **{f"campana_v2_n{n}_top3": (lambda regs, n=n: _top(regs, n, "acierto_top3")) for n in range(3)},
     **{f"combinado_n{n}_top1": (lambda regs, n=n: _top(regs, n, "acierto_top1")) for n in range(3)},
     **{f"combinado_n{n}_top3": (lambda regs, n=n: _top(regs, n, "acierto_top3")) for n in range(3)},
+    "evolus_llamadas": lambda regs: str(len(regs)),
+    "evolus_ordenes_control": lambda regs: str(sum(len(r.get("ordenes_de_control", [])) for r in regs)),
     "combinado_rechazo": _tasa_rechazo,
     "campana_v2_rechazo_antes": _tasa_rechazo,
     "campana_v2_rechazo_despues": _tasa_rechazo,
@@ -136,6 +139,21 @@ def verificar_afirmaciones(raiz: Path, claims_path: Path) -> list[tuple[str, str
     return res
 
 
+MARCADOR = re.compile(r"<!--claim:([A-Za-z0-9_]+)-->(.*?)<!--/claim-->", re.S)
+
+
+def verificar_readme(readme: Path, claims_path: Path) -> list[tuple[str, str, str, str]]:
+    """[(id, estado, en_readme, en_claims)] por cada marcador `<!--claim:ID-->VALOR<!--/claim-->` del README."""
+    valores = {c["id"]: str(c["valor"]) for c in json.loads(claims_path.read_text(encoding="utf-8"))}
+    res = []
+    for id_, valor in MARCADOR.findall(readme.read_text(encoding="utf-8")):
+        if id_ not in valores:
+            res.append((id_, "FALLA", valor, "id inexistente en claims.json"))
+        else:
+            res.append((id_, "OK" if valor == valores[id_] else "FALLA", valor, valores[id_]))
+    return res
+
+
 def main(raiz: Path = RAIZ) -> int:
     fallos = 0
     print("== SHA256SUMS ==")
@@ -156,6 +174,19 @@ def main(raiz: Path = RAIZ) -> int:
     for id_, est, esp, calc in verificar_afirmaciones(raiz, claims):
         print(f"{id_:32} {est:6} {esp:10} {calc}")
         fallos += est == "FALLA"
+    print("\n== README ==")
+    readme = raiz / "README.md"
+    if not readme.exists():
+        print("FALLA README.md no existe")
+        fallos += 1
+    else:
+        marc = verificar_readme(readme, claims)
+        for id_, est, en_readme, en_claims in marc:
+            if est == "FALLA":
+                print(f"FALLA {id_}: README dice {en_readme!r}, claims.json {en_claims!r}")
+                fallos += 1
+        print(f"{sum(m[1] == 'OK' for m in marc)}/{len(marc)} marcadores verificados")
+
     print("\nRESULTADO:", "TODO OK" if not fallos else f"{fallos} FALLA(S)")
     return 1 if fallos else 0
 
