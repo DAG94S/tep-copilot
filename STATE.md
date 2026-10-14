@@ -315,3 +315,17 @@ Ver `docs/CHECKLIST.md`.
   ⇒ El disfraz no baja el acierto con thinking, pero **sube el esfuerzo de razonamiento ~30 %**.
 - Lectura provisional: Gemma no "recita" TEP en general; la memoria de TEP solo pesa en IDV8 (variación de
   composición A/B/C), que pierde la mitad de los aciertos top-3 al quitar los nombres.
+
+## 2026-10-14 (noche) — Verificación del "giro": qué sobrevive dentro de cada falla
+- **NO sobrevive: "la compuerta sabe cuándo confiar".** En Rieth (300) VERIFICADO da top-3 85 % vs PARCIAL 60 %,
+  pero es confusión por falla: las fallas fáciles (IDV1) salen siempre VERIFICADO y aciertan; las difíciles (10, 13)
+  salen PARCIAL y fallan. Dentro de falla: top-3 V−P permutación estratificada p=0,09 (OR Mantel-Haenszel 3,6, lo
+  arrastran IDV14 y 12); top-1 sin relación (p=1). Con thinking, "acuerdo=1 → 71 % vs 16 %" tampoco: en las 3
+  fallas con acuerdo mixto, 0/5 vs 0/4. ⇒ No usar el estado de la compuerta ni el acuerdo como confianza por caso.
+- Anecdótico: BLOQUEADO 0/7 aciertos; dentro de IDV5, 0/6 bloqueados vs 16/24 parciales (Fisher p=0,005). Una falla.
+- **SÍ sobrevive: razonar inventa más evidencia.** Braatz, mismos 36 casos (falla×nivel) con y sin thinking:
+  rechazo medio por caso 22 % → 36 %; thinking peor en 24, mejor en 2, igual en 10; Wilcoxon p=0,00015.
+  Afirmaciones 143 → 182; rechazadas 35 → 68. A la vez top-1 sube de 11/36 a 15/36. ⇒ el thinking acierta algo más
+  pero cita casi el doble de evidencia que los datos no respaldan: la compuerta importa más con modelos que razonan.
+- Pitch revisado: no "sabe cuándo confiar", sino "no deja que el modelo invente evidencia" + "el disfraz cuesta
+  esfuerzo, no acierto (salvo IDV8)" + réplica 8/11 vs GPT-4o 7/11.
