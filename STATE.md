@@ -283,3 +283,11 @@ Ver `docs/CHECKLIST.md`.
   1, 2, 5, 6, 7, 8, 10, 12, 13, 14 (10 tarde: mediana 179 muestras); 3, 4, 9, 11, 15 ≤4/20 con retardos ~305
   ≈ falsas alarmas tardías (4/20 corridas normales también alarman en 500 muestras). 0/300 alarmas antes de la falla.
   ⚠ IDV11 se detecta en Braatz pero no en Rieth-train con T².
+
+## 2026-10-14 — Versión robusta (Rieth): plan y lanzamiento del brazo sin thinking
+- Decisión con Diego: **A hoy** = sin thinking, fallas 1,2,5,6,7,8,10,12,13,14 (detectadas 20/20 en Rieth) × corridas
+  1–10 × niveles 0/1/2 = 300 casos, mismos parámetros que `tf_gemma31b_k5_v2` (k=5, T=0,7, ampliado, t2, sin esquema,
+  max_tokens 1500) → `data/runs/tf_rieth_k5_n{0,1,2}`. **B mañana** (tras el reinicio de las 16:00 UTC) = con thinking
+  minimal, mismas fallas × corridas 1–10 × niveles **0 y 2** (200 casos).
+- Presupuesto medido hoy (`/v1/usage`): ~0,003–0,004 USD por caso con thinking (k=5) → 300 casos superarían el tope
+  diario de 1 USD; por eso B omite el nivel 1. Sin thinking ~0,0002 por caso.
