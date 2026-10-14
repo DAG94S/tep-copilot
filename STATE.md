@@ -236,8 +236,7 @@ Ver `docs/CHECKLIST.md`.
 ## 2026-10-14 — Agente de Evolus creado; Gemma de Token Factory caído (~16:00 UTC)
 - Agente `TEP Shift Copilot` (app.evolus.ai, desde cero, instrucciones = `evolus/agente_instrucciones.md` v1).
   Modelo: conexión `amd` → `Gemma-4-31B-IT` (por defecto había quedado DeepSeek-V4-Flash). Temperatura "Automatic"
-  (no se envía; ≠ campaña, que usó 0,7). Reasoning "Model default" (la UI no tiene Off; Gemma en TF no piensa por
-  defecto; "Minimal" lo encendería). Widgets desactivados. Fallback de la conexión: "Stop" (nunca modelos de Evolus).
+  (no se envía; ≠ campaña, que usó 0,7). Reasoning: quedó en "Minimal" (ver entrada siguiente). Widgets desactivados. Fallback de la conexión: "Stop" (nunca modelos de Evolus).
   `GET /v1/models` → 1 agente, id `<applicationId>:<agentId>`.
 - **Esquema externo:** con el agente sin respuesta, Evolus devuelve **200** con el error como texto del asistente:
   "Your model 'gemma-4-31b-it' could not answer: The model endpoint could not be reached or did not answer in time."
@@ -256,7 +255,8 @@ Ver `docs/CHECKLIST.md`.
   alarma "not provided" aunque el índice está en el mensaje. Dice "rejected evidence not provided" (correcto: no hubo).
 - **Evidencia de que corrió en AMD:** `uso_token_factory.json` (GET /v1/usage justo después): desde 16:00 UTC, 8
   peticiones (4 errores = la caída previa), `last_request_at` 16:09:34 = fin de la corrida, modelo Gemma-4-31B-IT.
-- **Desviación:** `reasoning_tokens` hoy = 1.770 de 2.148 de completion → con "Reasoning: Model default", el agente de
-  Evolus **hace pensar a Gemma** (en llamada directa a TF no piensa). Explica los ~75 s. La UI no ofrece "Off".
+- **Desviación:** `reasoning_tokens` hoy = 1.770 de 2.148 de completion → el agente quedó con **"Reasoning: Minimal"**
+  (no "Model default", corrección de Diego), que enciende el thinking de Gemma. Explica los ~75 s. Para alinearlo con
+  la campaña (thinking off) → "Model default" y repetir; la UI no ofrece "Off".
 - `sha256_instrucciones` del manifiesto es del archivo `evolus/agente_instrucciones.md` completo (cabecera en
   español + bloque pegado), no solo del bloque.
