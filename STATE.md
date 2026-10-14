@@ -290,4 +290,6 @@ Ver `docs/CHECKLIST.md`.
   max_tokens 1500) → `data/runs/tf_rieth_k5_n{0,1,2}`. **B mañana** (tras el reinicio de las 16:00 UTC) = con thinking
   minimal, mismas fallas × corridas 1–10 × niveles **0 y 2** (200 casos).
 - Presupuesto medido hoy (`/v1/usage`): ~0,003–0,004 USD por caso con thinking (k=5) → 300 casos superarían el tope
-  diario de 1 USD; por eso B omite el nivel 1. Sin thinking ~0,0002 por caso.
+  diario de 1 USD. Sin thinking ~0,0002 por caso. **Corrección de Diego: no se recorta B, se reparte en dos días**
+  (el tope se reinicia a diario y la entrega es el dom 18): jue 15 niveles 0 y 2 (200 casos), vie 16 nivel 1
+  (100 casos), sáb 17 margen para reintentos.
