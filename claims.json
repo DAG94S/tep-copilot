@@ -117,13 +117,13 @@
   {
     "id": "evolus_llamadas",
     "valor": "2",
-    "fuente": "data/runs/evolus/agente_2026-10-14/resultados.jsonl",
+    "fuente": "data/runs/evolus/agente_2026-10-14_sinrazonamiento/resultados.jsonl",
     "descripcion": "Llamadas reales grabadas al agente de Evolus (IDV6 niveles 0 y 2)"
   },
   {
     "id": "evolus_ordenes_control",
     "valor": "0",
-    "fuente": "data/runs/evolus/agente_2026-10-14/resultados.jsonl",
+    "fuente": "data/runs/evolus/agente_2026-10-14_sinrazonamiento/resultados.jsonl",
     "descripcion": "Órdenes de control detectadas por el filtro de verbos en las salidas del agente de Evolus"
   }
 ]

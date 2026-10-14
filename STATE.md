@@ -260,3 +260,6 @@ Ver `docs/CHECKLIST.md`.
   la campaña (thinking off) → "Model default" y repetir; la UI no ofrece "Off".
 - `sha256_instrucciones` del manifiesto es del archivo `evolus/agente_instrucciones.md` completo (cabecera en
   español + bloque pegado), no solo del bloque.
+- **Repetición con "Reasoning: Model default"** → `data/runs/evolus/agente_2026-10-14_sinrazonamiento` (pineada; es la
+  que cita el README): 7,3 s y 30,0 s (antes ~75 s), 0 órdenes de control, y ahora sí cita "sample index 173" en ambos
+  niveles. Los `reasoning_tokens` de `/v1/usage` no sirven para aislarla: el piloto con thinking corría a la vez.
