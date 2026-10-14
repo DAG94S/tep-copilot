@@ -232,3 +232,18 @@ Ver `docs/CHECKLIST.md`.
   top-1 n0/n1/n2 = **3/12, 4/12, 4/12**; top-3 = **7/12, 6/12, 6/12**; rechazo 23/24/26 %.
   La caída top-3 entre el original y la gemela es de 1 caso.
 - Pendiente: llevar la combinación a `verify_claims.py`/`claims.json` antes de citar estas cifras.
+
+## 2026-10-14 — Agente de Evolus creado; Gemma de Token Factory caído (~16:00 UTC)
+- Agente `TEP Shift Copilot` (app.evolus.ai, desde cero, instrucciones = `evolus/agente_instrucciones.md` v1).
+  Modelo: conexión `amd` → `Gemma-4-31B-IT` (por defecto había quedado DeepSeek-V4-Flash). Temperatura "Automatic"
+  (no se envía; ≠ campaña, que usó 0,7). Reasoning "Model default" (la UI no tiene Off; Gemma en TF no piensa por
+  defecto; "Minimal" lo encendería). Widgets desactivados. Fallback de la conexión: "Stop" (nunca modelos de Evolus).
+  `GET /v1/models` → 1 agente, id `<applicationId>:<agentId>`.
+- **Esquema externo:** con el agente sin respuesta, Evolus devuelve **200** con el error como texto del asistente:
+  "Your model 'gemma-4-31b-it' could not answer: The model endpoint could not be reached or did not answer in time."
+  (68 s en streaming; sin streaming el cliente agotó 180 s). ⇒ el script debe tratar ese texto como error, no como
+  respuesta.
+- Causa: Token Factory directo → `Gemma-4-31B-IT` **500** `no_available_workers` ("all circuits open or unhealthy");
+  `DeepSeek-V4-Flash` 200 en 1,9 s. A las 15:41 UTC Gemma funcionaba. Los nombres de modelo distinguen mayúsculas
+  (`gemma-4-31b-it` → 404 model_not_found); falta ver si Evolus envía el nombre en minúsculas o solo lo muestra así.
+- Tope diario: el período empieza 16:00 UTC (`daily_reset_timezone` Asia/Shanghai); uso ≈ 0.
