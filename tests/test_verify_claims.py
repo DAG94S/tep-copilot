@@ -113,6 +113,23 @@ def test_alarmas_por_tarjeta_mediana(tmp_path):
     assert res[0][1] == "FALLA"
 
 
+def test_anticipacion(tmp_path):
+    _escribir(tmp_path / "base.jsonl", [_caso(1, "VERIFICADO", 1), _caso(2, "PARCIAL", 1), _caso(3, "VERIFICADO", 1),
+                                        _caso(4, "NO_DETECTADO", idx=900)])
+    fila = lambda t, p, i, n: {"indice_alarma": 170, "tarjeta_min": t, "primera_alarma_min": p, "inundacion_min": i,
+                               "alarmas_2h_tras_tarjeta": n}
+    aux = {"por_falla": {"1": fila(30, 45, 40, 7), "2": fila(30, 3, None, 12), "3": fila(30, 30, 1000, 4),
+                         "4": fila(0, 0, 5, 99)}}
+    (tmp_path / "an.json").write_text(json.dumps(aux), encoding="utf-8")
+    esperado = {"anticipacion_inundaciones": "2/2", "anticipacion_minutos": "10, 970",
+                "tarjeta_antes_primera_alarma": "1", "alarmas_2h_tras_tarjeta_max": "12"}
+    for id_, v in esperado.items():
+        assert vc.verificar_afirmaciones(tmp_path, _un_claim(tmp_path, id_, v, auxiliar="an.json"))[0][1] == "OK", id_
+    aux["por_falla"]["3"]["indice_alarma"] = 171      # el auxiliar no corresponde a la campaña
+    (tmp_path / "an.json").write_text(json.dumps(aux), encoding="utf-8")
+    assert vc.verificar_afirmaciones(tmp_path, _un_claim(tmp_path, "anticipacion_minutos", "10, 970", auxiliar="an.json"))[0][1] == "FALLA"
+
+
 # ---------- fuente-lista, pareado/McNemar y bootstrap por clusters ----------
 
 def _rieth(falla, corrida, nivel, top3, estado="VERIFICADO"):

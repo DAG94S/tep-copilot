@@ -378,5 +378,37 @@
       "data/runs/tf_gemma31b_k5_think_n2/registros.jsonl"
     ],
     "descripcion": "Datos Braatz d00-d21 con razonamiento (thinking minimal), Gemma-4-31B, k=5, una corrida por falla; 12 casos evaluables por nivel (3 NO_DETECTADO excluidos de 15). Mediana por caso de `segundos` (total de las k=5 llamadas secuenciales) en los niveles 0 / 1 / 2, redondeada a entero."
+  },
+  {
+    "id": "anticipacion_inundaciones",
+    "valor": "4/4",
+    "descripcion": "Fallas con inundación de alarmas (>=10 eventos en una ventana de 4 muestras = 12 min, aproximación del criterio EEMUA de 10 en 10 min) en las que la tarjeta llega antes de la inundación, sobre las fallas con inundación (1, 8, 12 y 13). Alarmas generadas por nuestro sistema de límites estadísticos sobre TEP (p99.9, retardo 2, solo XMEAS), no la configuración de alarmas de una planta real; nivel 0, una simulación por falla (Braatz); 12 fallas con caso LLM. Calculado por scripts/medir_anticipacion.py.",
+    "fuente": "data/runs/tf_gemma31b_k5_v2/recompuertado.jsonl",
+    "reintentos": "data/runs/tf_gemma31b_k5_v2_reintentos/registros.jsonl",
+    "auxiliar": "data/processed/anticipacion.json"
+  },
+  {
+    "id": "anticipacion_minutos",
+    "valor": "9, 615, 1488, 1143",
+    "descripcion": "Minutos de anticipación (inundación menos tarjeta) en las fallas con inundación, ordenadas por falla (1, 8, 12, 13). Inundación: >=10 eventos en una ventana de 4 muestras (12 min). Alarmas generadas por nuestro sistema de límites estadísticos sobre TEP (p99.9, retardo 2, solo XMEAS), no la configuración de alarmas de una planta real; nivel 0, una simulación por falla (Braatz); 12 fallas con caso LLM. Calculado por scripts/medir_anticipacion.py.",
+    "fuente": "data/runs/tf_gemma31b_k5_v2/recompuertado.jsonl",
+    "reintentos": "data/runs/tf_gemma31b_k5_v2_reintentos/registros.jsonl",
+    "auxiliar": "data/processed/anticipacion.json"
+  },
+  {
+    "id": "tarjeta_antes_primera_alarma",
+    "valor": "2",
+    "descripcion": "Número de fallas en que la tarjeta llega estrictamente antes de la primera alarma de proceso (fallas 1 y 6). Alarmas generadas por nuestro sistema de límites estadísticos sobre TEP (p99.9, retardo 2, solo XMEAS), no la configuración de alarmas de una planta real; nivel 0, una simulación por falla (Braatz); 12 fallas con caso LLM. Calculado por scripts/medir_anticipacion.py.",
+    "fuente": "data/runs/tf_gemma31b_k5_v2/recompuertado.jsonl",
+    "reintentos": "data/runs/tf_gemma31b_k5_v2_reintentos/registros.jsonl",
+    "auxiliar": "data/processed/anticipacion.json"
+  },
+  {
+    "id": "alarmas_2h_tras_tarjeta_max",
+    "valor": "47",
+    "descripcion": "Máximo, entre fallas, de eventos de alarma en las 2 h (40 muestras) posteriores a la tarjeta (falla 1). Alarmas generadas por nuestro sistema de límites estadísticos sobre TEP (p99.9, retardo 2, solo XMEAS), no la configuración de alarmas de una planta real; nivel 0, una simulación por falla (Braatz); 12 fallas con caso LLM. Calculado por scripts/medir_anticipacion.py.",
+    "fuente": "data/runs/tf_gemma31b_k5_v2/recompuertado.jsonl",
+    "reintentos": "data/runs/tf_gemma31b_k5_v2_reintentos/registros.jsonl",
+    "auxiliar": "data/processed/anticipacion.json"
   }
 ]

@@ -139,6 +139,46 @@ def _alarmas_por_tarjeta_mediana(regs: list[dict], aux: dict) -> str:
     return f"{_mediana(por_falla.values()):g}"
 
 
+def _filas_anticipacion(regs: list[dict], aux: dict) -> list[tuple[int, dict]]:
+    """Filas (falla, fila) de anticipacion.json para las fallas con caso LLM de nivel 0, ordenadas por falla.
+    Falla si falta una falla en el auxiliar o su indice_alarma no coincide con la campaña (scripts/medir_anticipacion.py)."""
+    filas = {}
+    for r in _con_llm(regs):
+        if r["nivel"] != 0:
+            continue
+        a = aux["por_falla"][str(r["falla"])]
+        if a["indice_alarma"] != r["indice_alarma"]:
+            raise ValueError(f"falla {r['falla']}: indice_alarma {r['indice_alarma']} != auxiliar {a['indice_alarma']}")
+        filas[r["falla"]] = a
+    return sorted(filas.items())
+
+
+def _con_inundacion(regs: list[dict], aux: dict) -> list[tuple[int, dict]]:
+    return [(f, a) for f, a in _filas_anticipacion(regs, aux) if a["inundacion_min"] is not None]
+
+
+def _anticipacion_inundaciones(regs: list[dict], aux: dict) -> str:
+    """Fallas con inundación de alarmas en las que la tarjeta llega antes / fallas con inundación."""
+    con = _con_inundacion(regs, aux)
+    return f"{sum(a['tarjeta_min'] < a['inundacion_min'] for _, a in con)}/{len(con)}"
+
+
+def _anticipacion_minutos(regs: list[dict], aux: dict) -> str:
+    """(inundación - tarjeta) en minutos para las fallas con inundación, ordenadas por falla."""
+    return ", ".join(f"{a['inundacion_min'] - a['tarjeta_min']:g}" for _, a in _con_inundacion(regs, aux))
+
+
+def _tarjeta_antes_primera_alarma(regs: list[dict], aux: dict) -> str:
+    """Número de fallas en que la tarjeta llega estrictamente antes de la primera alarma de proceso."""
+    return str(sum(a["primera_alarma_min"] is not None and a["tarjeta_min"] < a["primera_alarma_min"]
+                   for _, a in _filas_anticipacion(regs, aux)))
+
+
+def _alarmas_2h_tras_tarjeta_max(regs: list[dict], aux: dict) -> str:
+    """Máximo, entre fallas, de eventos de alarma en las 2 h posteriores a la tarjeta."""
+    return str(max(a["alarmas_2h_tras_tarjeta"] for _, a in _filas_anticipacion(regs, aux)))
+
+
 def combinar_reintentos(regs: list[dict], reintentos: list[dict]) -> list[dict]:
     """Sustituye cada registro INVALIDO por el reintento con la misma (falla, nivel); el resto no se toca."""
     por_caso = {(r["falla"], r["nivel"]): r for r in reintentos}
@@ -254,6 +294,10 @@ METRICAS = {
 METRICAS_AUX = {
     "coste_por_incidente": _coste_por_incidente,
     "alarmas_por_tarjeta_mediana": _alarmas_por_tarjeta_mediana,
+    "anticipacion_inundaciones": _anticipacion_inundaciones,
+    "anticipacion_minutos": _anticipacion_minutos,
+    "tarjeta_antes_primera_alarma": _tarjeta_antes_primera_alarma,
+    "alarmas_2h_tras_tarjeta_max": _alarmas_2h_tras_tarjeta_max,
 }
 
 

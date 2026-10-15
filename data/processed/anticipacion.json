@@ -1,0 +1,102 @@
+{
+ "definicion": "anticipacion de la tarjeta frente a las alarmas de proceso (limites estadisticos p99.9 sobre TEP, retardo 2, solo XMEAS; no es la configuracion de alarmas de una planta real); nivel 0, una simulacion por falla (Braatz); minutos desde el inicio de la falla",
+ "fuentes": [
+  "data/runs/tf_gemma31b_k5_v2/recompuertado.jsonl",
+  "data/runs/tf_gemma31b_k5_v2_reintentos/registros.jsonl"
+ ],
+ "parametros": {
+  "horizonte_muestras": 40,
+  "inicio_falla": 160,
+  "minutos_por_muestra": 3.0,
+  "percentil_limites": 99.9,
+  "retardo": 2,
+  "umbral_inundacion_eventos": 10,
+  "ventana_inundacion_muestras": 4
+ },
+ "por_falla": {
+  "1": {
+   "alarmas_2h_tras_tarjeta": 47,
+   "indice_alarma": 173,
+   "inundacion_min": 48.0,
+   "primera_alarma_min": 45.0,
+   "tarjeta_min": 39.0
+  },
+  "10": {
+   "alarmas_2h_tras_tarjeta": 3,
+   "indice_alarma": 254,
+   "inundacion_min": null,
+   "primera_alarma_min": 147.0,
+   "tarjeta_min": 282.0
+  },
+  "11": {
+   "alarmas_2h_tras_tarjeta": 2,
+   "indice_alarma": 359,
+   "inundacion_min": null,
+   "primera_alarma_min": 111.0,
+   "tarjeta_min": 597.0
+  },
+  "12": {
+   "alarmas_2h_tras_tarjeta": 34,
+   "indice_alarma": 186,
+   "inundacion_min": 1566.0,
+   "primera_alarma_min": 9.0,
+   "tarjeta_min": 78.0
+  },
+  "13": {
+   "alarmas_2h_tras_tarjeta": 26,
+   "indice_alarma": 213,
+   "inundacion_min": 1302.0,
+   "primera_alarma_min": 42.0,
+   "tarjeta_min": 159.0
+  },
+  "14": {
+   "alarmas_2h_tras_tarjeta": 0,
+   "indice_alarma": 171,
+   "inundacion_min": null,
+   "primera_alarma_min": 33.0,
+   "tarjeta_min": 33.0
+  },
+  "15": {
+   "alarmas_2h_tras_tarjeta": 4,
+   "indice_alarma": 930,
+   "inundacion_min": null,
+   "primera_alarma_min": 48.0,
+   "tarjeta_min": 2310.0
+  },
+  "2": {
+   "alarmas_2h_tras_tarjeta": 18,
+   "indice_alarma": 179,
+   "inundacion_min": null,
+   "primera_alarma_min": 45.0,
+   "tarjeta_min": 57.0
+  },
+  "5": {
+   "alarmas_2h_tras_tarjeta": 8,
+   "indice_alarma": 178,
+   "inundacion_min": null,
+   "primera_alarma_min": 3.0,
+   "tarjeta_min": 54.0
+  },
+  "6": {
+   "alarmas_2h_tras_tarjeta": 29,
+   "indice_alarma": 173,
+   "inundacion_min": null,
+   "primera_alarma_min": 51.0,
+   "tarjeta_min": 39.0
+  },
+  "7": {
+   "alarmas_2h_tras_tarjeta": 37,
+   "indice_alarma": 165,
+   "inundacion_min": null,
+   "primera_alarma_min": 3.0,
+   "tarjeta_min": 15.0
+  },
+  "8": {
+   "alarmas_2h_tras_tarjeta": 26,
+   "indice_alarma": 193,
+   "inundacion_min": 714.0,
+   "primera_alarma_min": 3.0,
+   "tarjeta_min": 99.0
+  }
+ }
+}
