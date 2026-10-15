@@ -52,6 +52,8 @@ The gate rejected <!--claim:combinado_rechazo-->24%<!--/claim--> of the evidence
 
 Median reasoning tokens per case (k=5 calls) at levels 0 / 1 / 2: <!--claim:think_razonamiento_mediana-->16750 / 21215 / 22528<!--/claim-->. Median seconds per case: <!--claim:think_segundos_mediana-->451 / 694 / 702<!--/claim-->.
 
+**Thinking makes the model invent more evidence.** Same 36 cases (12 faults × 3 levels) with thinking off and on: top-1 goes from <!--claim:think_top1_pares-->11 / 15 of 36<!--/claim--> (off / on), but the share of each card's evidence that the gate rejects as unsupported by the data rises from <!--claim:think_rechazo_medias-->22% / 36%<!--/claim--> (mean per case; rejected/claimed in total: <!--claim:think_afirmaciones-->35/143 / 68/182<!--/claim-->). Rejection is higher / lower / equal with thinking in <!--claim:think_rechazo_pares-->24 / 2 / 10<!--/claim--> cases (Wilcoxon p = <!--claim:think_rechazo_wilcoxon_p-->0.00015<!--/claim-->). Because the levels of one fault are not independent, we also average each fault over its levels: higher / lower / equal in <!--claim:think_rechazo_fallas-->9 / 1 / 2<!--/claim--> faults, Wilcoxon p = <!--claim:think_rechazo_fallas_wilcoxon_p-->0.0039<!--/claim-->. The gate matters more, not less, with a model that reasons.
+
 **The disguise costs the model effort, not accuracy, except on IDV8.** The Rieth arm with thinking is pending (runs on 15-16 Oct); no numbers yet.
 
 ## How we keep it honest

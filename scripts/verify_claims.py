@@ -252,6 +252,56 @@ def _idv8_top3(regs: list[dict]) -> str:
     return "/".join(str(sum(bool(r["acierto_top3"]) for r in _ev(regs, n) if r["falla"] == 8)) for n in range(3))
 
 
+# ---------- evidencia rechazada: sin razonamiento (fuente) vs con razonamiento (auxiliar), mismos casos ----------
+
+def _rechazo_por_caso(rs: list[dict]) -> dict:
+    """{(falla, nivel): registro} de los casos evaluables con al menos una afirmación."""
+    return {(r["falla"], r["nivel"]): r for r in rs if r["estado"] not in EXCLUIDOS and r.get("afirmaciones")}
+
+
+def _pares_rechazo(regs: list[dict], aux: list[dict]) -> list[tuple[int, float, float]]:
+    """Casos (falla, nivel) evaluables en ambas campañas: [(falla, rechazo_sin, rechazo_con)],
+    rechazo = afirmaciones rechazadas por la compuerta / afirmaciones del caso."""
+    a, b = _rechazo_por_caso(regs), _rechazo_por_caso(aux)
+    tasa = lambda r: len(r.get("evidencia_rechazada", [])) / r["afirmaciones"]
+    return [(k[0], tasa(a[k]), tasa(b[k])) for k in sorted(a.keys() & b.keys())]
+
+
+def _por_falla(par) -> list[tuple[int, float, float]]:
+    """Media por falla de sus niveles emparejados (los niveles de una falla se parecen: clusters, no casos)."""
+    return [(f, statistics.fmean(x for g, x, _ in par if g == f), statistics.fmean(y for g, _, y in par if g == f))
+            for f in sorted({f for f, _, _ in par})]
+
+
+def _peor_mejor_igual(par) -> str:
+    """Pares en que el rechazo con razonamiento es mayor / menor / igual."""
+    return f"{sum(y > x for _, x, y in par)} / {sum(y < x for _, x, y in par)} / {sum(y == x for _, x, y in par)}"
+
+
+def _wilcoxon_p(par) -> str:
+    from scipy.stats import wilcoxon  # perezoso
+    return f"{wilcoxon([y for _, _, y in par], [x for _, x, _ in par]).pvalue:.2g}"
+
+
+def _think_rechazo_medias(regs: list[dict], aux: list[dict]) -> str:
+    par = _pares_rechazo(regs, aux)
+    return f"{statistics.fmean(x for _, x, _ in par):.0%} / {statistics.fmean(y for _, _, y in par):.0%}"
+
+
+def _think_afirmaciones(regs: list[dict], aux: list[dict]) -> str:
+    """Rechazadas/afirmaciones sin y con razonamiento, sumadas sobre los mismos casos emparejados."""
+    a, b = _rechazo_por_caso(regs), _rechazo_por_caso(aux)
+    ks = a.keys() & b.keys()
+    tot = lambda d: f"{sum(len(d[k].get('evidencia_rechazada', [])) for k in ks)}/{sum(d[k]['afirmaciones'] for k in ks)}"
+    return f"{tot(a)} / {tot(b)}"
+
+
+def _think_top1_pares(regs: list[dict], aux: list[dict]) -> str:
+    a, b = _rechazo_por_caso(regs), _rechazo_por_caso(aux)
+    ks = sorted(a.keys() & b.keys())
+    return f"{sum(bool(a[k]['acierto_top1']) for k in ks)} / {sum(bool(b[k]['acierto_top1']) for k in ks)} of {len(ks)}"
+
+
 def _por_nivel_mediana(valor, redondeo=lambda x: f"{x:.0f}"):
     def f(regs):
         return " / ".join(redondeo(_mediana([valor(r) for r in _ev(regs, n)])) for n in range(3))
@@ -298,6 +348,13 @@ METRICAS_AUX = {
     "anticipacion_minutos": _anticipacion_minutos,
     "tarjeta_antes_primera_alarma": _tarjeta_antes_primera_alarma,
     "alarmas_2h_tras_tarjeta_max": _alarmas_2h_tras_tarjeta_max,
+    "think_rechazo_medias": _think_rechazo_medias,
+    "think_rechazo_pares": lambda regs, aux: _peor_mejor_igual(_pares_rechazo(regs, aux)),
+    "think_rechazo_wilcoxon_p": lambda regs, aux: _wilcoxon_p(_pares_rechazo(regs, aux)),
+    "think_rechazo_fallas": lambda regs, aux: _peor_mejor_igual(_por_falla(_pares_rechazo(regs, aux))),
+    "think_rechazo_fallas_wilcoxon_p": lambda regs, aux: _wilcoxon_p(_por_falla(_pares_rechazo(regs, aux))),
+    "think_afirmaciones": _think_afirmaciones,
+    "think_top1_pares": _think_top1_pares,
 }
 
 
@@ -308,6 +365,10 @@ def leer_jsonl(ruta: Path) -> list[dict]:
 def leer_auxiliar(ruta: Path):
     """JSON completo, o lista de registros si es .jsonl."""
     return leer_jsonl(ruta) if ruta.suffix == ".jsonl" else json.loads(ruta.read_text(encoding="utf-8"))
+
+
+def _rutas_auxiliar(c: dict) -> list[str]:
+    return c["auxiliar"] if isinstance(c["auxiliar"], list) else [c["auxiliar"]]
 
 
 def verificar_afirmaciones(raiz: Path, claims_path: Path) -> list[tuple[str, str, str, str]]:
@@ -336,11 +397,15 @@ def verificar_afirmaciones(raiz: Path, claims_path: Path) -> list[tuple[str, str
                 if not c.get("auxiliar"):
                     res.append((c["id"], "FALLA", esperado, "la métrica requiere `auxiliar`"))
                     continue
-                aux = raiz / c["auxiliar"]
-                if not aux.exists():
-                    res.append((c["id"], "FALLA", esperado, f"auxiliar ausente: {c['auxiliar']}"))
+                rutas = _rutas_auxiliar(c)
+                falta = next((x for x in rutas if not (raiz / x).exists()), None)
+                if falta is not None:
+                    res.append((c["id"], "FALLA", esperado, f"auxiliar ausente: {falta}"))
                     continue
-                calculado = f(regs, leer_auxiliar(aux))
+                # una sola ruta: JSON o JSONL tal cual; lista: JSONL concatenados
+                aux = (leer_auxiliar(raiz / rutas[0]) if len(rutas) == 1
+                       else [r for x in rutas for r in leer_jsonl(raiz / x)])
+                calculado = f(regs, aux)
             else:
                 calculado = f(regs)
         except (KeyError, ValueError, TypeError, StopIteration, ZeroDivisionError) as e:

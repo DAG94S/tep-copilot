@@ -180,3 +180,35 @@ def test_bootstrap_por_clusters_determinista():
     plano = [(f, True, False) for f in (1, 2, 3) for _ in range(2)]
     assert vc.caida_bootstrap(plano) == (100.0, 100.0, 100.0)
     assert vc.METRICAS["rieth_top3_caida_ic95_n0_n2"](_pareado_sintetico()).startswith("50 pp [")
+
+
+def _caso_rech(falla, nivel, afirm, rech, top1=False, estado="PARCIAL"):
+    return {"falla": falla, "nivel": nivel, "estado": estado, "acierto_top1": top1, "acierto_top3": top1,
+            "afirmaciones": afirm, "evidencia_rechazada": [{}] * rech}
+
+
+def test_rechazo_con_y_sin_razonamiento(tmp_path):
+    # falla 1: dos niveles, sube el rechazo en ambos; falla 2: igual; falla 3: solo en la campaña sin razonamiento
+    sin = [_caso_rech(1, 0, 4, 0, True), _caso_rech(1, 2, 4, 1), _caso_rech(2, 0, 2, 1), _caso_rech(3, 0, 2, 0)]
+    con = [_caso_rech(1, 0, 4, 2, True), _caso_rech(1, 2, 4, 2, True), _caso_rech(2, 0, 2, 1),
+           _caso_rech(4, 0, 2, 2, estado="INVALIDO")]
+    assert vc.METRICAS_AUX["think_rechazo_pares"](sin, con) == "2 / 0 / 1"
+    assert vc.METRICAS_AUX["think_rechazo_fallas"](sin, con) == "1 / 0 / 1"
+    assert vc.METRICAS_AUX["think_afirmaciones"](sin, con) == "2/10 / 5/10"
+    assert vc.METRICAS_AUX["think_top1_pares"](sin, con) == "1 / 2 of 3"
+    assert vc.METRICAS_AUX["think_rechazo_medias"](sin, con) == "25% / 50%"
+
+
+def test_auxiliar_lista_concatena_y_falla_si_falta(tmp_path):
+    _escribir(tmp_path / "sin.jsonl", [_caso_rech(1, 0, 4, 0), _caso_rech(2, 0, 4, 0)])
+    _escribir(tmp_path / "c0.jsonl", [_caso_rech(1, 0, 4, 2)])
+    _escribir(tmp_path / "c1.jsonl", [_caso_rech(2, 0, 4, 1)])
+    c = {"id": "think_rechazo_pares", "valor": "2 / 0 / 0", "fuente": "sin.jsonl",
+         "auxiliar": ["c0.jsonl", "c1.jsonl"], "descripcion": "x"}
+    ruta = tmp_path / "claims.json"
+    ruta.write_text(json.dumps([c]), encoding="utf-8")
+    assert vc.verificar_afirmaciones(tmp_path, ruta)[0][1] == "OK"
+    c["auxiliar"] = ["c0.jsonl", "falta.jsonl"]
+    ruta.write_text(json.dumps([c]), encoding="utf-8")
+    res = vc.verificar_afirmaciones(tmp_path, ruta)
+    assert res[0][1] == "FALLA" and "falta.jsonl" in res[0][3]

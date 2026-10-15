@@ -12,7 +12,7 @@
 - [ ] Rieth con thinking: n0/n2 (95/200 válidos) y n1. **Máx. 2 procesos.**
 - [ ] Probar el agente con la biblioteca cuando Gemma vuelva; grabar y pinear.
 - [ ] Workflow de Evolus (aprobación → agente → traducción) manejado por API; grabar ejecución.
-- [ ] Claims y README: anticipación, evidencia inventada con thinking, Rieth thinking.
+- [x] Claims y README: anticipación y evidencia inventada con thinking (control por falla). Falta Rieth thinking.
 - [ ] Demo como producto (replay en tiempo real) y despliegue con URL pública.
 - [ ] Copyright del LICENSE (decide Diego).
 

@@ -381,3 +381,10 @@ Ver `docs/CHECKLIST.md`.
   de GPU en el ACT III). Si no llegan en 48 h, contactar a los organizadores.
 - Con Gemma fuera de Token Factory, un vLLM propio en Developer Cloud (`deploy/` ya preparado) cumpliría a la vez
   Google (Gemma + ROCm) y Evolus (vLLM propio). Pendiente: que Diego confirme si recibió crédito de GPU.
+
+## 2026-10-15 — "Razonar inventa más evidencia" comprobado dentro de cada falla
+- Reproducido con datos pineados (combinada sin thinking vs `tf_gemma31b_k5_think_n{0,1,2}`, 36 pares falla×nivel):
+  rechazo medio por caso 22 % → 36 %, peor 24 / mejor 2 / igual 10, Wilcoxon p=0,00015; afirmaciones 143 → 182,
+  rechazadas 35 → 68; top-1 11 → 15.
+- **Agregado por falla (12 clusters, media de los 3 niveles): peor en 9, mejor en 1 (IDV11, 0,23→0,22), igual en 2
+  (IDV7, 12); Wilcoxon p=0,0039; signo p=0,021.** Sobrevive al control por falla → en claims.json (`think_rechazo_*`, `think_afirmaciones`, `think_top1_pares`) y en el README.

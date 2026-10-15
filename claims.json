@@ -410,5 +410,89 @@
     "fuente": "data/runs/tf_gemma31b_k5_v2/recompuertado.jsonl",
     "reintentos": "data/runs/tf_gemma31b_k5_v2_reintentos/registros.jsonl",
     "auxiliar": "data/processed/anticipacion.json"
+  },
+  {
+    "id": "think_rechazo_medias",
+    "valor": "22% / 36%",
+    "fuente": "data/runs/tf_gemma31b_k5_v2/recompuertado.jsonl",
+    "reintentos": "data/runs/tf_gemma31b_k5_v2_reintentos/registros.jsonl",
+    "auxiliar": [
+      "data/runs/tf_gemma31b_k5_think_n0/registros.jsonl",
+      "data/runs/tf_gemma31b_k5_think_n1/registros.jsonl",
+      "data/runs/tf_gemma31b_k5_think_n2/registros.jsonl"
+    ],
+    "descripcion": "Braatz d00-d21, Gemma-4-31B, k=5: campaña combinada sin razonamiento (fuente + reintentos) frente a la campaña con razonamiento minimal (auxiliar), emparejadas por (falla, nivel) evaluables en ambas (36 pares = 12 fallas x 3 niveles). Rechazo por caso = afirmaciones de evidencia rechazadas por la compuerta / afirmaciones del caso. Rechazo medio por caso sin / con razonamiento."
+  },
+  {
+    "id": "think_rechazo_pares",
+    "valor": "24 / 2 / 10",
+    "fuente": "data/runs/tf_gemma31b_k5_v2/recompuertado.jsonl",
+    "reintentos": "data/runs/tf_gemma31b_k5_v2_reintentos/registros.jsonl",
+    "auxiliar": [
+      "data/runs/tf_gemma31b_k5_think_n0/registros.jsonl",
+      "data/runs/tf_gemma31b_k5_think_n1/registros.jsonl",
+      "data/runs/tf_gemma31b_k5_think_n2/registros.jsonl"
+    ],
+    "descripcion": "Braatz d00-d21, Gemma-4-31B, k=5: campaña combinada sin razonamiento (fuente + reintentos) frente a la campaña con razonamiento minimal (auxiliar), emparejadas por (falla, nivel) evaluables en ambas (36 pares = 12 fallas x 3 niveles). Rechazo por caso = afirmaciones de evidencia rechazadas por la compuerta / afirmaciones del caso. Pares en que el rechazo con razonamiento es mayor / menor / igual."
+  },
+  {
+    "id": "think_rechazo_wilcoxon_p",
+    "valor": "0.00015",
+    "fuente": "data/runs/tf_gemma31b_k5_v2/recompuertado.jsonl",
+    "reintentos": "data/runs/tf_gemma31b_k5_v2_reintentos/registros.jsonl",
+    "auxiliar": [
+      "data/runs/tf_gemma31b_k5_think_n0/registros.jsonl",
+      "data/runs/tf_gemma31b_k5_think_n1/registros.jsonl",
+      "data/runs/tf_gemma31b_k5_think_n2/registros.jsonl"
+    ],
+    "descripcion": "Braatz d00-d21, Gemma-4-31B, k=5: campaña combinada sin razonamiento (fuente + reintentos) frente a la campaña con razonamiento minimal (auxiliar), emparejadas por (falla, nivel) evaluables en ambas (36 pares = 12 fallas x 3 niveles). Rechazo por caso = afirmaciones de evidencia rechazadas por la compuerta / afirmaciones del caso. p-valor de Wilcoxon de rangos con signo (scipy, bilateral, empates excluidos) sobre los 36 pares, 2 cifras significativas. Trata los niveles de una falla como independientes; ver think_rechazo_fallas_wilcoxon_p."
+  },
+  {
+    "id": "think_rechazo_fallas",
+    "valor": "9 / 1 / 2",
+    "fuente": "data/runs/tf_gemma31b_k5_v2/recompuertado.jsonl",
+    "reintentos": "data/runs/tf_gemma31b_k5_v2_reintentos/registros.jsonl",
+    "auxiliar": [
+      "data/runs/tf_gemma31b_k5_think_n0/registros.jsonl",
+      "data/runs/tf_gemma31b_k5_think_n1/registros.jsonl",
+      "data/runs/tf_gemma31b_k5_think_n2/registros.jsonl"
+    ],
+    "descripcion": "Braatz d00-d21, Gemma-4-31B, k=5: campaña combinada sin razonamiento (fuente + reintentos) frente a la campaña con razonamiento minimal (auxiliar), emparejadas por (falla, nivel) evaluables en ambas (36 pares = 12 fallas x 3 niveles). Rechazo por caso = afirmaciones de evidencia rechazadas por la compuerta / afirmaciones del caso. Agregado por falla (media de sus 3 niveles; 12 clusters): fallas en que el rechazo con razonamiento es mayor / menor / igual."
+  },
+  {
+    "id": "think_rechazo_fallas_wilcoxon_p",
+    "valor": "0.0039",
+    "fuente": "data/runs/tf_gemma31b_k5_v2/recompuertado.jsonl",
+    "reintentos": "data/runs/tf_gemma31b_k5_v2_reintentos/registros.jsonl",
+    "auxiliar": [
+      "data/runs/tf_gemma31b_k5_think_n0/registros.jsonl",
+      "data/runs/tf_gemma31b_k5_think_n1/registros.jsonl",
+      "data/runs/tf_gemma31b_k5_think_n2/registros.jsonl"
+    ],
+    "descripcion": "Braatz d00-d21, Gemma-4-31B, k=5: campaña combinada sin razonamiento (fuente + reintentos) frente a la campaña con razonamiento minimal (auxiliar), emparejadas por (falla, nivel) evaluables en ambas (36 pares = 12 fallas x 3 niveles). Rechazo por caso = afirmaciones de evidencia rechazadas por la compuerta / afirmaciones del caso. p-valor de Wilcoxon (scipy, bilateral) sobre las 12 diferencias por falla, 2 cifras significativas. Control por falla de AGENTS.md regla 6."
+  },
+  {
+    "id": "think_afirmaciones",
+    "valor": "35/143 / 68/182",
+    "fuente": "data/runs/tf_gemma31b_k5_v2/recompuertado.jsonl",
+    "reintentos": "data/runs/tf_gemma31b_k5_v2_reintentos/registros.jsonl",
+    "auxiliar": [
+      "data/runs/tf_gemma31b_k5_think_n0/registros.jsonl",
+      "data/runs/tf_gemma31b_k5_think_n1/registros.jsonl",
+      "data/runs/tf_gemma31b_k5_think_n2/registros.jsonl"
+    ],
+    "descripcion": "Braatz d00-d21, Gemma-4-31B, k=5: campaña combinada sin razonamiento (fuente + reintentos) frente a la campaña con razonamiento minimal (auxiliar), emparejadas por (falla, nivel) evaluables en ambas (36 pares = 12 fallas x 3 niveles). Rechazo por caso = afirmaciones de evidencia rechazadas por la compuerta / afirmaciones del caso. Afirmaciones rechazadas/afirmaciones sin / con razonamiento, sumadas sobre los 36 pares."
+  },
+  {
+    "id": "think_top1_pares",
+    "valor": "11 / 15 of 36",
+    "fuente": "data/runs/tf_gemma31b_k5_v2/recompuertado.jsonl",
+    "reintentos": "data/runs/tf_gemma31b_k5_v2_reintentos/registros.jsonl",
+    "auxiliar": [
+      "data/runs/tf_gemma31b_k5_think_n0/registros.jsonl",
+      "data/runs/tf_gemma31b_k5_think_n1/registros.jsonl",
+      "data/runs/tf_gemma31b_k5_think_n2/registros.jsonl"
+    ],
+    "descripcion": "Braatz d00-d21, Gemma-4-31B, k=5: campaña combinada sin razonamiento (fuente + reintentos) frente a la campaña con razonamiento minimal (auxiliar), emparejadas por (falla, nivel) evaluables en ambas (36 pares = 12 fallas x 3 niveles). Rechazo por caso = afirmaciones de evidencia rechazadas por la compuerta / afirmaciones del caso. Aciertos top-1 sin / con razonamiento sobre los 36 pares."
   }
 ]
