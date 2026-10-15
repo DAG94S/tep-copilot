@@ -1,0 +1,14 @@
+{
+  "campana": "tf_replica_fe_k5",
+  "anotador": "DeepSeek-V4-Flash",
+  "temperatura": 0.0,
+  "max_tokens": 400,
+  "sha256_prompt": "651ed64d5eca78f3f4ba5fd00c0b2a698d795fc37c2c3a23a39f98d2b32a589e",
+  "commit": "9c3c6ee9a947c38e8f75a7f88b816ee4260d81d9",
+  "inicio": "2026-10-15T20:00:27.616074+00:00",
+  "fin": "2026-10-15T20:03:53.583435+00:00",
+  "uso": {
+    "prompt_tokens": 65360,
+    "completion_tokens": 1097
+  }
+}

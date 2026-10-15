@@ -1,0 +1,29 @@
+{
+  "campana": "tf_qwen27b_k5_think_n0",
+  "argumentos": {
+    "campana": "tf_qwen27b_k5_think_n0",
+    "backend": "AMD_TF",
+    "fallas": "1-15",
+    "niveles": "0",
+    "fuente": "braatz",
+    "corridas": null,
+    "k": 5,
+    "temperatura": 0.7,
+    "semilla": null,
+    "calibracion": "ampliado",
+    "estadistico": "t2",
+    "sin_esquema": true,
+    "fusionar_system": false,
+    "continuar": false,
+    "max_tokens": 8000,
+    "sin_json": false,
+    "razonamiento": "low",
+    "dev": false
+  },
+  "commit": "9c3c6ee9a947c38e8f75a7f88b816ee4260d81d9",
+  "inicio": "2026-10-15T18:32:05.375499+00:00",
+  "backend": "AMD_TF",
+  "modelo": "Qwen3.8-27B",
+  "host_endpoint": "developer.amd.com.cn",
+  "fin": "2026-10-15T19:58:48.954194+00:00"
+}

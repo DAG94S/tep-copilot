@@ -1,0 +1,27 @@
+{
+  "campana": "tf_replica_fe_qwen27b_k5",
+  "tipo": "replica_faultexplainer",
+  "argumentos": {
+    "campana": "tf_replica_fe_qwen27b_k5",
+    "backend": "AMD_TF",
+    "fallas": "1-15",
+    "k": 5,
+    "temperatura": 0.7,
+    "max_tokens": 8000,
+    "razonamiento": null,
+    "continuar": false,
+    "dev": false
+  },
+  "commit": "9c3c6ee9a947c38e8f75a7f88b816ee4260d81d9",
+  "inicio": "2026-10-15T17:35:53.010412+00:00",
+  "backend": "AMD_TF",
+  "modelo": "Qwen3.8-27B",
+  "host_endpoint": "developer.amd.com.cn",
+  "faultexplainer_commit": "2fcfee975a687c350f10909eeccd1ecdd60340be",
+  "pca": {
+    "componentes": 30,
+    "umbral_t2": 55.4620400206456,
+    "n": 500
+  },
+  "fin": "2026-10-15T19:44:05.595611+00:00"
+}

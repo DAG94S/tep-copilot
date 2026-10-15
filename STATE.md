@@ -388,3 +388,55 @@ Ver `docs/CHECKLIST.md`.
   rechazadas 35 → 68; top-1 11 → 15.
 - **Agregado por falla (12 clusters, media de los 3 niveles): peor en 9, mejor en 1 (IDV11, 0,23→0,22), igual en 2
   (IDV7, 12); Wilcoxon p=0,0039; signo p=0,021.** Sobrevive al control por falla → en claims.json (`think_rechazo_*`, `think_afirmaciones`, `think_top1_pares`) y en el README.
+
+## 2026-10-15 (~17:00 UTC) — Segundo modelo: Qwen3.8-27B en Token Factory (decisión de Diego)
+- Motivo: Gemma fuera del catálogo y presupuesto del día sin usar; la única forma de saber si la sonda distingue
+  modelos (¿Qwen recita donde Gemma razona?) es medirlo. Brazo aparte; no se mezcla con las campañas de Gemma.
+  Si Gemma vuelve, Gemma tiene prioridad (máx. 2 procesos en total).
+- **Esquema externo (Qwen3.8-27B, verificado):** piensa POR DEFECTO (350 tokens de razonamiento en un prompt corto);
+  `chat_template_kwargs.enable_thinking=false` lo apaga (0 reasoning_tokens, 4 s). Con T=0 se queda razonando hasta
+  max_tokens sin responder → T=0,7 como con Gemma. `n=2` → 400 (mismo mensaje que Gemma) → k llamadas separadas.
+  Precio 3,5e-8 / 7e-8 por token (igual que Gemma). `json_object` OK.
+- Config: `AMD_TF_MODEL=Qwen3.8-27B`, `AMD_TF_EXTRA_BODY={"response_format":{"type":"json_object"},
+  "chat_template_kwargs":{"enable_thinking":false}}` (por entorno; `.env` sin tocar). Humo dev `data/dev/qwen_salud_idv6`
+  (IDV1/6 × n0/n2, k=1): 4/4 JSON válidos, ~12 s por llamada. No reportable.
+- Lanzadas (mismos parámetros que `tf_gemma31b_k5_v2` y `tf_replica_fe_k5`): `data/runs/tf_qwen27b_k5_v2`
+  (fallas 1–15 × niveles 0/1/2, k=5, T=0,7, ampliado, t2, sin esquema, max_tokens 1500) y `data/runs/tf_replica_fe_qwen27b_k5`.
+- **Réplica con Qwen abortada y relanzada:** con max_tokens 1500 las 5 muestras de IDV1 se cortaron a mitad de frase
+  (7.500 = 5×1.500 tokens de completion; ~6.000 caracteres de prosa cada una). Gemma usó ~700 por muestra y nunca llegó
+  al tope. Carpeta borrada (1 caso). Relanzada como `tf_replica_fe_qwen27b_k5` con **max_tokens 4000** (desviación
+  declarada: el tope solo debe evitar truncar; no favorece a Qwen frente a Gemma, que no truncó con 1500).
+  La campaña Braatz de Qwen no trunca (JSON de 700–3.300 caracteres) → sigue con 1500.
+- Con max_tokens 4000 siguen truncadas 4/10 muestras (IDV1 3/5, IDV2 1/5; hasta 15.500 caracteres: Qwen sin thinking
+  razona dentro del texto). FaultExplainer no ponía tope (API de OpenAI por defecto) → se relanza con **max_tokens 8000**
+  (2 casos perdidos, carpeta borrada). Al analizar, contar las muestras que aún terminen sin conclusión.
+- **Esquema externo (Qwen3.8-27B, thinking):** `reasoning_effort=minimal` → 400 "Unexpected reasoning effort minimal.
+  Supported types are xhigh (default), medium, and low." ⇒ por defecto Qwen piensa en **xhigh**. Se usa `low` (el más
+  bajo disponible; desviación declarada frente a `minimal` de Gemma).
+- Piloto dev `data/dev/qwen_think_piloto_low` (IDV1/6 × n0/n2, k=1, max_tokens 8000): 4/4 top-1, 4 PARCIAL;
+  reasoning 1.158–1.972 tokens y 50–75 s por llamada (Gemma minimal: 1.380–3.320 y 46–130 s). A diferencia de Gemma,
+  el disfraz casi no sube el razonamiento de Qwen (IDV1 1.964→1.972; IDV6 1.158→1.581). ~0,001 USD por caso (k=5).
+  Gastado hoy 0,018 USD.
+- Lanzada `data/runs/tf_qwen27b_k5_think_n0` (mismos parámetros que `tf_gemma31b_k5_think_n0` salvo `--razonamiento low`);
+  n2 y n1 cuando termine la réplica (máx. 2 procesos).
+
+## 2026-10-15 (~20:00 UTC) — Réplica FaultExplainer con Qwen: NO puntuable automáticamente
+- `data/runs/tf_replica_fe_qwen27b_k5` (max_tokens 8000) terminó: 11 detectadas, la puntuación automática da 5/11
+  (Gemma 8/11), **pero no es válida**: `extraer_idv` toma los 3 primeros IDV por orden de aparición, lo que solo funciona
+  con respuestas breves (Gemma: 2/11 casos a revisión). Qwen escribe 12.000–31.000 caracteres repasando y descartando
+  causas: 10/11 casos marcados `requiere_revision_alias`; ej. IDV13 muestra con "The root cause is IDV(6)" → extraído
+  [6,1,2]; otra termina "I will focus on IDV(4)" → [7,6,3]. Varias muestras siguen cortadas a 8000 tokens (IDV11).
+- **Decisión propuesta:** no citar la réplica de Qwen. Puntuarla exigiría leer a mano 55 textos largos (FaultExplainer
+  puntuó a mano). La comparación válida entre modelos es la del contrato JSON + compuerta (`tf_qwen27b_k5_v2`), que
+  justamente existe para que la evaluación no dependa de interpretar prosa.
+- **Resuelto con un anotador LLM** (`eval/extraer_causas_llm.py`, DeepSeek-V4-Flash, T=0, sin thinking por defecto;
+  modelo distinto de los evaluados; mismo anotador para ambas réplicas; escribe `extraccion_llm.jsonl` sin tocar
+  `registros.jsonl`). Esquema externo: DeepSeek rechaza `thinking` en /chat/completions ("use reasoning_effort").
+  · Validación con Gemma (`tf_replica_fe_k5`): **mismo resultado por mayoría en las 11 fallas (8/11)**; a nivel de
+    muestra 42/52 listas idénticas a `extraer_idv` donde este no era ambiguo — las 10 diferencias son el anotador más
+    estricto (Gemma propone 1 causa y menciona otras al razonar; la regex las contaba).
+  · Qwen (`tf_replica_fe_qwen27b_k5`): **5/11** (aciertos 1, 5, 6, 7, 12; fallos 2, 8, 10, 11, 13, 14), idéntico
+    por falla a la regex; 1 muestra sin conclusión (IDV11, 0/5: no puede cambiar el voto).
+  ⇒ La réplica de Qwen SÍ es citable con el anotador: Qwen 5/11 vs Gemma 8/11, GPT-4o 7/11, o1-preview 9/11.
+  Contraste: con nuestro contrato JSON + compuerta Qwen acierta MÁS que Gemma (top-3 n0 9 vs 7 de 12); en prosa libre,
+  menos. El formato estructurado le favorece. Coste del anotador: céntimos.
