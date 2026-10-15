@@ -336,3 +336,13 @@ Ver `docs/CHECKLIST.md`.
 - Lanzado a las ~20:40 UTC: `data/runs/tf_rieth_k5_think_n{0,2}_{a,b,c}` (grupos de fallas a=1,2,5,6 b=7,8,10
   c=12,13,14; corridas 1–10; mismos parámetros que el piloto: minimal, k=5, T=0,7, max_tokens 8000). 6 procesos.
   Las 3 carpetas de cada nivel forman una campaña (verify_claims acepta `fuente` como lista). Nivel 1 después.
+
+## 2026-10-15 — Knowledge Library de Evolus (2.º building block) cargada por API
+- Biblioteca RAG creada en la UI (memoryId `e8fe0150-34c8-f111-bf5b-000d3aae6dc8`; la lista de bibliotecas por API da
+  401 con la API key, el id se sacó de la URL de la UI). Formatos aceptados (GET /memories/document-formats):
+  .txt .md .csv .json .xml .html .htm .pdf .docx, máx. 50 MB.
+- `scripts/evolus_biblioteca.py --subir` subió los 3 documentos de `knowledge/` (multipart) → indexados
+  (ingestionStatus 2): tep_process_description 4 chunks, alarm_response_procedure 3, inspection_guide 3.
+  Evidencia: `data/runs/evolus/biblioteca_20261015T011352Z` (pineada).
+- Pendiente: vincular la biblioteca al agente en la UI y repetir la corrida del agente para ver si la orden de trabajo
+  deja de ser superficial (antes: "Inspect IDV(6)…").
