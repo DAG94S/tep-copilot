@@ -357,3 +357,27 @@ Ver `docs/CHECKLIST.md`.
 - Reanudar: cuando Gemma dé 200, probar primero el agente; luego Rieth thinking con **2 procesos** (n0 y n2, grupos en serie).
 - Guías actualizadas: AGENTS.md (Token Factory, límites, reglas), docs/PROYECTO.md (§0 estado y pitch, plan, riesgos),
   docs/CHECKLIST.md, docs/ANTECEDENTES.md (Evolus con Token Factory, competidores).
+
+## 2026-10-15 (16:22 UTC) — Gemma-4-31B-IT retirado del catálogo de Token Factory
+- **Esquema externo:** chequeo de salud (`data/dev/tf_salud_idv6_d`, IDV6 n0, k=1) → **400**
+  `"Requested model Gemma-4-31B-IT not supported"` (ya no es el 500 `no_available_workers` de ayer).
+- `GET /v1/models` (200) lista 11 modelos y **ninguno es Gemma**: DeepSeek-V4.1-Flash, DeepSeek-V4-Flash,
+  DeepSeek-V4-Flash-Vision-Exp, GLM-5.3-Flash, MiMo-V2.6-Flash, MinerU2.5-Pro, MiniCPM5-2B, MiniCPM-V-4.7-1B,
+  MiniCPM-V-4.7-35B-A3B, Qwen3.8-27B, Qwen3.8-Flash-Next. `/v1/usage`: período desde 16:00 UTC, gastado 0.
+- Consecuencias: Rieth con thinking queda en 95/200 válidos (n0 59, n2 36; n1 sin empezar). El agente de Evolus
+  (conexión `amd` → Gemma) tampoco puede responder. Todo lo ya pineado sigue valiendo (corrió en Gemma sobre AMD).
+- La corrida `data/runs/evolus/agente_2026-10-15_biblioteca` (01:16 UTC) dio 422 en los dos casos → no se pinea.
+
+## 2026-10-15 — Discord y página del evento: premio de Google confirmado; los dos premios de socio piden Developer Cloud
+- Discord, Zofia [lablab], 14 oct 6:41: Google DeepMind se suma como socio; **premio de Google ($5k) para equipos que
+  usen Gemma** "running on AMD GPUs in the cloud using AMD Developer Cloud and ROCm". Cierra la pregunta abierta
+  (el supuesto de trabajo era correcto). La página no dice si Gemma vía Token Factory cuenta.
+- Página del evento (consultada hoy): AMD obligatorio ("a meaningful part of its workload on AMD infrastructure");
+  Token Factory aparece en el FAQ. **Track Evolus "Business Agents on AMD":** "your own open model served on AMD
+  Developer Cloud through a vLLM endpoint", ≥2 bloques, manejado por API, app containerizada, repo público, README.
+  Criterios generales: Application of Technology, Presentation, Business Value, Originality.
+- Discord, Yuvi [GDev], 15 oct 8:02: **"AMD GPU credits and tokens are being distributed on a rolling basis within
+  48 hours"** de completar las tres inscripciones (lablab, AMD, equipo). Contradice a Maharshi (13 oct: sin crédito
+  de GPU en el ACT III). Si no llegan en 48 h, contactar a los organizadores.
+- Con Gemma fuera de Token Factory, un vLLM propio en Developer Cloud (`deploy/` ya preparado) cumpliría a la vez
+  Google (Gemma + ROCm) y Evolus (vLLM propio). Pendiente: que Diego confirme si recibió crédito de GPU.

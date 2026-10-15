@@ -141,3 +141,53 @@ def variable_en_vistas(columna_tep: int = 6) -> list[dict]:
         var = v.variables[j]
         filas.append({"vista": nivel, "tag": var.tag, "descripcion": var.descripcion, "unidad": var.unidad})
     return filas
+
+
+# ---------- replay en vivo de un incidente ----------
+CAMPANA_EVOLUS = "evolus/agente_2026-10-14_sinrazonamiento"
+ANTICIPACION = RAIZ / "data" / "processed" / "anticipacion.json"
+
+
+def linea_de_tiempo(falla: int, nivel: int, indice_alarma: int | None) -> dict:
+    """Datos del replay de un incidente (muestras relativas al inicio de la falla, 3 min por muestra).
+    Los eventos de alarma se calculan igual que scripts/medir_anticipacion.medir_falla (coordenadas TEP: invariantes a la vista)."""
+    from core import alarmas, datos
+    from scripts.medir_anticipacion import inundacion
+    s = serie_t2(falla, nivel)
+    lim = alarmas.ajustar_limites(datos.normal_ampliado())
+    x = datos.cargar(falla, prueba=True)[datos.INICIO_FALLA_TEST:]
+    eventos = [{"muestra": e.muestra, "minuto": e.minuto, "variable": e.variable, "direccion": e.direccion}
+               for e in alarmas.eventos(lim, x)]
+    inund = inundacion([e["muestra"] for e in eventos])
+    tarjeta = None if indice_alarma is None else indice_alarma - datos.INICIO_FALLA_TEST
+    fin = min(len(x) - 1, max(tarjeta or 0, inund or 0) + 20)
+    return {"t2": s["t2"], "limite": s["limite"], "inicio_falla": datos.INICIO_FALLA_TEST, "eventos": eventos,
+            "inundacion_rel": inund, "tarjeta_rel": tarjeta, "fin_rel": fin}
+
+
+def estado_en(m: int, muestras_eventos: list[int], tarjeta_rel: int | None, inundacion_rel: int | None,
+              ventana: int = 4) -> dict:
+    """Estado del replay en la muestra relativa m (negativa = antes del inicio de la falla). Pura."""
+    from core import alarmas
+    return {"minuto": m * alarmas.MINUTOS_POR_MUESTRA,
+            "acumuladas": sum(e <= m for e in muestras_eventos),
+            "en_ventana": sum(m - ventana < e <= m for e in muestras_eventos),
+            "inundacion": inundacion_rel is not None and m >= inundacion_rel,
+            "tarjeta": tarjeta_rel is not None and m >= tarjeta_rel}
+
+
+def tag_en_vista(v, columna_tep: int) -> tuple[str, str]:
+    """(tag, descripción) de una columna TEP en la vista v."""
+    j = int(np.flatnonzero(v.origen == columna_tep)[0])
+    return v.variables[j].tag, v.variables[j].descripcion
+
+
+def salida_evolus(falla: int, nivel: int) -> dict | None:
+    """Registro grabado del agente de Evolus para (falla, nivel); None si no hay."""
+    regs = leer_jsonl(RUNS / CAMPANA_EVOLUS / "resultados.jsonl")
+    return next((r for r in regs if r["falla"] == falla and r["nivel"] == nivel), None)
+
+
+def anticipacion(falla: int) -> dict | None:
+    """Entrada de la falla en data/processed/anticipacion.json; None si no existe."""
+    return leer_json(ANTICIPACION).get("por_falla", {}).get(str(falla))

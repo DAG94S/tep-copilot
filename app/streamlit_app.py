@@ -3,6 +3,7 @@
 Ejecutar: python -m streamlit run app/streamlit_app.py
 """
 import sys
+import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -49,6 +50,11 @@ def t2(falla: int, nivel: int) -> dict:
 @st.cache_data
 def alarmas(falla: int) -> dict:
     return da.alarmas_proceso(falla)
+
+
+@st.cache_data
+def linea_tiempo(falla: int, nivel: int, indice_alarma: int | None) -> dict:
+    return da.linea_de_tiempo(falla, nivel, indice_alarma)
 
 
 @st.cache_data
@@ -120,7 +126,8 @@ def pestana_control() -> None:
     st.info(NOTA)
 
 
-def tarjeta(r: dict, v) -> None:
+def tarjeta(r: dict, v, sufijo: str = "") -> None:
+    """`sufijo` distingue las keys de los botones si la misma tarjeta se dibuja en dos pestañas; la decisión es compartida."""
     estado = ESTADO_UI.get(r["estado"], r["estado"])
     st.markdown(f"<span style='background:{COLOR.get(estado, '#555')};color:white;padding:4px 12px;border-radius:6px;"
                 f"font-weight:600'>{estado}</span>", unsafe_allow_html=True)
@@ -155,12 +162,153 @@ def tarjeta(r: dict, v) -> None:
         st.error(m)
     d1, d2, _ = st.columns([1, 1, 4])
     clave = f"decision_{r['falla']}_{r['nivel']}"
-    if d1.button("Approve", key=f"ap_{clave}"):
+    if d1.button("Approve", key=f"ap_{clave}{sufijo}"):
         st.session_state[clave] = "APPROVED"
-    if d2.button("Escalate", key=f"es_{clave}"):
+    if d2.button("Escalate", key=f"es_{clave}{sufijo}"):
         st.session_state[clave] = "ESCALATED"
     if clave in st.session_state:
         st.success(f"Decision recorded in this session: {st.session_state[clave]} (no action sent to the process).")
+
+
+VELOCIDADES = {"Fast": 0.08, "Normal": 0.25, "Slow": 0.6}   # segundos de pantalla por muestra (3 min de proceso)
+VENTANA_MUESTRAS = 4                                          # 12 min: misma definición que scripts/medir_anticipacion.py
+MOTIVO_SIN_TARJETA = {"NO_DETECTADO": "the statistical detector did not raise an alarm, so the LLM was never called",
+                      "INVALIDO": "the model produced no valid JSON in any sample (degenerate output); nothing is shown",
+                      "ERROR_LLM": "the LLM call failed"}
+
+
+def cuadro_t2(lt: dict, m: int):
+    """T² desde 60 min antes del inicio de la falla hasta la muestra relativa m, con eje fijo para que no salte."""
+    ini = lt["inicio_falla"]
+    desde = ini - 20
+    hasta = ini + max(m, -20)
+    t = lt["t2"]
+    df = pd.DataFrame({"min": [(i - ini) * 3 for i in range(desde, hasta + 1)], "T²": t[desde:hasta + 1]})
+    dom_x = [-60, lt["fin_rel"] * 3]
+    dom_y = [float(min(t[desde:ini + lt["fin_rel"] + 1].min(), lt["limite"])) * 0.8,
+             float(max(t[desde:ini + lt["fin_rel"] + 1].max(), lt["limite"])) * 1.2]
+    base = alt.Chart(df).mark_line(color="#0969da").encode(
+        x=alt.X("min:Q", title="minutes since fault onset", scale=alt.Scale(domain=dom_x)),
+        y=alt.Y("T²:Q", scale=alt.Scale(type="log", domain=dom_y)))
+    return alt.layer(base,
+                     alt.Chart(pd.DataFrame({"y": [lt["limite"]]})).mark_rule(color="#cf222e", strokeDash=[6, 4]).encode(y="y:Q"),
+                     alt.Chart(pd.DataFrame({"x": [0]})).mark_rule(color="#888", strokeDash=[2, 2]).encode(x="x:Q"))
+
+
+def tarjeta_compacta(r: dict, v) -> None:
+    """Resumen de la tarjeta para la animación (sin botones: los botones van en `tarjeta`, fuera del bucle)."""
+    estado = ESTADO_UI.get(r["estado"], r["estado"])
+    st.markdown(f"<span style='background:{COLOR.get(estado, '#555')};color:white;padding:4px 12px;border-radius:6px;"
+                f"font-weight:600'>{estado}</span>", unsafe_allow_html=True)
+    cat = {c.codigo: c.descripcion for c in v.catalogo}
+    for i, c in enumerate(r.get("causas", [])[:3], 1):
+        st.markdown(f"{i}. `{c}` — {cat.get(c, 'not in catalog')}")
+    st.caption(f"{len(r.get('evidencia_verificada', []))} evidence items verified · "
+               f"{len(r.get('evidencia_rechazada', []))} claims rejected by the gate")
+
+
+def cuadro(ph, m: int, lt: dict, v, r: dict | None) -> None:
+    """Dibuja el estado del replay en la muestra relativa m dentro del placeholder `ph`."""
+    muestras = [e["muestra"] for e in lt["eventos"]]
+    est = da.estado_en(m, muestras, lt["tarjeta_rel"], lt["inundacion_rel"], VENTANA_MUESTRAS)
+    minuto = int(est["minuto"])
+    with ph.container():
+        st.markdown(f"### t = +{minuto} min since fault onset" if minuto >= 0
+                    else f"### t = −{-minuto} min (normal operation)")
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("Alarms so far", est["acumuladas"])
+        c2.metric(f"Alarms in last {VENTANA_MUESTRAS * 3} min", est["en_ventana"])
+        c3.metric(f"Alarm flood (≥10 in {VENTANA_MUESTRAS * 3} min)", "FLOOD" if est["inundacion"] else "no")
+        c4.metric("Copilot", f"card delivered at +{lt['tarjeta_rel'] * 3} min" if est["tarjeta"] else "watching…")
+        st.altair_chart(cuadro_t2(lt, m), use_container_width=True)
+        previos = [e for e in lt["eventos"] if e["muestra"] <= m][-8:][::-1]
+        st.markdown("**Alarm log (newest first)**")
+        if not previos:
+            st.caption("No alarms yet.")
+        for e in previos:
+            tag, desc = da.tag_en_vista(v, e["variable"])
+            st.markdown(f"`+{int(e['minuto'])} min` · `{tag}` {desc} · **{'HIGH' if e['direccion'] == 'alta' else 'LOW'}**")
+        if est["tarjeta"] and r is not None:
+            st.markdown("**Root-cause card**")
+            tarjeta_compacta(r, v)
+
+
+def pestana_replay() -> None:
+    regs, _ = registros_combinados()
+    if not regs:
+        st.warning(f"Recorded run not found: data/runs/{da.CAMPANA_PRINCIPAL}. The replay needs it.")
+        return
+    fallas = sorted({r["falla"] for r in regs})
+    c1, c2, c3 = st.columns([1, 2, 1])
+    falla = c1.selectbox("Fault (IDV)", fallas, index=fallas.index(1) if 1 in fallas else 0,
+                         format_func=lambda i: f"IDV({i})", key="rp_falla")
+    nivel = da.VISTAS[c2.radio("View", list(da.VISTAS), horizontal=True, key="rp_vista")]
+    veloc = c3.selectbox("Speed", list(VELOCIDADES), index=1, key="rp_veloc")
+    v = vista(nivel)
+    r = da.buscar_registro(regs, falla, nivel)
+    con_tarjeta = r is not None and r["estado"] not in MOTIVO_SIN_TARJETA
+    try:
+        lt = linea_tiempo(falla, nivel, r["indice_alarma"] if con_tarjeta else None)
+    except (OSError, ValueError) as e:
+        st.warning(f"Local Braatz data not available ({e}). Run scripts/descargar_datos.py.")
+        return
+    if r is None:
+        st.warning("No recorded case for this fault and view: only the alarms are replayed.")
+    elif not con_tarjeta:
+        st.info(f"{ESTADO_UI[r['estado']]}: {MOTIVO_SIN_TARJETA[r['estado']]}. Only the alarms are replayed.")
+
+    fin = lt["fin_rel"]
+    cuando = st.columns([1, 4])
+    reproducir = cuando[0].button("▶ Play incident", key=f"rp_play_{falla}_{nivel}")
+    pos = cuando[1].slider("Minutes since fault onset", -60, fin * 3, -60, step=3, key=f"rp_pos_{falla}_{nivel}")
+    m0 = pos // 3
+    marco = st.empty()
+    clave_fin = f"rp_fin_{falla}_{nivel}"
+    if reproducir:
+        st.session_state.pop(clave_fin, None)
+        for m in range(m0, fin + 1):
+            cuadro(marco, m, lt, v, r if con_tarjeta else None)
+            time.sleep(VELOCIDADES[veloc])
+        st.session_state[clave_fin] = True
+        m_final = fin
+    else:
+        m_final = fin if st.session_state.get(clave_fin) else m0
+        cuadro(marco, m_final, lt, v, r if con_tarjeta else None)
+
+    tarj, inund = lt["tarjeta_rel"], lt["inundacion_rel"]
+    if con_tarjeta and tarj is not None and m_final >= tarj:
+        st.subheader("Root-cause card (recorded Gemma-4-31B output, replayed)")
+        tarjeta(r, v, sufijo="_replay")
+        if st.session_state.get(f"decision_{falla}_{nivel}") == "APPROVED":
+            evolus(falla, nivel)
+    if tarj is not None and inund is not None and m_final >= max(tarj, inund):
+        ant = da.anticipacion(falla)
+        if ant and ant.get("tarjeta_min") is not None and ant.get("inundacion_min") is not None:
+            st.success(f"The root-cause card arrived {(inund - tarj) * 3:.0f} min before the alarm flood "
+                       f"(>= 10 alarms in {VENTANA_MUESTRAS * 3} min).")
+            sha = da.sha256_registrado(da.ANTICIPACION)
+            definicion = da.leer_json(da.ANTICIPACION).get("definicion", "")
+            st.caption(f"Source: `{da.ANTICIPACION.relative_to(da.RAIZ)}` · SHA-256 (from SHA256SUMS): "
+                       f"`{sha or 'not registered'}` · {definicion}. Computed on level 0; alarms and detection are "
+                       f"invariant to the disguise.")
+    st.info(NOTA)
+
+
+def evolus(falla: int, nivel: int) -> None:
+    """Salida grabada del agente de Evolus para el caso aprobado."""
+    st.subheader("Documentation drafted by the Evolus agent (recorded run, replayed)")
+    s = da.salida_evolus(falla, nivel)
+    if s is None:
+        casos = [(x["falla"], x["nivel"]) for x in da.leer_jsonl(da.RUNS / da.CAMPANA_EVOLUS / "resultados.jsonl")]
+        st.info("No recorded Evolus output for this case; recorded cases: "
+                + (", ".join(f"IDV({f}) level {n}" for f, n in casos) or "none") + ".")
+        return
+    st.markdown(s["texto"])
+    ruta = da.RUNS / da.CAMPANA_EVOLUS / "resultados.jsonl"
+    sha = da.sha256_registrado(ruta)
+    st.caption(f"{s['segundos']} s · control orders detected in the output: {len(s['ordenes_de_control'])} · "
+               f"model: `{s['modelo']}` · recorded: {s['ts']} · Source: `{ruta.relative_to(da.RAIZ)}` · "
+               f"SHA-256 (from SHA256SUMS): `{sha or 'not registered'}`")
 
 
 def pestana_audit() -> None:
@@ -241,7 +389,9 @@ def pestana_como() -> None:
 
 st.title("TEP Copilot")
 st.caption("Control-room copilot on the Tennessee Eastman Process. Replay of recorded runs: no GPU, no live LLM calls.")
-t_ctrl, t_aud, t_how = st.tabs(["Control room", "Audit", "How it works"])
+t_replay, t_ctrl, t_aud, t_how = st.tabs(["Live replay", "Control room", "Audit", "How it works"])
+with t_replay:
+    pestana_replay()
 with t_ctrl:
     pestana_control()
 with t_aud:

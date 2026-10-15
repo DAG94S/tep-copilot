@@ -75,3 +75,69 @@ def test_combinar_reintentos_sustituye_solo_invalidos():
     assert comb[2]["estado"] == "INVALIDO"         # sin reintento: se queda INVALIDO
     assert comb[3] is base[3] and len(comb) == len(base)
     assert base[1]["estado"] == "INVALIDO"         # la entrada no se muta
+
+
+# ---------- replay en vivo ----------
+def test_estado_en_antes_del_inicio():
+    e = da.estado_en(-5, [0, 1, 2], 10, 8)
+    assert (e["minuto"], e["acumuladas"], e["en_ventana"], e["inundacion"], e["tarjeta"]) == (-15.0, 0, 0, False, False)
+
+
+def test_estado_en_cuenta_ventana_y_acumuladas():
+    ev = [0, 1, 1, 5, 6]
+    e = da.estado_en(5, ev, None, None)
+    assert e["acumuladas"] == 4 and e["en_ventana"] == 1          # ventana (1, 5]: solo la muestra 5
+    e = da.estado_en(4, ev, None, None)
+    assert e["acumuladas"] == 3 and e["en_ventana"] == 2          # ventana (0, 4]: las dos de la muestra 1
+    assert da.estado_en(6, ev, None, None)["minuto"] == 18.0
+
+
+def test_estado_en_banderas_conmutan_exactamente():
+    assert not da.estado_en(7, [], 10, 8)["inundacion"] and da.estado_en(8, [], 10, 8)["inundacion"]
+    assert not da.estado_en(9, [], 10, 8)["tarjeta"] and da.estado_en(10, [], 10, 8)["tarjeta"]
+
+
+def test_estado_en_sin_tarjeta_ni_inundacion():
+    e = da.estado_en(500, [1], None, None)
+    assert e["tarjeta"] is False and e["inundacion"] is False
+
+
+def test_tag_en_vista_con_vista_falsa():
+    import numpy as np
+    from types import SimpleNamespace as NS
+    v = NS(origen=np.array([3, 0, 6]),
+           variables=[NS(tag="A", descripcion="dA"), NS(tag="B", descripcion="dB"), NS(tag="C", descripcion="dC")])
+    assert da.tag_en_vista(v, 6) == ("C", "dC") and da.tag_en_vista(v, 0) == ("B", "dB")
+
+
+def test_salida_evolus_y_anticipacion_con_archivos_temporales(tmp_path, monkeypatch):
+    carpeta = tmp_path / "ev"
+    carpeta.mkdir()
+    (carpeta / "resultados.jsonl").write_text(json.dumps({"falla": 6, "nivel": 0, "texto": "x"}) + "\n")
+    monkeypatch.setattr(da, "RUNS", tmp_path)
+    monkeypatch.setattr(da, "CAMPANA_EVOLUS", "ev")
+    assert da.salida_evolus(6, 0)["texto"] == "x"
+    assert da.salida_evolus(6, 2) is None and da.salida_evolus(1, 0) is None
+    ant = tmp_path / "ant.json"
+    ant.write_text(json.dumps({"por_falla": {"1": {"tarjeta_min": 3}}}))
+    monkeypatch.setattr(da, "ANTICIPACION", ant)
+    assert da.anticipacion(1) == {"tarjeta_min": 3} and da.anticipacion(2) is None
+    monkeypatch.setattr(da, "ANTICIPACION", tmp_path / "no.json")
+    assert da.anticipacion(1) is None
+
+
+def test_linea_de_tiempo_coincide_con_anticipacion_json():
+    import pytest
+    ant = da.leer_json(da.RAIZ / "data" / "processed" / "anticipacion.json").get("por_falla", {})
+    if not ant:
+        pytest.skip("anticipacion.json no disponible")
+    try:
+        for f, entry in ant.items():
+            lt = da.linea_de_tiempo(int(f), 0, entry["indice_alarma"])
+            assert lt["tarjeta_rel"] * 3 == entry["tarjeta_min"]
+            inund = lt["inundacion_rel"]
+            assert (None if inund is None else inund * 3) == entry["inundacion_min"]
+            ms = [e["muestra"] for e in lt["eventos"]]
+            assert (min(ms) * 3 if ms else None) == entry["primera_alarma_min"]
+    except OSError:
+        pytest.skip("datos Braatz locales ausentes")
