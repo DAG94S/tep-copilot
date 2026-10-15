@@ -494,5 +494,187 @@
       "data/runs/tf_gemma31b_k5_think_n2/registros.jsonl"
     ],
     "descripcion": "Braatz d00-d21, Gemma-4-31B, k=5: campaña combinada sin razonamiento (fuente + reintentos) frente a la campaña con razonamiento minimal (auxiliar), emparejadas por (falla, nivel) evaluables en ambas (36 pares = 12 fallas x 3 niveles). Rechazo por caso = afirmaciones de evidencia rechazadas por la compuerta / afirmaciones del caso. Aciertos top-1 sin / con razonamiento sobre los 36 pares."
+  },
+  {
+    "id": "replica_anotador_gemma_top3",
+    "valor": "8/11",
+    "fuente": "data/runs/tf_replica_fe_k5/extraccion_llm.jsonl",
+    "descripcion": "Réplica FaultExplainer con Gemma-4-31B puntuada por el anotador LLM (eval/extraer_causas_llm.py, DeepSeek-V4-Flash, T=0): aciertos top-3 por mayoría de 5 sobre las fallas detectadas. Coincide falla a falla con la puntuación por regex (replica_gemma_top3)."
+  },
+  {
+    "id": "replica_anotador_qwen_top3",
+    "valor": "5/11",
+    "fuente": "data/runs/tf_replica_fe_qwen27b_k5/extraccion_llm.jsonl",
+    "descripcion": "Réplica FaultExplainer con Qwen3.8-27B (sin razonamiento, max_tokens 8000 porque con 1500 y 4000 truncaba) puntuada por el anotador LLM: aciertos top-3 por mayoría de 5 sobre las fallas detectadas."
+  },
+  {
+    "id": "replica_anotador_qwen_fallas",
+    "valor": "1,5,6,7,12",
+    "fuente": "data/runs/tf_replica_fe_qwen27b_k5/extraccion_llm.jsonl",
+    "descripcion": "Fallas detectadas en que la réplica con Qwen3.8-27B acierta top-3 (anotador LLM)."
+  },
+  {
+    "id": "qwen_n0_top1",
+    "valor": "7/12",
+    "fuente": "data/runs/tf_qwen27b_k5_v2/registros.jsonl",
+    "descripcion": "Qwen3.8-27B en AMD Token Factory (segundo modelo), Braatz d00-d21, k=5, T=0,7, mismos parámetros que la campaña de Gemma; 12 casos evaluables por nivel (3 NO_DETECTADO). Sin razonamiento. Nivel 0: aciertos top1 sobre casos evaluables."
+  },
+  {
+    "id": "qwen_think_n0_top1",
+    "valor": "4/12",
+    "fuente": [
+      "data/runs/tf_qwen27b_k5_think_n0/registros.jsonl",
+      "data/runs/tf_qwen27b_k5_think_n1/registros.jsonl",
+      "data/runs/tf_qwen27b_k5_think_n2/registros.jsonl"
+    ],
+    "descripcion": "Qwen3.8-27B con razonamiento (reasoning_effort=low, el mínimo que admite; Gemma usó minimal), Braatz, k=5, max_tokens 8000; 12 evaluables por nivel. Nivel 0: aciertos top1 sobre casos evaluables."
+  },
+  {
+    "id": "qwen_n0_top3",
+    "valor": "9/12",
+    "fuente": "data/runs/tf_qwen27b_k5_v2/registros.jsonl",
+    "descripcion": "Qwen3.8-27B en AMD Token Factory (segundo modelo), Braatz d00-d21, k=5, T=0,7, mismos parámetros que la campaña de Gemma; 12 casos evaluables por nivel (3 NO_DETECTADO). Sin razonamiento. Nivel 0: aciertos top3 sobre casos evaluables."
+  },
+  {
+    "id": "qwen_think_n0_top3",
+    "valor": "7/12",
+    "fuente": [
+      "data/runs/tf_qwen27b_k5_think_n0/registros.jsonl",
+      "data/runs/tf_qwen27b_k5_think_n1/registros.jsonl",
+      "data/runs/tf_qwen27b_k5_think_n2/registros.jsonl"
+    ],
+    "descripcion": "Qwen3.8-27B con razonamiento (reasoning_effort=low, el mínimo que admite; Gemma usó minimal), Braatz, k=5, max_tokens 8000; 12 evaluables por nivel. Nivel 0: aciertos top3 sobre casos evaluables."
+  },
+  {
+    "id": "qwen_n1_top1",
+    "valor": "6/12",
+    "fuente": "data/runs/tf_qwen27b_k5_v2/registros.jsonl",
+    "descripcion": "Qwen3.8-27B en AMD Token Factory (segundo modelo), Braatz d00-d21, k=5, T=0,7, mismos parámetros que la campaña de Gemma; 12 casos evaluables por nivel (3 NO_DETECTADO). Sin razonamiento. Nivel 1: aciertos top1 sobre casos evaluables."
+  },
+  {
+    "id": "qwen_think_n1_top1",
+    "valor": "4/12",
+    "fuente": [
+      "data/runs/tf_qwen27b_k5_think_n0/registros.jsonl",
+      "data/runs/tf_qwen27b_k5_think_n1/registros.jsonl",
+      "data/runs/tf_qwen27b_k5_think_n2/registros.jsonl"
+    ],
+    "descripcion": "Qwen3.8-27B con razonamiento (reasoning_effort=low, el mínimo que admite; Gemma usó minimal), Braatz, k=5, max_tokens 8000; 12 evaluables por nivel. Nivel 1: aciertos top1 sobre casos evaluables."
+  },
+  {
+    "id": "qwen_n1_top3",
+    "valor": "9/12",
+    "fuente": "data/runs/tf_qwen27b_k5_v2/registros.jsonl",
+    "descripcion": "Qwen3.8-27B en AMD Token Factory (segundo modelo), Braatz d00-d21, k=5, T=0,7, mismos parámetros que la campaña de Gemma; 12 casos evaluables por nivel (3 NO_DETECTADO). Sin razonamiento. Nivel 1: aciertos top3 sobre casos evaluables."
+  },
+  {
+    "id": "qwen_think_n1_top3",
+    "valor": "6/12",
+    "fuente": [
+      "data/runs/tf_qwen27b_k5_think_n0/registros.jsonl",
+      "data/runs/tf_qwen27b_k5_think_n1/registros.jsonl",
+      "data/runs/tf_qwen27b_k5_think_n2/registros.jsonl"
+    ],
+    "descripcion": "Qwen3.8-27B con razonamiento (reasoning_effort=low, el mínimo que admite; Gemma usó minimal), Braatz, k=5, max_tokens 8000; 12 evaluables por nivel. Nivel 1: aciertos top3 sobre casos evaluables."
+  },
+  {
+    "id": "qwen_n2_top1",
+    "valor": "6/12",
+    "fuente": "data/runs/tf_qwen27b_k5_v2/registros.jsonl",
+    "descripcion": "Qwen3.8-27B en AMD Token Factory (segundo modelo), Braatz d00-d21, k=5, T=0,7, mismos parámetros que la campaña de Gemma; 12 casos evaluables por nivel (3 NO_DETECTADO). Sin razonamiento. Nivel 2: aciertos top1 sobre casos evaluables."
+  },
+  {
+    "id": "qwen_think_n2_top1",
+    "valor": "5/12",
+    "fuente": [
+      "data/runs/tf_qwen27b_k5_think_n0/registros.jsonl",
+      "data/runs/tf_qwen27b_k5_think_n1/registros.jsonl",
+      "data/runs/tf_qwen27b_k5_think_n2/registros.jsonl"
+    ],
+    "descripcion": "Qwen3.8-27B con razonamiento (reasoning_effort=low, el mínimo que admite; Gemma usó minimal), Braatz, k=5, max_tokens 8000; 12 evaluables por nivel. Nivel 2: aciertos top1 sobre casos evaluables."
+  },
+  {
+    "id": "qwen_n2_top3",
+    "valor": "8/12",
+    "fuente": "data/runs/tf_qwen27b_k5_v2/registros.jsonl",
+    "descripcion": "Qwen3.8-27B en AMD Token Factory (segundo modelo), Braatz d00-d21, k=5, T=0,7, mismos parámetros que la campaña de Gemma; 12 casos evaluables por nivel (3 NO_DETECTADO). Sin razonamiento. Nivel 2: aciertos top3 sobre casos evaluables."
+  },
+  {
+    "id": "qwen_think_n2_top3",
+    "valor": "5/12",
+    "fuente": [
+      "data/runs/tf_qwen27b_k5_think_n0/registros.jsonl",
+      "data/runs/tf_qwen27b_k5_think_n1/registros.jsonl",
+      "data/runs/tf_qwen27b_k5_think_n2/registros.jsonl"
+    ],
+    "descripcion": "Qwen3.8-27B con razonamiento (reasoning_effort=low, el mínimo que admite; Gemma usó minimal), Braatz, k=5, max_tokens 8000; 12 evaluables por nivel. Nivel 2: aciertos top3 sobre casos evaluables."
+  },
+  {
+    "id": "qwen_vs_gemma_rechazo_medias",
+    "valor": "22% / 31%",
+    "fuente": "data/runs/tf_gemma31b_k5_v2/recompuertado.jsonl",
+    "reintentos": "data/runs/tf_gemma31b_k5_v2_reintentos/registros.jsonl",
+    "auxiliar": "data/runs/tf_qwen27b_k5_v2/registros.jsonl",
+    "descripcion": "Gemma-4-31B (combinada, fuente) frente a Qwen3.8-27B (auxiliar), ambos sin razonamiento. Emparejado por (falla, nivel) evaluable en ambas (36 pares = 12 fallas x 3 niveles); rechazo por caso = rechazadas/afirmaciones. Rechazo medio por caso Gemma / Qwen (ambos sin razonamiento)."
+  },
+  {
+    "id": "qwen_vs_gemma_rechazo_fallas",
+    "valor": "9 / 2 / 1",
+    "fuente": "data/runs/tf_gemma31b_k5_v2/recompuertado.jsonl",
+    "reintentos": "data/runs/tf_gemma31b_k5_v2_reintentos/registros.jsonl",
+    "auxiliar": "data/runs/tf_qwen27b_k5_v2/registros.jsonl",
+    "descripcion": "Gemma-4-31B (combinada, fuente) frente a Qwen3.8-27B (auxiliar), ambos sin razonamiento. Emparejado por (falla, nivel) evaluable en ambas (36 pares = 12 fallas x 3 niveles); rechazo por caso = rechazadas/afirmaciones. Agregado por falla (12 clusters): fallas en que el rechazo de Qwen es mayor / menor / igual que el de Gemma."
+  },
+  {
+    "id": "qwen_vs_gemma_rechazo_fallas_wilcoxon_p",
+    "valor": "0.04",
+    "fuente": "data/runs/tf_gemma31b_k5_v2/recompuertado.jsonl",
+    "reintentos": "data/runs/tf_gemma31b_k5_v2_reintentos/registros.jsonl",
+    "auxiliar": "data/runs/tf_qwen27b_k5_v2/registros.jsonl",
+    "descripcion": "Gemma-4-31B (combinada, fuente) frente a Qwen3.8-27B (auxiliar), ambos sin razonamiento. Emparejado por (falla, nivel) evaluable en ambas (36 pares = 12 fallas x 3 niveles); rechazo por caso = rechazadas/afirmaciones. p-valor de Wilcoxon (scipy, bilateral) sobre las 12 diferencias por falla, 2 cifras significativas."
+  },
+  {
+    "id": "qwen_think_rechazo_medias",
+    "valor": "31% / 36%",
+    "fuente": "data/runs/tf_qwen27b_k5_v2/registros.jsonl",
+    "auxiliar": [
+      "data/runs/tf_qwen27b_k5_think_n0/registros.jsonl",
+      "data/runs/tf_qwen27b_k5_think_n1/registros.jsonl",
+      "data/runs/tf_qwen27b_k5_think_n2/registros.jsonl"
+    ],
+    "descripcion": "Qwen3.8-27B sin razonamiento (fuente) frente a con razonamiento low (auxiliar). Emparejado por (falla, nivel) evaluable en ambas (36 pares = 12 fallas x 3 niveles); rechazo por caso = rechazadas/afirmaciones. Rechazo medio por caso Qwen sin / con razonamiento."
+  },
+  {
+    "id": "qwen_think_rechazo_fallas",
+    "valor": "7 / 2 / 3",
+    "fuente": "data/runs/tf_qwen27b_k5_v2/registros.jsonl",
+    "auxiliar": [
+      "data/runs/tf_qwen27b_k5_think_n0/registros.jsonl",
+      "data/runs/tf_qwen27b_k5_think_n1/registros.jsonl",
+      "data/runs/tf_qwen27b_k5_think_n2/registros.jsonl"
+    ],
+    "descripcion": "Qwen3.8-27B sin razonamiento (fuente) frente a con razonamiento low (auxiliar). Emparejado por (falla, nivel) evaluable en ambas (36 pares = 12 fallas x 3 niveles); rechazo por caso = rechazadas/afirmaciones. Agregado por falla: fallas en que el rechazo con razonamiento es mayor / menor / igual."
+  },
+  {
+    "id": "qwen_think_rechazo_fallas_wilcoxon_p",
+    "valor": "0.074",
+    "fuente": "data/runs/tf_qwen27b_k5_v2/registros.jsonl",
+    "auxiliar": [
+      "data/runs/tf_qwen27b_k5_think_n0/registros.jsonl",
+      "data/runs/tf_qwen27b_k5_think_n1/registros.jsonl",
+      "data/runs/tf_qwen27b_k5_think_n2/registros.jsonl"
+    ],
+    "descripcion": "Qwen3.8-27B sin razonamiento (fuente) frente a con razonamiento low (auxiliar). Emparejado por (falla, nivel) evaluable en ambas (36 pares = 12 fallas x 3 niveles); rechazo por caso = rechazadas/afirmaciones. p-valor de Wilcoxon (scipy, bilateral) sobre las 12 diferencias por falla, 2 cifras significativas."
+  },
+  {
+    "id": "qwen_think_top1_pares",
+    "valor": "19 / 13 of 36",
+    "fuente": "data/runs/tf_qwen27b_k5_v2/registros.jsonl",
+    "auxiliar": [
+      "data/runs/tf_qwen27b_k5_think_n0/registros.jsonl",
+      "data/runs/tf_qwen27b_k5_think_n1/registros.jsonl",
+      "data/runs/tf_qwen27b_k5_think_n2/registros.jsonl"
+    ],
+    "descripcion": "Qwen3.8-27B sin razonamiento (fuente) frente a con razonamiento low (auxiliar). Emparejado por (falla, nivel) evaluable en ambas (36 pares = 12 fallas x 3 niveles); rechazo por caso = rechazadas/afirmaciones. Aciertos top-1 sin / con razonamiento sobre los 36 pares."
   }
 ]

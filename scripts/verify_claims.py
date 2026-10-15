@@ -339,6 +339,14 @@ METRICAS = {
     "think_razonamiento_mediana": _por_nivel_mediana(lambda r: r["uso"]["reasoning_tokens"], lambda x: f"{int(x)}"),
     "think_segundos_mediana": _por_nivel_mediana(lambda r: r["segundos"]),
     "evolus_latencia_max_s": lambda regs: f"{max(r['segundos'] for r in regs):.0f} s",
+    # réplica puntuada por el anotador LLM (eval/extraer_causas_llm.py): una fila por falla detectada
+    "replica_anotador_gemma_top3": lambda regs: _fraccion(sum(bool(r["acierto_top3"]) for r in regs), len(regs)),
+    "replica_anotador_qwen_top3": lambda regs: _fraccion(sum(bool(r["acierto_top3"]) for r in regs), len(regs)),
+    "replica_anotador_qwen_fallas": lambda regs: _lista(r["falla"] for r in regs if r["acierto_top3"]),
+    **{f"qwen_n{n}_top1": (lambda regs, n=n: _top_ev(regs, n, "acierto_top1")) for n in range(3)},
+    **{f"qwen_n{n}_top3": (lambda regs, n=n: _top_ev(regs, n, "acierto_top3")) for n in range(3)},
+    **{f"qwen_think_n{n}_top1": (lambda regs, n=n: _top_ev(regs, n, "acierto_top1")) for n in range(3)},
+    **{f"qwen_think_n{n}_top3": (lambda regs, n=n: _top_ev(regs, n, "acierto_top3")) for n in range(3)},
 }
 # métricas que además reciben el archivo `auxiliar` del claim
 METRICAS_AUX = {
@@ -355,6 +363,14 @@ METRICAS_AUX = {
     "think_rechazo_fallas_wilcoxon_p": lambda regs, aux: _wilcoxon_p(_por_falla(_pares_rechazo(regs, aux))),
     "think_afirmaciones": _think_afirmaciones,
     "think_top1_pares": _think_top1_pares,
+    # segundo modelo: mismas métricas con otras fuentes (fuente = referencia, auxiliar = comparada)
+    "qwen_vs_gemma_rechazo_medias": _think_rechazo_medias,
+    "qwen_vs_gemma_rechazo_fallas": lambda regs, aux: _peor_mejor_igual(_por_falla(_pares_rechazo(regs, aux))),
+    "qwen_vs_gemma_rechazo_fallas_wilcoxon_p": lambda regs, aux: _wilcoxon_p(_por_falla(_pares_rechazo(regs, aux))),
+    "qwen_think_rechazo_medias": _think_rechazo_medias,
+    "qwen_think_rechazo_fallas": lambda regs, aux: _peor_mejor_igual(_por_falla(_pares_rechazo(regs, aux))),
+    "qwen_think_rechazo_fallas_wilcoxon_p": lambda regs, aux: _wilcoxon_p(_por_falla(_pares_rechazo(regs, aux))),
+    "qwen_think_top1_pares": _think_top1_pares,
 }
 
 

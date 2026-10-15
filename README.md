@@ -26,7 +26,7 @@ Gemma-4-31B-IT, thinking off, k=5 samples, T=0.7, majority vote, faults IDV 1-15
 
 The gate rejected <!--claim:combinado_rechazo-->24%<!--/claim--> of the evidence claims the model made. Top-3 drops by one case between the original plant and the disguised twin, so the sample does not show a collapse; with 12 cases per level it also cannot show equivalence.
 
-**FaultExplainer replication.** We ran the FaultExplainer protocol (Khan et al. 2025): their data, their PCA (reproduced exactly) and their literal prompt. Top-3 on the faults their PCA detects: Gemma-4-31B <!--claim:replica_gemma_top3-->8/11<!--/claim-->, GPT-4o 7/11 and o1-preview 9/11 (their Table 1). Gemma misses IDV <!--claim:replica_gemma_fallas-->8,10,14<!--/claim-->; their PCA does not detect IDV <!--claim:replica_gemma_no_detectadas-->3,4,9,15<!--/claim-->. Protocol differences: they use n=1 with the API default temperature and hand-scored aliases; we use k=5 with majority vote at T=0.7.
+**FaultExplainer replication.** We ran the FaultExplainer protocol (Khan et al. 2025): their data, their PCA (reproduced exactly) and their literal prompt. Top-3 on the faults their PCA detects: Gemma-4-31B <!--claim:replica_gemma_top3-->8/11<!--/claim-->, GPT-4o 7/11 and o1-preview 9/11 (their Table 1). Gemma misses IDV <!--claim:replica_gemma_fallas-->8,10,14<!--/claim-->; their PCA does not detect IDV <!--claim:replica_gemma_no_detectadas-->3,4,9,15<!--/claim-->. Protocol differences: they use n=1 with the API default temperature and hand-scored aliases; we use k=5 with majority vote at T=0.7. Free-text answers are scored by reading the three causes the model proposes; an independent LLM annotator (DeepSeek-V4-Flash, `eval/extraer_causas_llm.py`) gives the same result fault by fault: Gemma <!--claim:replica_anotador_gemma_top3-->8/11<!--/claim-->.
 
 ## Robust results: does the disguise cost accuracy?
 **Robust check on Rieth et al. (thinking off).** 10 faults x 10 independent simulations per level (100 cases per level), same model and protocol as above.
@@ -54,7 +54,22 @@ Median reasoning tokens per case (k=5 calls) at levels 0 / 1 / 2: <!--claim:thin
 
 **Thinking makes the model invent more evidence.** Same 36 cases (12 faults × 3 levels) with thinking off and on: top-1 goes from <!--claim:think_top1_pares-->11 / 15 of 36<!--/claim--> (off / on), but the share of each card's evidence that the gate rejects as unsupported by the data rises from <!--claim:think_rechazo_medias-->22% / 36%<!--/claim--> (mean per case; rejected/claimed in total: <!--claim:think_afirmaciones-->35/143 / 68/182<!--/claim-->). Rejection is higher / lower / equal with thinking in <!--claim:think_rechazo_pares-->24 / 2 / 10<!--/claim--> cases (Wilcoxon p = <!--claim:think_rechazo_wilcoxon_p-->0.00015<!--/claim-->). Because the levels of one fault are not independent, we also average each fault over its levels: higher / lower / equal in <!--claim:think_rechazo_fallas-->9 / 1 / 2<!--/claim--> faults, Wilcoxon p = <!--claim:think_rechazo_fallas_wilcoxon_p-->0.0039<!--/claim-->. The gate matters more, not less, with a model that reasons.
 
-**The disguise costs the model effort, not accuracy, except on IDV8.** The Rieth arm with thinking is pending (runs on 15-16 Oct); no numbers yet.
+**The disguise costs the model effort, not accuracy, except on IDV8.** The Rieth arm with thinking was stopped at 95/200 cases when Gemma-4-31B-IT was removed from Token Factory on 15 Oct; no numbers from it are reported.
+
+## Second model: Qwen3.8-27B (same protocol, same AMD Token Factory)
+
+We repeated the Braatz campaigns with Qwen3.8-27B, the closest model left on Token Factory (dense, similar size, same price). One run per fault, 12 evaluable cases per level, so treat these as consistency checks, not as a model ranking.
+
+| Disguise level | Qwen top-1 (thinking off / on) | Qwen top-3 (thinking off / on) |
+|---|---|---|
+| 0 original names | <!--claim:qwen_n0_top1-->7/12<!--/claim--> / <!--claim:qwen_think_n0_top1-->4/12<!--/claim--> | <!--claim:qwen_n0_top3-->9/12<!--/claim--> / <!--claim:qwen_think_n0_top3-->7/12<!--/claim--> |
+| 1 anonymous tags | <!--claim:qwen_n1_top1-->6/12<!--/claim--> / <!--claim:qwen_think_n1_top1-->4/12<!--/claim--> | <!--claim:qwen_n1_top3-->9/12<!--/claim--> / <!--claim:qwen_think_n1_top3-->6/12<!--/claim--> |
+| 2 full disguise | <!--claim:qwen_n2_top1-->6/12<!--/claim--> / <!--claim:qwen_think_n2_top1-->5/12<!--/claim--> | <!--claim:qwen_n2_top3-->8/12<!--/claim--> / <!--claim:qwen_think_n2_top3-->5/12<!--/claim--> |
+
+- **Qwen does not recite TEP either:** without thinking, the disguise costs one case at most.
+- **The gate catches more unsupported evidence from Qwen than from Gemma:** mean rejection per case Gemma / Qwen <!--claim:qwen_vs_gemma_rechazo_medias-->22% / 31%<!--/claim-->; higher / lower / equal for Qwen in <!--claim:qwen_vs_gemma_rechazo_fallas-->9 / 2 / 1<!--/claim--> faults (Wilcoxon p = <!--claim:qwen_vs_gemma_rechazo_fallas_wilcoxon_p-->0.04<!--/claim-->, borderline with 12 faults).
+- **Thinking is not a free upgrade:** for Qwen it lowers top-1 (off / on: <!--claim:qwen_think_top1_pares-->19 / 13 of 36<!--/claim-->), while mean rejection per case goes <!--claim:qwen_think_rechazo_medias-->31% / 36%<!--/claim-->; by fault higher / lower / equal in <!--claim:qwen_think_rechazo_fallas-->7 / 2 / 3<!--/claim--> (p = <!--claim:qwen_think_rechazo_fallas_wilcoxon_p-->0.074<!--/claim-->, not significant). Same direction as Gemma, weaker. Qwen thinking used `reasoning_effort=low`, the lowest level it accepts (Gemma used `minimal`).
+- **FaultExplainer replication with Qwen:** <!--claim:replica_anotador_qwen_top3-->5/11<!--/claim--> (hits on IDV <!--claim:replica_anotador_qwen_fallas-->1,5,6,7,12<!--/claim-->), scored by the LLM annotator; Qwen's free-text answers run up to 30,000 characters and list many causes before concluding, so first-mention scoring is unreliable for it. Qwen beats Gemma with our structured JSON contract and loses to it on free text: the format matters.
 
 ## How we keep it honest
 - `SHA256SUMS` pins every file under `data/`, the recorded runs and the vendored FaultExplainer commit.

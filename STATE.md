@@ -440,3 +440,14 @@ Ver `docs/CHECKLIST.md`.
   ⇒ La réplica de Qwen SÍ es citable con el anotador: Qwen 5/11 vs Gemma 8/11, GPT-4o 7/11, o1-preview 9/11.
   Contraste: con nuestro contrato JSON + compuerta Qwen acierta MÁS que Gemma (top-3 n0 9 vs 7 de 12); en prosa libre,
   menos. El formato estructurado le favorece. Coste del anotador: céntimos.
+
+## 2026-10-15 (~23:30 UTC) — Qwen con thinking completo; segundo modelo en claims y README
+- `tf_qwen27b_k5_think_n{0,1,2}` (low, k=5, max_tokens 8000): 0 ERROR, 0 INVALIDO; top-1 4/4/5, top-3 7/6/5 de 12;
+  razonamiento mediano 11.544 / 13.560 / 12.955 tokens; ~470–590 s por caso.
+- Dentro de cada falla: el thinking baja el acierto de Qwen (top-1 19→13 de 36; peor en 4 fallas, mejor en 0, signo
+  p=0,125; top-3 26→18, 5/0, p=0,062: dirección consistente, no significativa con 12 fallas; lo arrastran IDV11 y 14).
+  Rechazo 31 %→36 %: casos 16/5/15 p=0,009; **por falla 7/2/3 p=0,074 (no significativo)**. Mismo sentido que Gemma, más débil.
+- Esfuerzo y disfraz: Gemma razona más disfrazada en **12/12 fallas** (Wilcoxon p<0,001); Qwen en 8/12 (p=0,13). La
+  "subida de esfuerzo con el disfraz" es de Gemma, no general.
+- 22 claims nuevos (`qwen_*`, `replica_anotador_*`) y sección "Second model" en el README: 62/62 marcadores OK.
+  Valores cotejados con el análisis independiente previo antes de fijarlos.
