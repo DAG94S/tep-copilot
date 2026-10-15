@@ -82,14 +82,19 @@ class ClienteEvolus:
                 self.esperar(falta)
         self._ultimo = time.monotonic()
 
-    def _pedir(self, metodo, ruta, json=None):
-        """Petición central: throttle, reintentos en 429/5xx, errores problem+json."""
+    def _pedir(self, metodo, ruta, json=None, archivos=None, grabar=None):
+        """Petición central: throttle, reintentos en 429/5xx, errores problem+json.
+
+        `archivos` (dict estilo requests, p. ej. {"file": (nombre, bytes, mime)}) envía multipart en vez de JSON;
+        no se fija Content-Type a mano para que requests ponga el boundary. `grabar` sustituye a la
+        petición en la grabación (para no volcar el contenido del archivo)."""
         url = self.base + ruta
         for intento in range(len(BACKOFF) + 1):
             self._throttle()
             t0 = time.monotonic()
+            extra = {"files": archivos} if archivos is not None else {}
             resp = self.sesion.request(metodo, url, headers=self._cabeceras(),
-                                       json=json, timeout=60)
+                                       json=json, timeout=60, **extra)
             seg = time.monotonic() - t0
             status = resp.status_code
             if status == 429 or status >= 500:
@@ -103,7 +108,8 @@ class ClienteEvolus:
         except Exception:
             cuerpo = {"texto": resp.text} if getattr(resp, "text", "") else None
         if self.grabadora is not None:
-            self.grabadora.registrar(metodo, ruta, json, status, cuerpo, seg)
+            self.grabadora.registrar(metodo, ruta, grabar if grabar is not None else json,
+                                     status, cuerpo, seg)
         if status >= 400:
             d = cuerpo if isinstance(cuerpo, dict) else {}
             if "problem+json" not in ctype and not d:
