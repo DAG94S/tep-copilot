@@ -5,7 +5,8 @@
 - Requisito: una parte significativa del trabajo corre en AMD, y esa parte debe verse en el producto que se muestra.
 - Premios de partners acumulables: Google $5k y Evolus €1.011 (plan y créditos).
 - Track de Evolus:
-  - el modelo es abierto y se sirve en nuestro propio vLLM en AMD Developer Cloud;
+  - el modelo es abierto y servido en AMD (las bases dicen "vLLM propio en AMD Developer Cloud"; el FAQ general acepta
+    Token Factory y no hubo crédito de GPU → usamos Token Factory y lo declaramos);
   - al menos 2 bloques de Evolus;
   - Evolus manejado vía REST;
   - app en contenedor, repo público MIT y README que funcione.
@@ -51,3 +52,9 @@ HSE, *The explosion and fires at the Texaco Refinery, Milford Haven, 24 July 199
 - 26 heridos y unos £48M en daños (HSE chis6).
 
 Objetivo EEMUA 191: ≤1 alarma cada 10 minutos en operación normal y ≤10 en los primeros 10 minutos tras una perturbación grave.
+
+## Competidores vistos en ACT III (lablab, 14 oct)
+- **FactoryPilot** (Qwen2.5-VL en vLLM sobre MI300X según su texto): foto + log de sensores + manual en biblioteca de Evolus,
+  5 guardrails deterministas, "calibrated confidence", TTFT y tok/s en la app, workflow de Evolus con aprobación.
+- **Industrial Fault Copilot** (Java/Spring + Evolus): diagnóstico con citas del manual del variador ABB ACS580 y escalamiento.
+- Ambos *prometen* verificación; ninguno publica medidas sobre un benchmark con línea base. Nuestra ventaja: todo medido.

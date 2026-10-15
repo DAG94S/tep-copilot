@@ -346,3 +346,14 @@ Ver `docs/CHECKLIST.md`.
   Evidencia: `data/runs/evolus/biblioteca_20261015T011352Z` (pineada).
 - Pendiente: vincular la biblioteca al agente en la UI y repetir la corrida del agente para ver si la orden de trabajo
   deja de ser superficial (antes: "Inspect IDV(6)…").
+
+## 2026-10-15 (~01:30 UTC) — Rieth con thinking detenido; Gemma 500; biblioteca sin probar
+- Con 6 procesos thinking volvieron los 429 ("maximum 20 requests per minute") pese a las esperas largas: 64 ERROR_LLM
+  apartados en `errores_429.jsonl` de cada carpeta `tf_rieth_k5_think_*`. Válidos: **95/200**. Procesos detenidos.
+- Después Gemma-4-31B-IT directo → **500** (DeepSeek-V4-Flash y Qwen3.8-27B → 200): caída del despliegue de Gemma.
+- Biblioteca vinculada al agente en la UI; la prueba del agente dio 422 "Your model 'gemma-4-31b-it' could not answer:
+  The model endpoint returned an error / is limiting the requests" → es Gemma, no la biblioteca. Pendiente probarla.
+- Presupuesto del período: gastado 0,414, restante 0,586 (reinicio 16:00 UTC del 15).
+- Reanudar: cuando Gemma dé 200, probar primero el agente; luego Rieth thinking con **2 procesos** (n0 y n2, grupos en serie).
+- Guías actualizadas: AGENTS.md (Token Factory, límites, reglas), docs/PROYECTO.md (§0 estado y pitch, plan, riesgos),
+  docs/CHECKLIST.md, docs/ANTECEDENTES.md (Evolus con Token Factory, competidores).

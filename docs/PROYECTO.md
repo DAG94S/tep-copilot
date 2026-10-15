@@ -3,6 +3,26 @@
 **Fecha de decisión:** 2026-10-09 · **Evento:** AMD Developer Hackathon ACT III (lablab.ai), del 12 al 18 oct 2026.
 **Entrega:** 18 oct, 15:00 UTC (10:00 en Ecuador) · **Equipo:** Diego García (solo).
 
+## 0. Estado al 15 oct (madrugada) — LEER PRIMERO
+**Cambios de base:** sin GPU propia (Token Factory, ver AGENTS.md); todo lo que diga MI300X/vLLM/droplet abajo es el plan
+original y ya no aplica. Detalle cronológico y cifras en `STATE.md`; cifras citables solo las de `claims.json`.
+
+**Pitch revisado (14 oct, tras verificar dentro de cada falla):**
+1. *"No deja que el modelo invente evidencia":* con thinking, Gemma acierta algo más (top-1 11→15 de 36) pero la evidencia
+   rechazada por la compuerta sube de 22 % a 36 % por caso (peor en 24 de 36 pares, Wilcoxon p=0,00015).
+2. *"La tarjeta llega antes que la inundación":* 4/4 fallas con inundación (≥10 alarmas/10 min) anticipadas
+   (9, 615, 1.488 y 1.143 min); en IDV1 e IDV6 antes de la primera alarma. Salvedad: alarmas de nuestro sistema de límites.
+3. *"El disfraz cuesta esfuerzo, no acierto (salvo IDV8)":* Rieth 10 fallas × 10 corridas, top-1 45/46/44, top-3 74/67/69,
+   caída concentrada en IDV8 (10→5→5), IC95 por clusters de falla [−4, 17] pp; con thinking, tokens de razonamiento +30 %.
+4. *Réplica FaultExplainer:* Gemma 4 31B 8/11 vs GPT-4o 7/11 y o1-preview 9/11 (protocolo k=5 declarado).
+
+**Descartado (no usar):** "la compuerta sabe cuándo confiar" y "el acuerdo entre muestras predice el acierto": eran
+confusión por falla (dentro de falla, top-3 p=0,09 y top-1 nada). "Colapsa inundaciones" tampoco: mediana 5,5 alarmas por tarjeta.
+
+**Hecho:** campañas Braatz sin/con thinking, Rieth sin thinking (300), réplica FE, métricas operativas y de anticipación,
+README en inglés con 33 marcadores verificados, agente de Evolus + Knowledge Library cargada por API (2 bloques).
+**En curso:** Rieth con thinking n0/n2: 95/200 válidos; detenido el 15 oct ~01:30 UTC por 429 y luego Gemma 500.
+
 ## 1. A qué premios apunta
 Un solo proyecto compite por varios premios a la vez, como permiten las reglas:
 - **Reto principal *Intelligent Industry*** (premios de AMD, $5k repartidos entre retos).
@@ -62,21 +82,19 @@ p95 desde la alarma hasta la tarjeta en MI300X, tok/s, $ por incidente.
 - La descripción del proceso sale de FaultExplainer `backend/prompts.py` (MIT). No se copia el paper (CC BY-NC-ND) y el diagrama de flujo se redibuja.
 - Demo en Streamlit con replay (GPU apagada) y modo vivo. Tres audiencias: operador, mantenimiento y gerencia.
 
-## 7. Plan
+## 7. Plan (revisado 15 oct)
 | Fecha | Trabajo |
 |---|---|
-| 9–11 oct | Pipeline determinista local, planta gemela, prompts con Gemma 4 E2B en Ollama, cliente Evolus con mocks |
-| 12 oct | Kickoff, workspace de Evolus desde el enlace del evento, primer flujo completo |
-| 13–14 oct | GPU: campaña grabada (≤3 GPU-h). **Congelar el alcance el 14** |
-| 15 oct | Integración con Evolus · **destruir el droplet** |
-| 16 oct | App, Docker, despliegue |
-| 17 oct | README con afirmaciones verificadas, deck y video de 3 min |
-| 18 oct | Enviar **antes de las 10:00 de Ecuador** |
+| jue 15 | Gemma de vuelta → probar el agente con biblioteca; reanudar Rieth thinking n0/n2 (**2 procesos**); Workflow de Evolus (3.er bloque: aprobación → agente → traducción al italiano) |
+| vie 16 | Rieth thinking n1; claims + README; demo "producto" (replay en tiempo real: alarmas → tarjeta → aprobar → Evolus); Docker y despliegue |
+| sáb 17 | Deck, video (≤5 min), portada; reintentos si hacen falta |
+| dom 18 | Enviar **antes de las 10:00 de Ecuador** |
 
-## 8. Riesgos principales
-1. **La GPU puede llegar tarde** (aprobación de 2–3 días hábiles). Pedir el crédito ya y diseñar la campaña para ≤3 GPU-h.
-2. **Alcance excesivo.** Congelarlo el 14 de octubre.
-3. **Evolus no se puede probar hasta el 12.** Usar solo 2 bloques y grabar sus salidas para el replay.
+## 8. Riesgos principales (revisado 15 oct)
+1. **Token Factory inestable:** Gemma degenera o da 500 a ratos; 429 con más de 2 procesos. Reanudar con `--continuar`.
+2. **Competidores muy parecidos** (FactoryPilot, Industrial Fault Copilot): ganar por evidencia medida y por la demo.
+3. **Evolus:** las bases piden vLLM propio; usamos Token Factory (declararlo). Hacen falta ≥2 bloques visibles por API.
+4. **Alcance:** no abrir frentes nuevos (descartado el benchmark del catálogo de modelos).
 
 ## 9. Preguntas abiertas
 - ¿Qué tecnología cuenta para el premio de Google?

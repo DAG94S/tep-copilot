@@ -1,28 +1,27 @@
-# CHECKLIST
+# CHECKLIST (actualizado 15 oct)
 
-## Antes del kickoff (12 oct)
-**Te toca a ti:**
-- [ ] **HOY:** AMD AI Developer Program → Member Perks → Request Cloud Credits → elegir **AMD Developer Cloud** (no Fireworks).
-      El formulario pide afiliación, cargo, uso previsto y un perfil público (LinkedIn o GitHub). Aprobación en 2–3 días hábiles.
-      El crédito se activa con el enlace del correo y caduca 30 días después de activarlo.
-- [ ] Inscribirse en lablab ACT III y en su Discord. Preguntar qué tecnología cuenta para el premio de Google.
-- [ ] Crear la cuenta de GitHub para el repo público (si se usa una nueva) y la de Streamlit Community Cloud.
-- [ ] Instalar Ollama en Windows y bajar `gemma4:e2b-it-qat`.
+## Hecho
+- [x] Proyecto en WSL con git; datos Braatz y Rieth (Training) pineados; FaultExplainer vendorizado.
+- [x] `core/`, `twin/`, `eval/`, `llm/` con tests (150+). Token Factory configurado.
+- [x] Campañas: Braatz sin thinking (+ reintentos), Braatz con thinking, Rieth sin thinking (300), réplica FaultExplainer.
+- [x] `claims.json` + `verify_claims.py` (hashes, claims y marcadores del README) en verde.
+- [x] README en inglés con resultados; LICENSE MIT.
+- [x] Evolus: agente TEP Shift Copilot (Gemma vía Token Factory), corridas grabadas, Knowledge Library cargada por API.
 
-**Me toca a mí (Claude):**
-- [ ] Mover el proyecto a WSL e inicializar git (pendiente de tu decisión).
-- [ ] `scripts/descargar_datos.py`: espejo Braatz d00–d21, `prompts.py` y CSV de FaultExplainer, y FaultFree_Training → `SHA256SUMS`.
-- [ ] `core/`: alarmas, PCA T²/SPE, contribuciones y compuerta, con tests.
-- [ ] `twin/`: la planta gemela disfrazada.
-- [ ] Prompts probados con E2B en local.
-- [ ] Cliente de Evolus con mocks. **No crear el workspace antes del enlace del evento.**
+## Pendiente
+- [ ] Rieth con thinking: n0/n2 (95/200 válidos) y n1. **Máx. 2 procesos.**
+- [ ] Probar el agente con la biblioteca cuando Gemma vuelva; grabar y pinear.
+- [ ] Workflow de Evolus (aprobación → agente → traducción) manejado por API; grabar ejecución.
+- [ ] Claims y README: anticipación, evidencia inventada con thinking, Rieth thinking.
+- [ ] Demo como producto (replay en tiempo real) y despliegue con URL pública.
+- [ ] Copyright del LICENSE (decide Diego).
 
 ## Entrega en lablab (antes del 18 oct, 10:00 hora de Ecuador)
-- [ ] Título de 50 caracteres o menos, descripción corta de 255 o menos y descripción larga de 100 palabras o más (en inglés).
-- [ ] Reto *Intelligent Industry* y tags (AMD Developer Cloud, ROCm, Gemma, Evolus).
+- [ ] Título ≤50 caracteres, descripción corta ≤255, larga ≥100 palabras (inglés).
+- [ ] Reto *Intelligent Industry* y tags (AMD Token Factory, Gemma, Evolus).
 - [ ] Repo público MIT, README que funcione, `docker compose up`, `.env.example`, sin keys.
-- [ ] URL de la demo en vivo (replay que funcione con la GPU apagada).
-- [ ] Portada 16:9, video de 5 min o menos (MP4, 300 MB o menos) y slides PDF.
-- [ ] Evidencia de AMD: logs de vLLM, modelo, `rocm-smi`, benchmarks en `data/runs/`.
-- [ ] Evidencia de Evolus: IDs de workflow y estadísticas de uso.
-- [ ] `scripts/verify_claims.py` en verde.
+- [ ] URL de la demo en vivo (replay sin red).
+- [ ] Portada 16:9, video ≤5 min (MP4 ≤300 MB) y slides PDF.
+- [ ] Evidencia de AMD: `/v1/usage` de Token Factory y corridas pineadas.
+- [ ] Evidencia de Evolus: agente verificado por API, biblioteca, workflow e intercambios grabados.
+- [ ] `.venv/bin/python scripts/verify_claims.py` en verde.
