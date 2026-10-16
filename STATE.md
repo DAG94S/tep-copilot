@@ -495,3 +495,9 @@ Ver `docs/CHECKLIST.md`.
   pineados en SHA256SUMS; licencia NCSA/UIUC que permite redistribuir conservando el aviso, LICENSE incluido).
   Rieth (579 MB) y los CSV de FaultExplainer siguen fuera. AGENTS.md regla 2 actualizada.
 - Corridas incompletas fuera del repo por `.gitignore`: Rieth thinking (95/200) y las corridas de Evolus con 422.
+
+## 2026-10-16 (~01:50 UTC) — Agente original (Gemma) con instrucciones v2: sin modelo; se queda Qwen
+- Diego pegó las instrucciones v2 también en el agente original. Sonda dev (`data/dev/evolus_gemma_sonda`): **422**
+  `own_models.request_rejected` "Requested model Gemma-4-31B-IT not supported" (Gemma sigue fuera de Token Factory).
+- Decisión de Diego: no conectar Gemma vía API de Google (no es hardware AMD y allí Gemma piensa a la fuerza);
+  la evidencia de Evolus es la corrida con Qwen sobre Token Factory. Si Gemma vuelve, repetir 6:0, 6:2, 1:0 (≈0,003 USD).
