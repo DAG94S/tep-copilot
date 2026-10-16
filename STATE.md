@@ -451,3 +451,34 @@ Ver `docs/CHECKLIST.md`.
   "subida de esfuerzo con el disfraz" es de Gemma, no general.
 - 22 claims nuevos (`qwen_*`, `replica_anotador_*`) y sección "Second model" en el README: 62/62 marcadores OK.
   Valores cotejados con el análisis independiente previo antes de fijarlos.
+
+## 2026-10-16 (00:30 UTC) — Discord: AMD revisa Gemma 4; sin créditos de GPU para el hackathon
+- Maharshi [AMD], 15 oct 13:11 (pegado por Diego): "folks with gemma4 issues, the team is currently reviewing and will
+  get back. for hackathon no cloud credits needed only apikey from notebooks.amd.com/tokenfactory".
+  ⇒ (1) Gemma puede volver (sin fecha). (2) **No hay créditos de GPU**: el camino del vLLM propio queda descartado; la
+  posición oficial de AMD es que Token Factory basta como componente AMD. Cita útil para el README/entrega, sobre todo
+  para el track de Evolus (las bases dicen "vLLM endpoint on AMD Developer Cloud").
+- Gemma sigue fuera de `/v1/models` (00:23 UTC). El sondeo de 8 h no lo vio volver.
+
+## 2026-10-16 (~00:50 UTC) — Agente de Evolus con Qwen: la biblioteca no se consultaba (causa: instrucciones v1)
+- Diego duplicó el agente: «TEP Shift Copilot (copia)» (`…:57f05ba1-…`), conexión `amd` → Qwen3.8-27B, Reasoning
+  "Model default", biblioteca «TEP process & procedures» vinculada. El original (Gemma, `…:384fa28a-…`) queda intacto.
+- Corrida `data/runs/evolus/agente_2026-10-16_biblioteca_qwen` (IDV6 n0/n2 + IDV1 n0, mensajes de tf_gemma31b_k5_v2):
+  3/3 respuestas, 0 órdenes de control, 154/80/76 s; `/v1/usage` antes/después grabado: 3 peticiones, +7.869 reasoning
+  de +9.127 completion ⇒ con "Model default" **Qwen piensa** (no hay opción Off en la UI). Pero solo ~1.200 tokens de
+  prompt por petición y ninguna búsqueda ⇒ **no consultó la biblioteca** (inspección genérica, no sabe qué es IDV(6)).
+- Sonda dev (`data/dev/evolus_biblioteca_sonda`): pidiendo explícitamente la biblioteca → 2 peticiones, +7.912 tokens de
+  prompt, respuesta correcta citando `inspection_guide_by_disturbance.md` y `tep_process_description.md`. La biblioteca
+  funciona; el agente no la busca por iniciativa propia.
+- Causa: la regla 2 de las instrucciones v1 ("Use only the data in the message… do not invent… equipment names").
+  **Instrucciones v2** (`evolus/agente_instrucciones.md`): buscar en la biblioteca cada causa aprobada antes de redactar,
+  inspección tomada de la guía con el documento citado, "no library entry for this code" para códigos disfrazados.
+  Pendiente: Diego pega v2 en la copia → repetir la corrida.
+- **Corrida con instrucciones v2 → `data/runs/evolus/agente_2026-10-16_biblioteca_qwen_v2` (pineada; la v1 queda
+  pineada como comparación):** 3/3, **0 órdenes de control**, 106/167/121 s; `/v1/usage`: 6 peticiones (búsqueda +
+  respuesta por caso), +58.091 tokens de prompt (los fragmentos de la biblioteca) frente a +3.620 con v1.
+  IDV6 n0: inspección por causa tomada de `inspection_guide_by_disturbance.md` (stream 1: válvulas de aislamiento,
+  transmisor de flujo, válvula de alimentación…) y cita los dos documentos. IDV1 n0: menciona que XMEAS(1) fue rechazada
+  por la compuerta y no la usa. **IDV6 n2 (disfrazado): "no library entry for this code" para C26/C89/C16, sin adivinar**
+  → el disfraz se mantiene también en la capa de documentación.
+- Bloques de Evolus visibles por API: agente + Knowledge Library (2). Falta el workflow (3.º).

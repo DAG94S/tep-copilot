@@ -296,17 +296,19 @@ def pestana_replay() -> None:
 
 def evolus(falla: int, nivel: int) -> None:
     """Salida grabada del agente de Evolus para el caso aprobado."""
-    st.subheader("Documentation drafted by the Evolus agent (recorded run, replayed)")
+    st.subheader("Documentation drafted by the Evolus agent with its Knowledge Library (recorded run on Qwen3.8-27B via AMD Token Factory, replayed)")
     s = da.salida_evolus(falla, nivel)
     if s is None:
         casos = [(x["falla"], x["nivel"]) for x in da.leer_jsonl(da.RUNS / da.CAMPANA_EVOLUS / "resultados.jsonl")]
         st.info("No recorded Evolus output for this case; recorded cases: "
                 + (", ".join(f"IDV({f}) level {n}" for f, n in casos) or "none") + ".")
         return
-    st.markdown(s["texto"])
+    texto = s["texto"]
+    i = texto.find("## Work order")   # el preámbulo del agente ("I'll start by searching…") no se muestra
+    st.markdown(texto[i:] if i > 0 else texto)
     ruta = da.RUNS / da.CAMPANA_EVOLUS / "resultados.jsonl"
     sha = da.sha256_registrado(ruta)
-    st.caption(f"{s['segundos']} s · control orders detected in the output: {len(s['ordenes_de_control'])} · "
+    st.caption(f"{'Agent preamble before the work order hidden; full text in the source file. ' if i > 0 else ''}{s['segundos']} s · control orders detected in the output: {len(s['ordenes_de_control'])} · "
                f"model: `{s['modelo']}` · recorded: {s['ts']} · Source: `{ruta.relative_to(da.RAIZ)}` · "
                f"SHA-256 (from SHA256SUMS): `{sha or 'not registered'}`")
 

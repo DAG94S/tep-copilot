@@ -144,7 +144,7 @@ def variable_en_vistas(columna_tep: int = 6) -> list[dict]:
 
 
 # ---------- replay en vivo de un incidente ----------
-CAMPANA_EVOLUS = "evolus/agente_2026-10-14_sinrazonamiento"
+CAMPANA_EVOLUS = "evolus/agente_2026-10-16_biblioteca_qwen_v2"   # agente con Knowledge Library (instrucciones v2; Qwen3.8-27B)
 ANTICIPACION = RAIZ / "data" / "processed" / "anticipacion.json"
 
 
