@@ -3,30 +3,32 @@
 **Fecha de decisión:** 2026-10-09 · **Evento:** AMD Developer Hackathon ACT III (lablab.ai), del 12 al 18 oct 2026.
 **Entrega:** 18 oct, 15:00 UTC (10:00 en Ecuador) · **Equipo:** Diego García (solo).
 
-## 0. Estado al 15 oct (madrugada) — LEER PRIMERO
-**Cambios de base:** sin GPU propia (Token Factory, ver AGENTS.md); todo lo que diga MI300X/vLLM/droplet abajo es el plan
-original y ya no aplica. Detalle cronológico y cifras en `STATE.md`; cifras citables solo las de `claims.json`.
+## 0. Estado al 16 oct (01:45 UTC) — LEER PRIMERO
+**Cambios de base:** sin GPU propia: AMD (Maharshi, 15 oct): "no cloud credits needed, only apikey from Token Factory".
+Todo lo que diga MI300X/vLLM/droplet abajo es el plan original y ya no aplica. **Gemma-4-31B-IT fue retirado de Token
+Factory el 15 oct** (AMD "lo revisa"). Detalle en `STATE.md`; cifras citables solo las de `claims.json` (65/65 OK).
 
-**Pitch revisado (14 oct, tras verificar dentro de cada falla):**
+**Pitch (verificado dentro de cada falla):**
 1. *"No deja que el modelo invente evidencia":* con thinking, Gemma acierta algo más (top-1 11→15 de 36) pero la evidencia
-   rechazada por la compuerta sube de 22 % a 36 % por caso (peor en 24 de 36 pares, Wilcoxon p=0,00015).
-2. *"La tarjeta llega antes que la inundación":* 4/4 fallas con inundación (≥10 alarmas/10 min) anticipadas
-   (9, 615, 1.488 y 1.143 min); en IDV1 e IDV6 antes de la primera alarma. Salvedad: alarmas de nuestro sistema de límites.
-3. *"El disfraz cuesta esfuerzo, no acierto (salvo IDV8)":* Rieth 10 fallas × 10 corridas, top-1 45/46/44, top-3 74/67/69,
-   caída concentrada en IDV8 (10→5→5), IC95 por clusters de falla [−4, 17] pp; con thinking, tokens de razonamiento +30 %.
-4. *Réplica FaultExplainer:* Gemma 4 31B 8/11 vs GPT-4o 7/11 y o1-preview 9/11 (protocolo k=5 declarado).
+   rechazada sube de 22 % a 36 % por caso (peor en 9 de 12 fallas, Wilcoxon por falla p=0,0039).
+2. *"La tarjeta llega antes que la inundación":* 4/4 fallas con inundación (9, 615, 1.488 y 1.143 min).
+3. *"Razona, no recita":* Rieth 10 fallas × 10 corridas, top-1 45/46/44; caída solo en IDV8. Qwen3.8-27B (segundo
+   modelo) tampoco recita.
+4. *Réplica FaultExplainer:* Gemma 8/11 vs GPT-4o 7/11 y o1-preview 9/11 (Qwen 5/11, puntuado con anotador LLM).
+5. *"El thinking no es gratis":* a Gemma le sube el acierto, a Qwen se lo baja (19→13 de 36); en ambos sube la evidencia
+   sin respaldo (en Qwen no significativo por falla). Argumento para la compuerta determinista.
 
-**Descartado (no usar):** "la compuerta sabe cuándo confiar" y "el acuerdo entre muestras predice el acierto": eran
-confusión por falla (dentro de falla, top-3 p=0,09 y top-1 nada). "Colapsa inundaciones" tampoco: mediana 5,5 alarmas por tarjeta.
+**Descartado (no usar):** "la compuerta sabe cuándo confiar", "el acuerdo predice el acierto", "colapsa inundaciones",
+"el disfraz sube el esfuerzo de razonamiento" como efecto general (solo Gemma: 12/12; Qwen 8/12 n.s.).
 
-**Hecho:** campañas Braatz sin/con thinking, Rieth sin thinking (300), réplica FE, métricas operativas y de anticipación,
-README en inglés con 33 marcadores verificados, agente de Evolus + Knowledge Library cargada por API (2 bloques).
-**En curso:** Rieth con thinking n0/n2: 95/200 válidos; detenido el 15 oct ~01:30 UTC por 429 y luego Gemma 500.
+**Hecho:** todas las campañas (experimentos cerrados), demo con Live replay (alarmas → tarjeta → aprobar → orden de
+trabajo con biblioteca → traducción), Evolus con 3 bloques por API, datos Braatz en el repo (la demo funciona desde un
+clon), textos de lablab (`docs/ENTREGA_LABLAB.md`). Rieth con thinking detenido en 95/200 (no se reporta).
 
 ## 1. A qué premios apunta
 Un solo proyecto compite por varios premios a la vez, como permiten las reglas:
 - **Reto principal *Intelligent Industry*** (premios de AMD, $5k repartidos entre retos).
-- **Premio de Google** ($5k). Se asume que es para el mejor uso de Gemma, como en el ACT II. **Hay que confirmarlo en Discord.**
+- **Premio de Google** ($5k) para equipos que usen Gemma (confirmado en Discord el 14 oct).
 - **Track de Evolus** (€1.011 en plan y créditos).
 - **Premio especial de Vibe Generation.** Criterios: valor cuantificado, ejecución técnica, diseño del flujo humano + IA.
 
@@ -82,13 +84,12 @@ p95 desde la alarma hasta la tarjeta en MI300X, tok/s, $ por incidente.
 - La descripción del proceso sale de FaultExplainer `backend/prompts.py` (MIT). No se copia el paper (CC BY-NC-ND) y el diagrama de flujo se redibuja.
 - Demo en Streamlit con replay (GPU apagada) y modo vivo. Tres audiencias: operador, mantenimiento y gerencia.
 
-## 7. Plan (revisado 15 oct)
+## 7. Plan (revisado 16 oct)
 | Fecha | Trabajo |
 |---|---|
-| jue 15 | Gemma de vuelta → probar el agente con biblioteca; reanudar Rieth thinking n0/n2 (**2 procesos**); Workflow de Evolus (3.er bloque: aprobación → agente → traducción al italiano) |
-| vie 16 | Rieth thinking n1; claims + README; demo "producto" (replay en tiempo real: alarmas → tarjeta → aprobar → Evolus); Docker y despliegue |
-| sáb 17 | Deck, video (≤5 min), portada; reintentos si hacen falta |
-| dom 18 | Enviar **antes de las 10:00 de Ecuador** |
+| vie 16 | Esquema del deck y guion del video (5 min); elegir título/nombre (`docs/ENTREGA_LABLAB.md`); si vuelve Gemma, repetir el agente con biblioteca sobre Gemma |
+| sáb 17 | Grabar el video, deck en PDF, portada 16:9 |
+| dom 18 | Repo público, despliegue (Streamlit Cloud) y envío **antes de las 10:00 de Ecuador** |
 
 ## 8. Riesgos principales (revisado 15 oct)
 1. **Token Factory inestable:** Gemma degenera o da 500 a ratos; 429 con más de 2 procesos. Reanudar con `--continuar`.
