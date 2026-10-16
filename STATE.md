@@ -501,3 +501,65 @@ Ver `docs/CHECKLIST.md`.
   `own_models.request_rejected` "Requested model Gemma-4-31B-IT not supported" (Gemma sigue fuera de Token Factory).
 - Decisión de Diego: no conectar Gemma vía API de Google (no es hardware AMD y allí Gemma piensa a la fuerza);
   la evidencia de Evolus es la corrida con Qwen sobre Token Factory. Si Gemma vuelve, repetir 6:0, 6:2, 1:0 (≈0,003 USD).
+
+## 2026-10-16 (~16:58 UTC) — Gemma-4-31B-IT de vuelta en Token Factory
+- `GET /models` vuelve a listar `Gemma-4-31B-IT` (junto a Qwen3.8-27B, DeepSeek-V4.x, GLM-5.3-Flash, etc.).
+- Llamada mínima ("Reply with exactly: OK"): 200 en 2,2 s, `finish_reason: stop`. La respuesta reporta
+  `"model": "self-dploy/Gemma-4-31B-IT"` (antes no llevaba prefijo); se sigue pidiendo como `Gemma-4-31B-IT`.
+- `scripts/probar_token_factory.py` (IDV1, gemela nivel 2): 10,6 s, 2.120 + 221 tokens, `reasoning_tokens: 0`,
+  JSON válido (causas C89/C16/C78), sin la salida degenerada del 13-oct. Gasto del periodo: 0,00009 USD.
+- Pendiente (decisión de Diego): repetir en Evolus el agente original con instrucciones v2 sobre Gemma (6:0, 6:2, 1:0).
+- **Corrida Evolus con Gemma → `data/runs/evolus/agente_2026-10-16_biblioteca_gemma_v2` (pineada):** agente original
+  (`…:384fa28a-…`, conexión `amd` → Gemma-4-31B-IT), instrucciones v2 (mismo SHA 8035598c… que la de Qwen), casos
+  6:0, 6:2, 1:0 de tf_gemma31b_k5_v2. 3/3, **0 órdenes de control**, 32/19/29 s (Qwen: 106/167/121 s).
+  `/v1/usage`: 6 peticiones, 0 errores, +55.847 prompt (consulta la biblioteca), +1.172 completion, **0 reasoning**,
+  0,0019 USD. IDV6 n0 e IDV1 n0: inspección por causa citando `inspection_guide_by_disturbance.md`; IDV1 n0 menciona
+  XMEAS(1) rechazada por la compuerta. IDV6 n2 (disfrazado): "no library entry for this code" para C26/C89/C16.
+- **Defecto:** el "Shift handover" de 6:0 y 6:2 sale **en italiano** pese a "Write exactly two sections, in English"
+  (1:0 en inglés; Qwen v2: 3/3 en inglés). Causa no verificada: lo que recupera la biblioteca no queda en
+  `intercambios.jsonl` (solo se ve la respuesta final).
+- **Causa del italiano (verificada, `data/dev/evolus_italiano/`):**
+  1. Config de los dos agentes por `GET /agents`: idéntica salvo `modelKey`; `language: null` en ambos; prompts iguales
+     entre sí (difieren del archivo solo en espacios que añade la UI); la biblioteca tiene solo los 3 .md en inglés del 15-oct.
+  2. Preguntado en la misma conversación, el agente dice "Nothing did. I failed to follow the instruction…"
+     (autoinforme, no prueba nada).
+  3. Gemma **directo en Token Factory** con el mismo system prompt y los mensajes de 6:0 y 6:2, 5 veces cada uno:
+     **0/10 en italiano** ⇒ el italiano entra por la capa de Evolus.
+  4. Pedido el texto literal de la regla de idioma, **Gemma y Qwen, en conversaciones nuevas, citan la misma frase palabra
+     por palabra**: "Language: by default, respond in Italian. If the user writes in a different language, respond in
+     the user's language instead. If your instructions define a language policy, that policy takes precedence."
+     ⇒ Evolus inyecta un system prompt propio con italiano por defecto (con `language: null`). Nuestro mensaje
+     de usuario está en inglés y el prompt dice "in English", así que lo correcto era inglés: Qwen lo respeta 3/3 y
+     Gemma solo en 1/3 (mezcla la regla oculta en la sección en prosa).
+  - Arreglo propuesto: fijar el idioma del agente en English en la UI de Evolus y repetir 6:0, 6:2, 1:0 en carpeta
+    nueva; la corrida en italiano queda pineada como evidencia del defecto.
+
+## 2026-10-16 (~18:00 UTC) — Instrucciones v3 (Language policy) y corridas Gemma/Qwen v3
+- El chatbot de ayuda de Evolus confirma que no hay ajuste de idioma por agente en la UI (el campo `language` de la API
+  no se expone): el idioma se fija en las instrucciones. (Su afirmación de que Gemma está "Italian-tuned" es falsa:
+  Gemma directo en Token Factory dio 0/10 en italiano.)
+- v3 = v2 + primera línea "Language policy: write everything in English, including the shift handover, whatever
+  default language the platform sets. Never write in Italian or any other language." (SHA ecd3c396…). Diego la pegó en
+  los dos agentes; `GET /agents`: ambos prompts = v3 (ignorando espacios de la UI).
+- **Gemma v3 → `data/runs/evolus/agente_2026-10-16_biblioteca_gemma_v3` (pineada):** 3/3 en inglés, 0 órdenes de
+  control, 70/29/26 s; `/v1/usage` 6 peticiones, 0 errores, +56.033 prompt, +1.106 completion, 0 reasoning, 0,0019 USD.
+  6:0 y 1:0 citan `inspection_guide_by_disturbance.md`; 1:0 menciona XMEAS(1) rechazada; 6:2: "no library entry" ×3,
+  sin "IDV" en el texto.
+- **Qwen v3 → `data/runs/evolus/agente_2026-10-16_biblioteca_qwen_v3` (pineada):** 3/3 en inglés, 0 órdenes,
+  126/64/93 s; 6 peticiones, 0 errores, +58.249 prompt, +4.819 completion (2.880 reasoning), 0,0025 USD. 6:2: "no library
+  entry" ×3 (dice que buscó en los dos documentos), sin "IDV".
+- Las corridas v2 (Gemma en italiano, Qwen) quedan pineadas como historial; la comparación limpia Gemma vs Qwen es v3.
+
+## 2026-10-16 (~17:30 UTC) — Rieth con thinking: el Gemma nuevo ignora reasoning_effort
+- Reanudado con `--continuar` (mismos argumentos del 14-oct, 2 procesos). Los 2 primeros casos de hoy (n0_a 5:5,
+  n2_a 2:2) salieron con **`reasoning_tokens: 0`** (14-oct: 6.000–25.000 por caso con k=5). Procesos detenidos
+  enseguida; esos 2 registros, apartados a `sin_thinking_2026-10-16.jsonl` en sus carpetas. La campaña vuelve a 95/200,
+  todos con razonamiento > 0.
+- **Esquema externo:** el despliegue que volvió responde `"model": "self-dploy/Gemma-4-31B-IT"`. Sonda
+  (`data/dev/gemma_thinking_sonda_2026-10-16.log`): `reasoning_effort` minimal/low/high → 0 tokens de razonamiento;
+  `"thinking": {"type": "enabled"}` → 400 "\"thinking\" is not supported on /v1/chat/completions and was not applied.
+  Use \"reasoning_effort\"…" (aunque reasoning_effort no tiene efecto); **`chat_template_kwargs: {"enable_thinking": true}`
+  sí razona**.
+- Caso real Rieth falla 2, corrida 1, nivel 2: 14-oct (reasoning_effort minimal, k=5) 15.065 razonamiento ≈ 3.000 por
+  llamada, VERIFICADO; hoy (enable_thinking, k=2) 5.566 ≈ 2.800 por llamada, VERIFICADO, 396 s. Volumen parecido, pero
+  es otro despliegue y otro mando: terminar los 105 casos así mezcla dos configuraciones (decide Diego).

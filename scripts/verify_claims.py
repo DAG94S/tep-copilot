@@ -62,6 +62,12 @@ def _fraccion(a: int, b: int) -> str:
     return f"{a}/{b}"
 
 
+def _relevo_italiano(r: dict) -> bool:
+    """La sección "## Shift handover" del agente de Evolus contiene palabras italianas frecuentes."""
+    relevo = r["texto"].split("## Shift handover", 1)[-1]
+    return re.search(r"\b(allarme|diagnosi|campione|della|sono|è)\b", relevo) is not None
+
+
 def _evaluables(regs: list[dict], nivel: int) -> list[dict]:
     return [r for r in regs if r["nivel"] == nivel and r["estado"] not in ("INVALIDO", "NO_DETECTADO")]
 
@@ -342,6 +348,15 @@ METRICAS = {
     "think_razonamiento_mediana": _por_nivel_mediana(lambda r: r["uso"]["reasoning_tokens"], lambda x: f"{int(x)}"),
     "think_segundos_mediana": _por_nivel_mediana(lambda r: r["segundos"]),
     "evolus_latencia_max_s": lambda regs: f"{max(r['segundos'] for r in regs):.0f} s",
+    # Evolus inyecta "respond in Italian" por defecto (STATE.md, 16 oct): v2 sin "Language policy", v3 con ella
+    "evolus_v2_gemma_italiano": lambda regs: f"{sum(_relevo_italiano(r) for r in regs)}/{len(regs)}",
+    "evolus_v3_ingles": lambda regs: f"{sum(not _relevo_italiano(r) for r in regs)}/{len(regs)}",
+    "evolus_v3_ordenes_control": lambda regs: str(sum(len(r.get("ordenes_de_control", [])) for r in regs)),
+    "evolus_v3_gemma_latencia_max_s": lambda regs: f"{max(r['segundos'] for r in regs):.0f} s",
+    "evolus_v3_qwen_latencia_max_s": lambda regs: f"{max(r['segundos'] for r in regs):.0f} s",
+    "evolus_v3_disfrazado_sin_adivinar": lambda regs: _fraccion(
+        sum("no library entry" in r["texto"] and "IDV" not in r["texto"] for r in regs if r["nivel"] == 2),
+        sum(r["nivel"] == 2 for r in regs)),
     # réplica puntuada por el anotador LLM (eval/extraer_causas_llm.py): una fila por falla detectada
     "replica_anotador_gemma_top3": lambda regs: _fraccion(sum(bool(r["acierto_top3"]) for r in regs), len(regs)),
     "replica_anotador_qwen_top3": lambda regs: _fraccion(sum(bool(r["acierto_top3"]) for r in regs), len(regs)),

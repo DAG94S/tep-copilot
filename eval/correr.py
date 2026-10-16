@@ -34,7 +34,7 @@ def correr(campana: str, backend: str, fallas: list[int], niveles: list[int], k:
            fusionar_system: bool = False, continuar: bool = False, raiz_runs: Path = RAIZ_RUNS,
            argumentos: dict | None = None, cliente=None, max_tokens: int = 800,
            razonamiento: str | None = None, sin_json: bool = False,
-           corridas: list[int] | None = None) -> list[dict]:
+           corridas: list[int] | None = None, thinking_plantilla: bool = False) -> list[dict]:
     """Corre la campaña y devuelve todos los registros de la carpeta.
 
     corridas=None: Braatz. Con lista de corridas (1..20): Rieth, bucle falla x corrida x nivel."""
@@ -48,6 +48,8 @@ def correr(campana: str, backend: str, fallas: list[int], niveles: list[int], k:
         cliente = cliente_llm.desde_env(prefijo=backend)
         if razonamiento:  # p. ej. Token Factory: reasoning_effort enciende el thinking de Gemma
             cliente.extra_body = cliente.extra_body | {"reasoning_effort": razonamiento}
+        if thinking_plantilla:  # Token Factory desde el 16-oct (self-dploy): ignora reasoning_effort (STATE.md)
+            cliente.extra_body = cliente.extra_body | {"chat_template_kwargs": {"enable_thinking": True}}
         if sin_json:  # Token Factory: response_format json_object degenera a Gemma en algunos prompts ('{"////…')
             cliente.extra_body = {k: v for k, v in cliente.extra_body.items() if k != "response_format"}
     endpoint = urlparse(cliente.base_url).netloc if cliente is not None and hasattr(cliente, "base_url") else None
@@ -115,6 +117,8 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--max-tokens", type=int, default=800)
     p.add_argument("--sin-json", action="store_true", help="quita response_format del extra_body del backend")
     p.add_argument("--razonamiento", default=None, help="valor de reasoning_effort (enciende el thinking si el backend lo admite)")
+    p.add_argument("--thinking-plantilla", action="store_true",
+                   help="enciende el thinking con chat_template_kwargs.enable_thinking (Gemma en Token Factory desde el 16-oct)")
     p.add_argument("--dev", action="store_true", help="guarda en data/dev (no versionado): corridas de depuración")
     a = p.parse_args(argv)
     if a.fuente == "rieth":
@@ -131,7 +135,7 @@ def main(argv: list[str] | None = None) -> None:
                        a.calibracion, a.estadistico, not a.sin_esquema, a.fusionar_system, a.continuar,
                        raiz_runs=RAIZ_RUNS.parent / "dev" if a.dev else RAIZ_RUNS,
                        argumentos=vars(a), max_tokens=a.max_tokens, razonamiento=a.razonamiento,
-                       sin_json=a.sin_json, corridas=corridas)
+                       sin_json=a.sin_json, corridas=corridas, thinking_plantilla=a.thinking_plantilla)
     print(tabla(registros))
 
 

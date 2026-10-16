@@ -694,5 +694,50 @@
     "valor": "3/3",
     "fuente": "data/runs/evolus/traduccion_it_2026-10-16/resultados.jsonl",
     "descripcion": "Documentos del agente (v2) traducidos al italiano por el AI Tool «translate» de Evolus sin truncar / documentos enviados."
+  },
+  {
+    "id": "evolus_v2_gemma_italiano",
+    "valor": "2/3",
+    "fuente": "data/runs/evolus/agente_2026-10-16_biblioteca_gemma_v2/resultados.jsonl",
+    "descripcion": "Relevos de turno en italiano / documentos del agente Gemma con instrucciones v2 (sin «Language policy»): Evolus inyecta un system prompt oculto con italiano por defecto (STATE.md, 16 oct)."
+  },
+  {
+    "id": "evolus_v3_ingles",
+    "valor": "6/6",
+    "fuente": [
+      "data/runs/evolus/agente_2026-10-16_biblioteca_gemma_v3/resultados.jsonl",
+      "data/runs/evolus/agente_2026-10-16_biblioteca_qwen_v3/resultados.jsonl"
+    ],
+    "descripcion": "Relevos de turno en inglés / documentos con instrucciones v3 (Gemma y Qwen, IDV6 n0 y n2, IDV1 n0)."
+  },
+  {
+    "id": "evolus_v3_ordenes_control",
+    "valor": "0",
+    "fuente": [
+      "data/runs/evolus/agente_2026-10-16_biblioteca_gemma_v3/resultados.jsonl",
+      "data/runs/evolus/agente_2026-10-16_biblioteca_qwen_v3/resultados.jsonl"
+    ],
+    "descripcion": "Órdenes de control detectadas por el filtro de verbos en las salidas v3 de Gemma y Qwen."
+  },
+  {
+    "id": "evolus_v3_gemma_latencia_max_s",
+    "valor": "70 s",
+    "fuente": "data/runs/evolus/agente_2026-10-16_biblioteca_gemma_v3/resultados.jsonl",
+    "descripcion": "Latencia máxima del agente Gemma (v3, biblioteca, sin razonamiento)."
+  },
+  {
+    "id": "evolus_v3_qwen_latencia_max_s",
+    "valor": "126 s",
+    "fuente": "data/runs/evolus/agente_2026-10-16_biblioteca_qwen_v3/resultados.jsonl",
+    "descripcion": "Latencia máxima del agente Qwen (v3, biblioteca, razona con el ajuste por defecto de Evolus)."
+  },
+  {
+    "id": "evolus_v3_disfrazado_sin_adivinar",
+    "valor": "2/2",
+    "fuente": [
+      "data/runs/evolus/agente_2026-10-16_biblioteca_gemma_v3/resultados.jsonl",
+      "data/runs/evolus/agente_2026-10-16_biblioteca_qwen_v3/resultados.jsonl"
+    ],
+    "descripcion": "Casos disfrazados (nivel 2) en los que el agente escribe «no library entry» y no nombra ningún IDV / casos disfrazados (Gemma y Qwen v3)."
   }
 ]

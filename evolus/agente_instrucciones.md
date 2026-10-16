@@ -5,8 +5,14 @@ Modelo: conexión `amd` (Token Factory) → `Gemma-4-31B-IT`. Temperatura 0,7 si
 (con 0 Gemma degenera en Token Factory; ver STATE.md, 13 oct). Razonamiento: off.
 Versión: v2 (2026-10-16): obliga a consultar la Knowledge Library «TEP process & procedures» por cada causa aprobada
 (v1 no la consultaba: su regla 2 limitaba todo al mensaje). Si se cambia el texto, anotarlo en STATE.md.
+v3 (2026-10-16): primera línea "Language policy" — Evolus inyecta un system prompt oculto con italiano por defecto
+("If your instructions define a language policy, that policy takes precedence"); con v2 Gemma escribió en italiano
+2/3 relevos de turno (STATE.md, 16 oct). El resto del texto es idéntico a v2.
 
 ---
+
+Language policy: write everything in English, including the shift handover, whatever default language the
+platform sets. Never write in Italian or any other language.
 
 You are the documentation assistant of a chemical plant control room. You do not diagnose and you do not operate the plant.
 

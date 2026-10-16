@@ -1,0 +1,13 @@
+{
+  "argumentos": {
+    "campana": "tf_gemma31b_k5_v2",
+    "casos": "6:0,6:2,1:0",
+    "salida": "data/runs/evolus/agente_2026-10-16_biblioteca_gemma_v2",
+    "dry_run": false
+  },
+  "archivo_campana": "data/runs/tf_gemma31b_k5_v2/recompuertado.jsonl",
+  "commit": "176d8788bf1379ac4ac3e0d3dca2c15d7369b33b",
+  "inicio_utc": "2026-10-16T16:58:55.645194+00:00",
+  "sha256_instrucciones": "8035598cf2fc46b36c25accd74ef73787f47a40d660a4478a4a84c7324c76a01",
+  "fin_utc": "2026-10-16T17:00:18.330671+00:00"
+}
