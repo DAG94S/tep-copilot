@@ -111,7 +111,7 @@ The TEP data download (`python3 scripts/descargar_datos.py`) is only needed for 
 - A copilot with a human in the loop is not novel by itself. What we add is the disguised-twin probe, which we have not found in prior work, and a verification pipeline for every number.
 
 ## Data
-- Main campaign and thinking arm: Braatz TEP data (Russell, Chiang & Braatz 2000; Downs & Vogel 1993 simulator), mirror github.com/jkitchin/tennessee-eastman-profbraatz at a pinned commit (license in `data/raw/braatz/LICENSE`).
+- Main campaign and thinking arm: Braatz TEP data (Russell, Chiang & Braatz 2000; Downs & Vogel 1993 simulator), mirror github.com/jkitchin/tennessee-eastman-profbraatz at a pinned commit, included in the repo so the demo runs offline (license in `data/raw/braatz/LICENSE`).
 - Robust check: Rieth et al. (2017), Harvard Dataverse, doi:10.7910/DVN/6C3JR1 (public domain), training files, simulation runs 1-10 per fault (`data/processed/rieth/PROCEDENCIA.md`).
 - FaultExplainer replication: the CSVs shipped with FaultExplainer.
 

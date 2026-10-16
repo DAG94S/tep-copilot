@@ -488,3 +488,10 @@ Ver `docs/CHECKLIST.md`.
   27 créditos en total; conserva Markdown y tags. La demo la muestra en un desplegable bajo la orden de trabajo.
 - README "Evolus integration" reescrito: 3 bloques (agente, biblioteca, AI Tool) con 3 claims nuevos; cita a Maharshi
   sobre Token Factory. 65/65 marcadores OK.
+
+## 2026-10-16 (~01:30 UTC) — Datos Braatz al repo (opción A, decisión de Diego)
+- Problema: la demo (Live replay y Control room) calcula T² y alarmas desde `data/raw/braatz/`, ignorado por git → en un
+  clon o en Streamlit Cloud el replay no funcionaría (regla 4). Se versiona `data/raw/braatz/` (46 archivos, 26 MB, ya
+  pineados en SHA256SUMS; licencia NCSA/UIUC que permite redistribuir conservando el aviso, LICENSE incluido).
+  Rieth (579 MB) y los CSV de FaultExplainer siguen fuera. AGENTS.md regla 2 actualizada.
+- Corridas incompletas fuera del repo por `.gitignore`: Rieth thinking (95/200) y las corridas de Evolus con 422.

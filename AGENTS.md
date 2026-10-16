@@ -30,7 +30,7 @@ docker compose up --build                      # réplica containerizada
 ## Reglas duras
 1. Prohibido commitear keys: `.env` local, `.env.example` versionado.
 2. Datos: TEP de Rieth et al. 2017 (Harvard Dataverse, dominio público) y espejo Braatz d00–d21.
-   Todo archivo de `data/` se registra en `SHA256SUMS`. `data/raw/` no se versiona (más de 1 GB).
+   Todo archivo de `data/` se registra en `SHA256SUMS`. `data/raw/` no se versiona (más de 1 GB), salvo `data/raw/braatz/` (26 MB, con su LICENSE): la demo la necesita.
    Rieth: solo los archivos *Training* (Faulty_Testing no cabe en la RAM de WSL); se extraen con R base, no pyreadr.
 3. Todo número del README, del deck o de la demo sale de `data/runs/` o `data/processed/` vía script. Nada hardcodeado en la UI.
 4. La demo debe funcionar sin red: replay de corridas reales grabadas en Token Factory (con SHA), incluidas las salidas de Evolus.

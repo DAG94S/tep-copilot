@@ -4,7 +4,15 @@ __pycache__/
 *.pyc
 data/raw/*
 !data/raw/.gitkeep
+# Braatz (26 MB, licencia NCSA/UIUC con su LICENSE): la demo calcula T² y alarmas con estos datos; debe ir en el repo (16 oct)
+!data/raw/braatz/
 .streamlit/secrets.toml
 data/dev/
 api_documentation.txt
 .claude/settings.local.json
+
+# corridas incompletas o fallidas, fuera del repo (decisión 16 oct): Rieth thinking detenido (Gemma retirado), Evolus 422
+data/runs/tf_rieth_k5_think_n*/
+data/runs/evolus/agente_2026-10-15_biblioteca/
+data/runs/evolus/biblioteca_20261015T011314Z/
+data/runs/evolus/biblioteca_20261015T011320Z/
