@@ -482,3 +482,9 @@ Ver `docs/CHECKLIST.md`.
   por la compuerta y no la usa. **IDV6 n2 (disfrazado): "no library entry for this code" para C26/C89/C16, sin adivinar**
   → el disfraz se mantiene también en la capa de documentación.
 - Bloques de Evolus visibles por API: agente + Knowledge Library (2). Falta el workflow (3.º).
+- **3.er bloque de Evolus = AI Tool «translate»** (no hay "Workflows" en la UI; "Automations" sin API verificada).
+  `scripts/evolus_traducir.py` traduce al italiano los documentos de `agente_2026-10-16_biblioteca_qwen_v2` (sin el
+  preámbulo, desde "## Work order") → `data/runs/evolus/traduccion_it_2026-10-16` (pineada): 3/3, ninguno truncado,
+  27 créditos en total; conserva Markdown y tags. La demo la muestra en un desplegable bajo la orden de trabajo.
+- README "Evolus integration" reescrito: 3 bloques (agente, biblioteca, AI Tool) con 3 claims nuevos; cita a Maharshi
+  sobre Token Factory. 65/65 marcadores OK.

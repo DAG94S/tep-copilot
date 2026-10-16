@@ -1,0 +1,12 @@
+{
+  "argumentos": {
+    "agente": "data/runs/evolus/agente_2026-10-16_biblioteca_qwen_v2",
+    "destino": "it",
+    "salida": null
+  },
+  "origen": "data/runs/evolus/agente_2026-10-16_biblioteca_qwen_v2/resultados.jsonl",
+  "commit": "0fc7e63f44f7fbf2bb43617f5fb6ef1aef6cc7c2",
+  "inicio_utc": "2026-10-16T01:17:48.018176+00:00",
+  "fin_utc": "2026-10-16T01:18:09.301566+00:00",
+  "creditos_totales": 26.983702
+}

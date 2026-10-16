@@ -311,6 +311,14 @@ def evolus(falla: int, nivel: int) -> None:
     st.caption(f"{'Agent preamble before the work order hidden; full text in the source file. ' if i > 0 else ''}{s['segundos']} s · control orders detected in the output: {len(s['ordenes_de_control'])} · "
                f"model: `{s['modelo']}` · recorded: {s['ts']} · Source: `{ruta.relative_to(da.RAIZ)}` · "
                f"SHA-256 (from SHA256SUMS): `{sha or 'not registered'}`")
+    t = da.salida_traduccion(falla, nivel)
+    if t is not None:
+        with st.expander(f"Translation for the next shift ({t['destino']}) — Evolus AI Tool «translate»"):
+            st.markdown(t["traduccion"])
+            ruta_t = da.RUNS / da.CAMPANA_TRADUCCION / "resultados.jsonl"
+            st.caption(f"Evolus credits used: {t['creditos']:.1f} · truncated: {t['truncado']} · recorded: {t['ts']} · "
+                       f"Source: `{ruta_t.relative_to(da.RAIZ)}` · SHA-256 (from SHA256SUMS): "
+                       f"`{da.sha256_registrado(ruta_t) or 'not registered'}`")
 
 
 def pestana_audit() -> None:

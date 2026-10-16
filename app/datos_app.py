@@ -146,6 +146,7 @@ def variable_en_vistas(columna_tep: int = 6) -> list[dict]:
 # ---------- replay en vivo de un incidente ----------
 CAMPANA_EVOLUS = "evolus/agente_2026-10-16_biblioteca_qwen_v2"   # agente con Knowledge Library (instrucciones v2; Qwen3.8-27B)
 ANTICIPACION = RAIZ / "data" / "processed" / "anticipacion.json"
+CAMPANA_TRADUCCION = "evolus/traduccion_it_2026-10-16"   # AI Tool «translate» de Evolus sobre CAMPANA_EVOLUS
 
 
 def linea_de_tiempo(falla: int, nivel: int, indice_alarma: int | None) -> dict:
@@ -191,3 +192,9 @@ def salida_evolus(falla: int, nivel: int) -> dict | None:
 def anticipacion(falla: int) -> dict | None:
     """Entrada de la falla en data/processed/anticipacion.json; None si no existe."""
     return leer_json(ANTICIPACION).get("por_falla", {}).get(str(falla))
+
+
+def salida_traduccion(falla: int, nivel: int) -> dict | None:
+    """Traducción grabada (AI Tool de Evolus) del documento del agente para (falla, nivel); None si no hay."""
+    regs = leer_jsonl(RUNS / CAMPANA_TRADUCCION / "resultados.jsonl")
+    return next((r for r in regs if r["falla"] == falla and r["nivel"] == nivel), None)

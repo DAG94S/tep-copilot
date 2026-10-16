@@ -10,8 +10,8 @@
 
 ## Pendiente
 - [ ] Rieth con thinking: n0/n2 (95/200 válidos) y n1. **Máx. 2 procesos.**
-- [ ] Probar el agente con la biblioteca cuando Gemma vuelva; grabar y pinear.
-- [ ] Workflow de Evolus (aprobación → agente → traducción) manejado por API; grabar ejecución.
+- [x] Agente con biblioteca (instrucciones v2) grabado y pineado, sobre Qwen (Gemma retirado). Repetir con Gemma si vuelve.
+- [x] 3.er bloque de Evolus: AI Tool «translate» por API (no hay Workflows en la UI), grabado y pineado.
 - [x] Claims y README: anticipación, evidencia inventada con thinking (control por falla), segundo modelo Qwen. Rieth thinking detenido en 95/200 (Gemma retirado).
 - [ ] Demo como producto (replay en tiempo real) y despliegue con URL pública.
 - [ ] Copyright del LICENSE (decide Diego).

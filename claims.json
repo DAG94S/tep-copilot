@@ -676,5 +676,23 @@
       "data/runs/tf_qwen27b_k5_think_n2/registros.jsonl"
     ],
     "descripcion": "Qwen3.8-27B sin razonamiento (fuente) frente a con razonamiento low (auxiliar). Emparejado por (falla, nivel) evaluable en ambas (36 pares = 12 fallas x 3 niveles); rechazo por caso = rechazadas/afirmaciones. Aciertos top-1 sin / con razonamiento sobre los 36 pares."
+  },
+  {
+    "id": "evolus_biblioteca_llamadas",
+    "valor": "3",
+    "fuente": "data/runs/evolus/agente_2026-10-16_biblioteca_qwen_v2/resultados.jsonl",
+    "descripcion": "Llamadas reales grabadas al agente de Evolus con Knowledge Library e instrucciones v2 (IDV6 niveles 0 y 2, IDV1 nivel 0), agente sobre Qwen3.8-27B vía Token Factory."
+  },
+  {
+    "id": "evolus_biblioteca_ordenes_control",
+    "valor": "0",
+    "fuente": "data/runs/evolus/agente_2026-10-16_biblioteca_qwen_v2/resultados.jsonl",
+    "descripcion": "Órdenes de control detectadas por el filtro de verbos en las salidas del agente con biblioteca (v2)."
+  },
+  {
+    "id": "evolus_traducciones",
+    "valor": "3/3",
+    "fuente": "data/runs/evolus/traduccion_it_2026-10-16/resultados.jsonl",
+    "descripcion": "Documentos del agente (v2) traducidos al italiano por el AI Tool «translate» de Evolus sin truncar / documentos enviados."
   }
 ]
