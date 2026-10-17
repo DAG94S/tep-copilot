@@ -3,7 +3,7 @@
 Todas las cifras salen de `claims.json` (verificadas con `scripts/verify_claims.py`). Si cambia un claim, cambiar aquí.
 Contar caracteres antes de pegar: título ≤ 50, descripción corta ≤ 255, larga ≥ 100 palabras.
 
-## Título (elegir uno)
+## Título (elegido por Diego el 17-oct: opción 3)
 1. `TEP Copilot: an AI that proves it isn't reciting` (48)
 2. `TEP Copilot: gate-verified root-cause cards` (43)
 3. `TEP Copilot: reasoning, not reciting` (36)
@@ -33,6 +33,6 @@ A second model (Qwen3.8-27B) confirms that the disguise does not break accuracy.
 - Etiquetas: AMD Token Factory, Gemma, Google DeepMind, Evolus, Qwen, Streamlit, Python, Industrial AI, LLM evaluation.
 
 ## Pendiente de Diego
-- Elegir el título y el nombre comercial (README dice "working title").
+- ~~Elegir el título~~ → `TEP Copilot: reasoning, not reciting` (17-oct).
 - Confirmar si se marca también el track de Evolus en el formulario.
-- La cifra de Milford Haven (275 alarmas en 10,7 min) viene del informe HSE citado en `docs/PROYECTO.md`; verificar la cita antes de usarla en el video.
+- Cita de Milford Haven verificada (17-oct): HSE 1997, ISBN 0 7176 1413 1, párr. 102: "in the last 10.7 minutes before the explosion the two operators had to recognise, acknowledge and take appropriate action on 275 alarms"; párr. 101: una cada 2-3 s; párr. 105: alarma de nivel alto del flare drum a las 12:56, ~25 min antes, "no evidence that it was seen". PDF: https://www.icheme.org/media/13706/the-explosion-and-fires-at-the-texaco-refinery-milford-haven.pdf

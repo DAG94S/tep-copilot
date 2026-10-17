@@ -1,4 +1,4 @@
-# TEP Copilot (working title)
+# TEP Copilot: reasoning, not reciting
 
 **A control-room copilot that turns an alarm flood into one gate-verified root-cause card, and measures whether the model reasons about the plant or just recites the Tennessee Eastman textbook.**
 

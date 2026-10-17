@@ -14,16 +14,18 @@ Lablab pide además portada 16:9 y slides en PDF: el deck de abajo sirve para la
 ## Deck (12 slides)
 
 ### 1. Cover
-- **TEP Copilot** *(título final pendiente: `docs/ENTREGA_LABLAB.md`)*
+- **TEP Copilot: reasoning, not reciting**
 - "An AI copilot that proves it isn't reciting the textbook."
 - AMD Developer Hackathon ACT III · Intelligent Industry · Gemma on AMD Token Factory · Evolus
 - Diego García
 - Visual: tarjeta de causa raíz sobre un fondo de alarmas en rojo (captura de la demo, pestaña Live replay).
 
 ### 2. The problem: alarm floods
-- Milford Haven, 1994: 275 alarms in 10.7 minutes; the critical alarm went unseen. *(verificar la cita HSE antes de usarla;
-  si no se verifica, quitar las cifras y dejar solo "alarm floods")*
-- EEMUA target: ≤ 10 alarms in the first 10 minutes after an upset.
+- Milford Haven, 1994: 275 alarms in the last 10.7 minutes before the explosion, one every 2-3 seconds; the flare drum
+  high-level alarm sounded ~25 minutes before, with no evidence it was seen. *(Fuente verificada 17-oct: HSE 1997,
+  "The explosion and fires at the Texaco Refinery, Milford Haven, 24 July 1994", ISBN 0 7176 1413 1, párrafos 101, 102
+  y 105. Ojo: el 275 sale de 1 de los 16 journals de alarmas, los 4 más relevantes se perdieron: es un mínimo.)*
+- EEMUA target: ≤ 10 alarms in the first 10 minutes after a major upset (HSE Chemical Information Sheet No 6, citing EEMUA 191).
 - LLM copilots can diagnose faults, but on the Tennessee Eastman Process (in every training set) **nobody checks whether
   the model reasons about the plant or recites the textbook.**
 
@@ -104,11 +106,11 @@ Producción: grabar pantalla a 1080p (OBS); la demo en Streamlit, pestaña Live 
 Voz en off; se puede grabar la voz aparte y montarla. Los tiempos son orientativos.
 
 **[0:00–0:25] Slide 1 → 2. Hook**
-> In 1994, at the Milford Haven refinery, operators faced 275 alarms in under eleven minutes. The one alarm that mattered
-> went unseen. Alarm floods are still how plant upsets look from the control room.
+> In 1994, at the Milford Haven refinery, two operators faced 275 alarms in the last eleven minutes before an explosion,
+> one every two to three seconds. The alarm that mattered had sounded 25 minutes earlier, and there is no evidence anyone
+> saw it. Alarm floods are still how plant upsets look from the control room.
 
-*(si la cita HSE no se verifica: "In a plant upset, operators can face hundreds of alarms in minutes, and the one that
-matters gets lost.")*
+*(cita verificada: HSE 1997, párrafos 101, 102 y 105; ver slide 2)*
 
 **[0:25–0:55] Slide 2. The real question**
 > AI copilots can already name the cause of a fault. But they are tested on the Tennessee Eastman Process, a benchmark
@@ -160,8 +162,8 @@ o cambiar la demo a la corrida Gemma v3 antes de grabar.
 ---
 
 ## Checklist de producción
-- [ ] Elegir título final (slide 1 y lablab).
-- [ ] Verificar la cita de Milford Haven (informe HSE) o usar la versión sin cifras.
+- [x] Título: "TEP Copilot: reasoning, not reciting" (Diego, 17-oct).
+- [x] Cita de Milford Haven verificada en el informe HSE de 1997 (17-oct).
 - [ ] Demo: decidir si el replay de Evolus pasa a la corrida Gemma v3 (`agente_2026-10-16_biblioteca_gemma_v3`).
 - [ ] Slide 7: variante A o B según el estado de Rieth a las 07:00 del 18-oct.
 - [ ] Exportar deck a PDF; portada 16:9 = slide 1.

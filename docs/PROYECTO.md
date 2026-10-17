@@ -35,7 +35,7 @@ Un solo proyecto compite por varios premios a la vez, como permiten las reglas:
 
 ## 2. Problema
 En una perturbación de planta, los operadores reciben inundaciones de alarmas. En Milford Haven (1994) fueron
-**275 alarmas en 10,7 minutos**, a razón de una cada 2 o 3 segundos (informe HSE). La alarma crítica sonó 25 minutos antes de la explosión y nadie la vio.
+**275 alarmas en 10,7 minutos**, a razón de una cada 2 o 3 segundos (informe HSE). La alarma de nivel alto del flare drum sonó ~25 minutos antes de la explosión y no hay evidencia de que la vieran (HSE 1997, párr. 101, 102 y 105).
 La guía EEMUA fija como objetivo un máximo de 10 alarmas en los primeros 10 minutos tras una perturbación grave.
 Ya hay copilotos con LLM para diagnosticar fallas, pero ninguno demuestra si **razona sobre la planta**
 o **recita la literatura de TEP**, que está en todos los datos de entrenamiento.
