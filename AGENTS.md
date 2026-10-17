@@ -13,7 +13,8 @@ El LLM nunca tiene herramientas de escritura sobre el proceso ni emite verbos de
 Python 3.11+, numpy/pandas/scikit-learn/scipy, pyreadr, pydantic, requests, Streamlit.
 LLM: `Gemma-4-31B-IT` en **AMD Token Factory** (API OpenAI-compatible sobre hardware AMD; ACT III no dio crédito de GPU,
 el FAQ oficial acepta Token Factory). k=5 llamadas separadas (no admite `n>1`), T=0,7 (T=0 degenera), thinking off por
-defecto; brazo con thinking vía `--razonamiento minimal`. Límites: **20 RPM** y tokens/min por usuario → **máx. 2 procesos**
+defecto; brazo con thinking vía `--thinking-plantilla` (`chat_template_kwargs: {"enable_thinking": true}`; el despliegue
+`self-dploy/Gemma-4-31B-IT` ignora `reasoning_effort`, así que `--razonamiento minimal` ya no lo activa en Gemma). Límites: **20 RPM** y tokens/min por usuario → **máx. 2 procesos**
 `eval.correr` a la vez; tope 1 USD/día que se reinicia a las 16:00 UTC (11:00 Ecuador).
 Orquestación de negocio: Evolus (REST + agente OpenAI-compatible), agente "TEP Shift Copilot" sobre la conexión `amd`
 (Token Factory → Gemma-4-31B-IT) + Knowledge Library `TEP process & procedures`.

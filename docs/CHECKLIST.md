@@ -1,4 +1,4 @@
-# CHECKLIST (actualizado 16 oct)
+# CHECKLIST (actualizado 17 oct)
 
 ## Hecho
 - [x] Proyecto en WSL con git; datos Braatz y Rieth (Training) pineados; FaultExplainer vendorizado.
@@ -9,13 +9,14 @@
 - [x] Evolus: agente TEP Shift Copilot (Gemma vía Token Factory), corridas grabadas, Knowledge Library cargada por API.
 
 ## Pendiente
-- [x] Experimentos cerrados (16 oct). Rieth con thinking detenido en 95/200 (Gemma retirado; no se reporta). Segundo modelo Qwen hecho.
-- [x] Agente con biblioteca (instrucciones v2) grabado y pineado, sobre Qwen (Gemma retirado). Repetir con Gemma si vuelve.
+- [x] Experimentos cerrados salvo Rieth con thinking (abajo). La campaña vieja de 95/200 se abandonó y no se reporta. Segundo modelo Qwen hecho.
+- [ ] Rieth con thinking (thinkpl) + brazo sin thinking mismo despliegue: terminar, analizar, claims (18 oct temprano).
+- [x] Agente con biblioteca (instrucciones v3, con «Language policy» porque Evolus inyecta un prompt oculto en italiano) grabado y pineado con Gemma y Qwen (3/3 entregas en inglés cada uno). Gemma con v2 escribió 2/3 en italiano (defecto documentado). Gemma volvió el 16 oct como `self-dploy/Gemma-4-31B-IT`.
 - [x] 3.er bloque de Evolus: AI Tool «translate» por API (no hay Workflows en la UI), grabado y pineado.
-- [x] Claims y README: anticipación, evidencia inventada con thinking (control por falla), segundo modelo Qwen. Rieth thinking detenido en 95/200 (Gemma retirado).
+- [x] Claims y README: anticipación, evidencia inventada con thinking (control por falla), segundo modelo Qwen. Rieth con thinking se repite en el despliegue nuevo (ver Pendiente).
 - [x] Demo como producto (Live replay) y funciona desde un clon (datos Braatz en el repo).
 - [ ] Despliegue con URL pública (domingo).
-- [ ] Esquema del deck y guion del video (viernes).
+- [x] Esquema del deck y guion del video: `docs/DECK_GUION.md` (17 oct). Falta exportar el deck a PDF y grabar.
 - [ ] Copyright del LICENSE (decide Diego).
 
 ## Entrega en lablab (antes del 18 oct, 10:00 hora de Ecuador)
@@ -26,4 +27,4 @@
 - [ ] Portada 16:9, video ≤5 min (MP4 ≤300 MB) y slides PDF.
 - [ ] Evidencia de AMD: `/v1/usage` de Token Factory y corridas pineadas.
 - [x] Evidencia de Evolus: agente, biblioteca y AI Tool translate por API, intercambios grabados y pineados.
-- [x] `.venv/bin/python scripts/verify_claims.py` en verde (65/65; repetir antes de enviar).
+- [x] `.venv/bin/python scripts/verify_claims.py` en verde (repetir antes de enviar).

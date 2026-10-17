@@ -6,7 +6,8 @@
 ## 0. Estado al 16 oct (01:45 UTC) — LEER PRIMERO
 **Cambios de base:** sin GPU propia: AMD (Maharshi, 15 oct): "no cloud credits needed, only apikey from Token Factory".
 Todo lo que diga MI300X/vLLM/droplet abajo es el plan original y ya no aplica. **Gemma-4-31B-IT fue retirado de Token
-Factory el 15 oct** (AMD "lo revisa"). Detalle en `STATE.md`; cifras citables solo las de `claims.json` (65/65 OK).
+Factory el 15 oct y volvió el 16 oct** como `self-dploy/Gemma-4-31B-IT` (ignora `reasoning_effort`; el thinking se
+activa con `--thinking-plantilla`). Detalle en `STATE.md`; cifras citables solo las de `claims.json`.
 
 **Pitch (verificado dentro de cada falla):**
 1. *"No deja que el modelo invente evidencia":* con thinking, Gemma acierta algo más (top-1 11→15 de 36) pero la evidencia
@@ -23,7 +24,7 @@ Factory el 15 oct** (AMD "lo revisa"). Detalle en `STATE.md`; cifras citables so
 
 **Hecho:** todas las campañas (experimentos cerrados), demo con Live replay (alarmas → tarjeta → aprobar → orden de
 trabajo con biblioteca → traducción), Evolus con 3 bloques por API, datos Braatz en el repo (la demo funciona desde un
-clon), textos de lablab (`docs/ENTREGA_LABLAB.md`). Rieth con thinking detenido en 95/200 (no se reporta).
+clon), textos de lablab (`docs/ENTREGA_LABLAB.md`). La campaña Rieth con thinking de 95/200 se abandonó (no se reporta); se repite completa en el despliegue nuevo (`tf_rieth_k5_thinkpl_*` y brazo sin thinking `tf_rieth_k5_sd_*`).
 
 ## 1. A qué premios apunta
 Un solo proyecto compite por varios premios a la vez, como permiten las reglas:
@@ -87,7 +88,7 @@ p95 desde la alarma hasta la tarjeta en MI300X, tok/s, $ por incidente.
 ## 7. Plan (revisado 16 oct)
 | Fecha | Trabajo |
 |---|---|
-| vie 16 | Esquema del deck y guion del video (5 min); elegir título/nombre (`docs/ENTREGA_LABLAB.md`); si vuelve Gemma, repetir el agente con biblioteca sobre Gemma |
+| vie 16 | Esquema del deck y guion del video (5 min); elegir título/nombre (`docs/ENTREGA_LABLAB.md`); Gemma volvió el 16 oct: agente con biblioteca v3 grabado con Gemma y Qwen |
 | sáb 17 | Grabar el video, deck en PDF, portada 16:9 |
 | dom 18 | Repo público, despliegue (Streamlit Cloud) y envío **antes de las 10:00 de Ecuador** |
 
