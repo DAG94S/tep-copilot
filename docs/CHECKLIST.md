@@ -22,7 +22,7 @@
 ## Entrega en lablab (antes del 18 oct, 10:00 hora de Ecuador)
 - [~] Textos en `docs/ENTREGA_LABLAB.md` (borrador): falta que Diego elija título/nombre.
 - [ ] Reto *Intelligent Industry* y tags (AMD Token Factory, Gemma, Evolus).
-- [ ] Repo público MIT, README que funcione, `docker compose up`, `.env.example`, sin keys.
+- [x] Repo público MIT: https://github.com/DAG94S/tep-copilot (17 oct; historial revisado sin keys, clon limpio pasa verify_claims). Falta comprobar `docker compose up`.
 - [ ] URL de la demo en vivo (replay sin red).
 - [ ] Portada 16:9, video ≤5 min (MP4 ≤300 MB) y slides PDF.
 - [ ] Evidencia de AMD: `/v1/usage` de Token Factory y corridas pineadas.
