@@ -327,6 +327,7 @@ METRICAS = {
     "evolus_biblioteca_llamadas": lambda regs: str(len(regs)),
     "evolus_biblioteca_ordenes_control": lambda regs: str(sum(len(r.get("ordenes_de_control", [])) for r in regs)),
     "evolus_traducciones": lambda regs: f"{sum(bool(r.get('traduccion')) and not r.get('truncado') for r in regs)}/{len(regs)}",
+    "evolus_traducciones_gemma_v3": lambda regs: f"{sum(bool(r.get('traduccion')) and not r.get('truncado') for r in regs)}/{len(regs)}",
     "combinado_rechazo": _tasa_rechazo,
     "campana_v2_rechazo_antes": _tasa_rechazo,
     "campana_v2_rechazo_despues": _tasa_rechazo,

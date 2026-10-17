@@ -586,3 +586,8 @@ Ver `docs/CHECKLIST.md`.
 - 17-oct 15:44–16:15 UTC: caída de Gemma en Token Factory. Error exacto: `status=500 … Error from provider self-dploy: 503 Service Unavailable … "code":"no_available_workers","message":"No available workers (all circuits open or unhealthy)"`.
   Más ReadTimeouts de 600 s en las fallas 10 y 12 (n0) y la falla 7 (n2). A las 17:56 UTC hay 7 ERROR_LLM en n0 y 2 en n2; el driver los aparta y los reintenta al final de la pasada.
   Desde el 16:27 UTC el ritmo es ~15 min/caso por nivel (antes del reinicio era ~8). Válidos a las 17:56: n0 71/100 y n2 44/100.
+- 17-oct ~21:00–21:35 UTC: la conexión a internet de la PC tuvo problemas (lo dijo Diego). Una llamada de prueba de 5 tokens tardó 14,4 s a las 21:07; tras arreglarla, a las 21:45, tardó 1,5–1,7 s.
+  No hubo ERROR_LLM nuevos en ese tramo. Los casos de esas horas tardaron 1.600–3.000 s (antes ~600–850 s), pero no se puede separar cuánto fue la red y cuánto el servidor.
+- 17-oct ~21:55 UTC: la demo pasa a reproducir el agente Evolus con Gemma (`agente_2026-10-16_biblioteca_gemma_v3`, antes `..._qwen_v2`).
+  La traducción vieja (`traduccion_it_2026-10-16`) era del documento de Qwen, así que se regeneró sobre los documentos de Gemma v3: `traduccion_it_2026-10-17_gemma_v3`.
+  Son 3/3 traducciones sin truncar, por 15,3 créditos de Evolus. Quedan pineadas, con el claim `evolus_traducciones_gemma_v3`. La traducción vieja se conserva como registro.

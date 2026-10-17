@@ -696,6 +696,12 @@
     "descripcion": "Documentos del agente (v2) traducidos al italiano por el AI Tool «translate» de Evolus sin truncar / documentos enviados."
   },
   {
+    "id": "evolus_traducciones_gemma_v3",
+    "valor": "3/3",
+    "fuente": "data/runs/evolus/traduccion_it_2026-10-17_gemma_v3/resultados.jsonl",
+    "descripcion": "AI Tool «translate» de Evolus (destino it) sobre los 3 documentos de la corrida agente_2026-10-16_biblioteca_gemma_v3 (la que reproduce la demo): traducidos y no truncados / total."
+  },
+  {
     "id": "evolus_v2_gemma_italiano",
     "valor": "2/3",
     "fuente": "data/runs/evolus/agente_2026-10-16_biblioteca_gemma_v2/resultados.jsonl",

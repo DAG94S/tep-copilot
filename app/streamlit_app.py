@@ -296,7 +296,7 @@ def pestana_replay() -> None:
 
 def evolus(falla: int, nivel: int) -> None:
     """Salida grabada del agente de Evolus para el caso aprobado."""
-    st.subheader("Documentation drafted by the Evolus agent with its Knowledge Library (recorded run on Qwen3.8-27B via AMD Token Factory, replayed)")
+    st.subheader("Documentation drafted by the Evolus agent with its Knowledge Library (recorded run on Gemma-4-31B-IT via AMD Token Factory, replayed)")
     s = da.salida_evolus(falla, nivel)
     if s is None:
         casos = [(x["falla"], x["nivel"]) for x in da.leer_jsonl(da.RUNS / da.CAMPANA_EVOLUS / "resultados.jsonl")]

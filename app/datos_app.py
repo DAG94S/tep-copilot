@@ -144,9 +144,9 @@ def variable_en_vistas(columna_tep: int = 6) -> list[dict]:
 
 
 # ---------- replay en vivo de un incidente ----------
-CAMPANA_EVOLUS = "evolus/agente_2026-10-16_biblioteca_qwen_v2"   # agente con Knowledge Library (instrucciones v2; Qwen3.8-27B)
+CAMPANA_EVOLUS = "evolus/agente_2026-10-16_biblioteca_gemma_v3"   # agente con Knowledge Library (instrucciones v3; Gemma-4-31B-IT)
 ANTICIPACION = RAIZ / "data" / "processed" / "anticipacion.json"
-CAMPANA_TRADUCCION = "evolus/traduccion_it_2026-10-16"   # AI Tool «translate» de Evolus sobre CAMPANA_EVOLUS
+CAMPANA_TRADUCCION = "evolus/traduccion_it_2026-10-17_gemma_v3"   # AI Tool «translate» de Evolus sobre CAMPANA_EVOLUS
 
 
 def linea_de_tiempo(falla: int, nivel: int, indice_alarma: int | None) -> dict:

@@ -130,8 +130,7 @@ Voz en off; se puede grabar la voz aparte y montarla. Los tiempos son orientativ
 > shift handover. Every action stays with the operator; the agent writes no control commands.
 > *(mostrar la traducción)* An Evolus AI tool translates it for the next shift.
 
-Nota: si el replay de Evolus de la demo sigue siendo la corrida de Qwen, decir "an Evolus agent" sin nombrar el modelo,
-o cambiar la demo a la corrida Gemma v3 antes de grabar.
+Nota: el replay de Evolus de la demo es la corrida con Gemma-4-31B-IT (v3) y su traducción (17-oct).
 
 **[2:20–3:05] Slides 5–6. Disguised twin**
 > Now the test. We built a disguised twin of the plant: every tag, unit, component and piece of equipment renamed, with
@@ -164,7 +163,7 @@ o cambiar la demo a la corrida Gemma v3 antes de grabar.
 ## Checklist de producción
 - [x] Título: "TEP Copilot: reasoning, not reciting" (Diego, 17-oct).
 - [x] Cita de Milford Haven verificada en el informe HSE de 1997 (17-oct).
-- [ ] Demo: decidir si el replay de Evolus pasa a la corrida Gemma v3 (`agente_2026-10-16_biblioteca_gemma_v3`).
+- [x] Demo: el replay de Evolus usa la corrida Gemma v3 y su traducción (`traduccion_it_2026-10-17_gemma_v3`) (17-oct).
 - [ ] Slide 7: variante A o B según el estado de Rieth a las 07:00 del 18-oct.
 - [ ] Exportar deck a PDF; portada 16:9 = slide 1.
 - [ ] `verify_claims.py` en verde justo antes de exportar el deck y de grabar.
