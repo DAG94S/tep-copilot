@@ -5,6 +5,8 @@
 Built for the AMD Developer Hackathon ACT III (lablab.ai), *Intelligent Industry* challenge, with the Google (Gemma) and Evolus tracks.
 LLM: Gemma-4-31B-IT served on AMD hardware through AMD Token Factory (OpenAI-compatible API).
 
+**Live demo:** https://tep-copilot-demo.streamlit.app (replays recorded runs; no GPU or API key needed).
+
 ## What it does
 Statistics detect → the LLM proposes → a deterministic gate verifies → a human approves.
 

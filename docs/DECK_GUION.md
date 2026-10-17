@@ -165,5 +165,5 @@ Nota: el replay de Evolus de la demo es la corrida con Gemma-4-31B-IT (v3) y su 
 - [x] Cita de Milford Haven verificada en el informe HSE de 1997 (17-oct).
 - [x] Demo: el replay de Evolus usa la corrida Gemma v3 y su traducción (`traduccion_it_2026-10-17_gemma_v3`) (17-oct).
 - [ ] Slide 7: variante A o B según el estado de Rieth a las 07:00 del 18-oct.
-- [ ] Exportar deck a PDF (artifact Slides https://claude.ai/artifact/Ah7JMbsKnSANz151ev2RhD; fuente en docs/deck/); portada 16:9 = slide 1. Rellenar [demo URL] en la slide 12 (repo ya puesto).
+- [ ] Exportar deck a PDF (artifact Slides https://claude.ai/artifact/Ah7JMbsKnSANz151ev2RhD; fuente en docs/deck/); portada 16:9 = slide 1. URLs de repo y demo ya puestas en la slide 12.
 - [ ] `verify_claims.py` en verde justo antes de exportar el deck y de grabar.

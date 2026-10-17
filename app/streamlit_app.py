@@ -2,6 +2,7 @@
 
 Ejecutar: python -m streamlit run app/streamlit_app.py
 """
+import re
 import sys
 import time
 from pathlib import Path
@@ -19,6 +20,23 @@ st.set_page_config(page_title="TEP Copilot", layout="wide")
 COLOR = {"VERIFIED": "#1a7f37", "PARTIAL": "#b08800", "BLOCKED": "#cf222e", "UNCERTAIN": "#6e40c9"}
 ESTADO_UI = {"VERIFICADO": "VERIFIED", "PARCIAL": "PARTIAL", "BLOQUEADO": "BLOCKED", "INCIERTO": "UNCERTAIN",
              "INVALIDO": "INVALID", "NO_DETECTADO": "NOT DETECTED", "ERROR_LLM": "LLM ERROR"}
+# los motivos de la compuerta se graban en español (core/compuerta.py); la UI va en inglés
+MOTIVOS_UI = [(r"^sin desviación", "no deviation"), (r"^oscila \(dirección no verificable", "oscillates (direction not verifiable"),
+              (r"^dirección contraria", "opposite direction"), (r"^tag inexistente$", "unknown tag"),
+              (r"^causa fuera del catálogo", "cause outside the catalogue"),
+              (r"^orden de control en la explicación", "control order in the explanation"),
+              (r"^ninguna evidencia respaldada por los datos$", "no evidence supported by the data"),
+              (r"^ninguna muestra con JSON válido$", "no sample with valid JSON"),
+              (r"^acuerdo (\S+) < (\S+) entre (\d+) muestras$", r"agreement \1 < \2 across \3 samples")]
+
+
+def motivo_en(m: str) -> str:
+    for patron, en in MOTIVOS_UI:
+        if re.match(patron, m):
+            return re.sub(patron, en, m)
+    return m
+
+
 NOTA = "The LLM proposes; deterministic checks verify; a human approves. No control actions are ever issued."
 
 
@@ -152,14 +170,14 @@ def tarjeta(r: dict, v, sufijo: str = "") -> None:
     if osc:
         st.markdown("**Oscillating evidence** (accepted, direction not verifiable)")
         for e in osc:
-            st.markdown("- " + linea(e, f" — {e['motivo']}"))
+            st.markdown("- " + linea(e, f" — {motivo_en(e['motivo'])}"))
     rech = r.get("evidencia_rechazada", [])
     if rech:
         st.markdown("**Rejected claims** (not supported by the data)")
         for e in rech:
-            st.markdown("- ~~" + linea(e) + f"~~ — {e['motivo']}")
+            st.markdown("- ~~" + linea(e) + f"~~ — {motivo_en(e['motivo'])}")
     for m in r.get("motivos", []):
-        st.error(m)
+        st.error(motivo_en(m))
     d1, d2, _ = st.columns([1, 1, 4])
     clave = f"decision_{r['falla']}_{r['nivel']}"
     if d1.button("Approve", key=f"ap_{clave}{sufijo}"):
@@ -287,7 +305,9 @@ def pestana_replay() -> None:
             st.success(f"The root-cause card arrived {(inund - tarj) * 3:.0f} min before the alarm flood "
                        f"(>= 10 alarms in {VENTANA_MUESTRAS * 3} min).")
             sha = da.sha256_registrado(da.ANTICIPACION)
-            definicion = da.leer_json(da.ANTICIPACION).get("definicion", "")
+            par = da.leer_json(da.ANTICIPACION).get("parametros", {})
+            definicion = (f"alarms from our own statistical limits on TEP (p{par.get('percentil_limites')}, "
+                          f"delay {par.get('retardo')}, XMEAS only), not a real plant's alarm configuration")
             st.caption(f"Source: `{da.ANTICIPACION.relative_to(da.RAIZ)}` · SHA-256 (from SHA256SUMS): "
                        f"`{sha or 'not registered'}` · {definicion}. Computed on level 0; alarms and detection are "
                        f"invariant to the disguise.")
