@@ -1,0 +1,20 @@
+<section id="audit" data-transition="fade" style="background:#F3F1EA;color:#13202A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#B8691A;letter-spacing:3px">AUDIT-READY</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1">Every number is recomputed by a script</h2>
+</div>
+<div style="display:flex;gap:64px;align-items:start">
+<div style="width:820px;background:#13202A;border-radius:16px;padding:40px;display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.6;color:#E3ECF2">$ python3 scripts/verify_claims.py</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.6;color:#B9CCD8">SHA256SUMS ........ OK<br>claims.json ....... OK<br>README markers .... OK</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.6;color:#7FC4F0">RESULTADO: TODO OK</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:28px">
+<p style="font-size:30px;line-height:1.4;color:#3D4A55;border-top:2px solid #D8D3C6;padding:20px 0 0 0"><b>SHA256SUMS</b> pins every dataset, recorded run and vendored file.</p>
+<p style="font-size:30px;line-height:1.4;color:#3D4A55;border-top:2px solid #D8D3C6;padding:20px 0 0 0"><b>claims.json</b> defines each figure; the script fails if any README number drifts.</p>
+<p style="font-size:30px;line-height:1.4;color:#3D4A55;border-top:2px solid #D8D3C6;padding:20px 0 0 0">The demo <b>replays recorded runs</b>: it works offline, no GPU or API key.</p>
+</div>
+</div>
+<p style="font-size:28px;line-height:1.4;color:#66737E;width:1600px">Limitations we state: 12 cases per level on Braatz; effective n ≈ 10 faults on Rieth; the PCA misses IDV 3, 4 and 9.</p>
+<aside>Audit (4:20–4:30). Every number you have seen is recomputed from recorded runs by a script, and the demo replays those runs, so it works offline.</aside>
+</section>

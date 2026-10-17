@@ -1,0 +1,20 @@
+{
+  "v": 4,
+  "createdOnFiles": {"v": 1, "at": "2026-10-17T22:10:00Z"},
+  "lists": "css",
+  "title": "TEP Copilot: reasoning, not reciting",
+  "cover": "cover",
+  "order": ["cover", "problem", "invariant", "demo", "twin", "reasons", "thinking", "early", "benchmark", "evolus", "audit", "close"],
+  "sections": {
+    "s1": {"description": "The problem: alarm floods, and copilots nobody checks for recitation", "start": "cover"},
+    "s2": {"description": "The product: statistics detect, the LLM proposes, a gate verifies, a human approves", "start": "invariant"},
+    "s3": {"description": "The evidence: disguised twin, thinking vs the gate, early warning, benchmark", "start": "twin"},
+    "s4": {"description": "Business layer on Evolus and how every number is audited", "start": "evolus"}
+  },
+  "faces": {
+    "space-grotesk": {"family": "Space Grotesk", "href": "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&display=swap"},
+    "ibm-plex-sans": {"family": "IBM Plex Sans", "href": "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&display=swap"},
+    "jetbrains-mono": {"family": "JetBrains Mono", "href": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap"}
+  },
+  "designSystems": []
+}

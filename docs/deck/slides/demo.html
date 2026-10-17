@@ -1,0 +1,31 @@
+<section id="demo" data-transition="fade" style="background:#F3F1EA;color:#13202A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#B8691A;letter-spacing:3px">THE DEMO</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1">From alarm flood to one card</h2>
+</div>
+<div style="display:flex;gap:64px;align-items:start">
+<div style="width:980px;background:#13202A;color:#F3F1EA;border-radius:20px;padding:40px;display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#B9CCD8">IDV1 · original plant · recorded run</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#13202A;background:#F0A23B;padding:6px 16px;border-radius:8px">GATE: PARTIAL</p>
+</div>
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:32px;font-weight:600">Suspected causes · agreement 5/5 samples</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E3ECF2">1  IDV(7)  C header pressure loss<br>2  IDV(8)  A, B, C feed composition<br>3  IDV(1)  A/C feed ratio  ← true cause</p>
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:32px;font-weight:600">Evidence</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#7FC4F0">✓ XMEAS(23) down   ✓ XMEAS(25) up<br>✓ XMEAS(29) down   ✓ XMEAS(31) up</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#F0A23B"><span style="color:#F0A23B">✗ </span><u>XMEAS(1) up</u>: struck, no deviation (|z| = 2.9 &lt; 3.0)</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:4px;border-top:2px solid #D8D3C6;padding:20px 0 0 0">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;color:#1F6FB2">22 s</p>
+<p style="font-size:28px;line-height:1.35;color:#3D4A55">median per card (p95 58 s), 5 calls to Gemma on AMD Token Factory</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;border-top:2px solid #D8D3C6;padding:20px 0 0 0">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;color:#1F6FB2">$0.00015</p>
+<p style="font-size:28px;line-height:1.35;color:#3D4A55">estimated cost per incident</p>
+</div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#66737E">Card replayed from run tf_gemma31b_k5_v2 (Braatz d01). Gemma, thinking off. Latency and cost: 36 cases, claims latencia_p50_s, latencia_p95_s, coste_por_incidente.</p>
+<aside>Demo (1:20–2:20, screen recording of Live replay). Here is a fault starting. Without the copilot, this is what the operator faces: alarms piling up. With it, one card. Three ranked causes, the agreement between five samples, and the evidence. This sensor the model cited did not actually move that way, so the gate struck it out. The operator approves, and an Evolus agent, using a knowledge library of plant procedures, drafts the work order and the shift handover. Every action stays with the operator; the agent writes no control commands. An Evolus AI tool translates it for the next shift.</aside>
+</section>

@@ -1,0 +1,28 @@
+<section id="thinking" data-transition="fade" style="background:#8A4B10;color:#FBF6EC;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#FBE3BF;letter-spacing:3px">THINKING ON</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1;color:#FBF6EC">The smarter the model, the more the gate matters</h2>
+</div>
+<div style="display:flex;gap:96px;align-items:end">
+<div style="display:flex;flex-direction:column;gap:8px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:200px;font-weight:700;line-height:1.0;letter-spacing:-6px;color:#FBF6EC">22% → 36%</p>
+<p style="font-size:32px;line-height:1.4;color:#FBE3BF">of each card’s evidence rejected by the gate, thinking off → on</p>
+</div>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;border-top:2px solid #E9B27A;padding:20px 0 0 0;display:flex;flex-direction:column;gap:8px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:36px;font-weight:600;color:#FBF6EC">Higher in 9 of 12 faults</h3>
+<p style="font-size:28px;line-height:1.4;color:#FBE3BF">Wilcoxon over per-fault means, p = 0.0039</p>
+</div>
+<div style="flex:1;border-top:2px solid #E9B27A;padding:20px 0 0 0;display:flex;flex-direction:column;gap:8px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:36px;font-weight:600;color:#FBF6EC">Top-1: 11 → 15 of 36</h3>
+<p style="font-size:28px;line-height:1.4;color:#FBE3BF">A few more right answers, with more unsupported evidence</p>
+</div>
+<div style="flex:1;border-top:2px solid #E9B27A;padding:20px 0 0 0;display:flex;flex-direction:column;gap:8px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:36px;font-weight:600;color:#FBF6EC">Qwen: same direction</h3>
+<p style="font-size:28px;line-height:1.4;color:#FBE3BF">31% → 36%, weaker, not significant (p = 0.074)</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#FBE3BF">Braatz TEP, same 36 cases (12 faults × 3 levels) with thinking off and on, Gemma-4-31B-IT on AMD Token Factory.</p>
+<aside>Thinking and the gate (3:05–3:40). Then we turned thinking on. Gemma gets a few more causes right, but the share of its evidence the gate rejects rises from 22 to 36 percent, in 9 of 12 faults. Thinking makes the model more confident about evidence that isn't there. The smarter the model, the more the gate matters. [PENDING 18 Oct: if the Rieth same-deployment replication holds within each fault, add one sentence here and on the slide; otherwise leave as is.]</aside>
+</section>
