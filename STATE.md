@@ -563,3 +563,26 @@ Ver `docs/CHECKLIST.md`.
 - Caso real Rieth falla 2, corrida 1, nivel 2: 14-oct (reasoning_effort minimal, k=5) 15.065 razonamiento ≈ 3.000 por
   llamada, VERIFICADO; hoy (enable_thinking, k=2) 5.566 ≈ 2.800 por llamada, VERIFICADO, 396 s. Volumen parecido, pero
   es otro despliegue y otro mando: terminar los 105 casos así mezcla dos configuraciones (decide Diego).
+- **Decisión de Diego: repetir los 200 casos con la configuración nueva** (no mezclar despliegues). Commit 2f6daa9
+  (`--thinking-plantilla`). Lanzado ~17:50 UTC: `data/runs/tf_rieth_k5_thinkpl_n{0,2}` (1 proceso por nivel; fallas
+  1,2,5,6,7,8,10,12,13,14; corridas 1–10; k=5, T=0,7, ampliado, t2, sin esquema, max_tokens 8000,
+  `--thinking-plantilla`). Driver: aparta ERROR_LLM y reanuda con `--continuar`. Estimado ~28 h (≈200 s por llamada).
+  Logs en `data/dev/rieth_thinkpl_n{0,2}.log`. La campaña vieja `tf_rieth_k5_think_*` (95/200) no se reporta.
+- **También (Diego): brazo sin thinking en el despliegue nuevo** para que la comparación con/sin thinking sea del mismo
+  despliegue: `data/runs/tf_rieth_k5_sd_n{0,2}` (mismos argumentos que `tf_rieth_k5_n{0,2}`: max_tokens 1500, sin
+  razonamiento), 1 proceso, n0→n2, encolado hasta que termine un nivel con thinking (máx. 2 procesos). Log:
+  `data/dev/rieth_sd.log`. ≈3,5 h.
+- **Pausa por reinicio de la PC (17-oct ~01:25 UTC):** procesos detenidos a mano con thinkpl n0 65/100 y n2 40/100
+  (JSON válidos; los 2 casos en curso se pierden y se repiten). Sin thinking aún sin empezar. 0 ERROR_LLM, 0,235 USD.
+  Relanzar (los drivers usan `--continuar` solos si existe el manifiesto):
+  `data/dev/drivers/rieth_thinkpl.sh 0 > data/dev/rieth_thinkpl_n0.log 2>&1 &`,
+  `data/dev/drivers/rieth_thinkpl.sh 2 > data/dev/rieth_thinkpl_n2.log 2>&1 &`,
+  `data/dev/drivers/rieth_sd_cola.sh > data/dev/rieth_sd.log 2>&1 &`. Comprobar `reasoning_tokens > 0` en el 1.er caso nuevo.
+- **Relanzado 17-oct 14:25 UTC** tras el reinicio (pausa de ~13 h): thinkpl n0 desde 65/100, n2 desde 40/100, cola sin
+  thinking esperando. Drivers en `data/dev/drivers/`.
+- 17-oct ~15:05 UTC: n0 falla 10 corrida 6 → ERROR_LLM `ReadTimeout … (read timeout=600.0)` (una llamada con thinking
+  superó 10 min). El driver lo aparta y lo reintenta al final de la pasada. `AMD_TF_TIMEOUT` en `.env`: 600 → **1200 s**
+  (solo el tiempo de espera del cliente; no cambia la petición). Rige desde la siguiente pasada.
+- 17-oct 15:44–16:15 UTC: caída de Gemma en Token Factory. Error exacto: `status=500 … Error from provider self-dploy: 503 Service Unavailable … "code":"no_available_workers","message":"No available workers (all circuits open or unhealthy)"`.
+  Más ReadTimeouts de 600 s en las fallas 10 y 12 (n0) y la falla 7 (n2). A las 17:56 UTC hay 7 ERROR_LLM en n0 y 2 en n2; el driver los aparta y los reintenta al final de la pasada.
+  Desde el 16:27 UTC el ritmo es ~15 min/caso por nivel (antes del reinicio era ~8). Válidos a las 17:56: n0 71/100 y n2 44/100.
