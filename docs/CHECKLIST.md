@@ -17,7 +17,7 @@
 - [x] Demo como producto (Live replay) y funciona desde un clon (datos Braatz en el repo).
 - [ ] Despliegue con URL pública (domingo).
 - [x] Esquema del deck y guion del video: `docs/DECK_GUION.md` (17 oct). Falta exportar el deck a PDF y grabar.
-- [ ] Copyright del LICENSE (decide Diego).
+- [x] Copyright del LICENSE: Diego García (17 oct).
 
 ## Entrega en lablab (antes del 18 oct, 10:00 hora de Ecuador)
 - [~] Textos en `docs/ENTREGA_LABLAB.md` (borrador): falta que Diego elija título/nombre.
