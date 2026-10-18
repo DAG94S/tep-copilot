@@ -1,0 +1,34 @@
+<section id="method" data-transition="fade" style="background:#13202A;color:#F3F1EA;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#F0A23B;letter-spacing:3px">HOW WE TESTED IT</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1">A controlled experiment, not a lucky demo</h2>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:28px">
+<div style="border-top:4px solid #5BA8E0;padding:20px 0 0;display:flex;flex-direction:column;gap:8px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;color:#5BA8E0;line-height:1">2</p>
+<p style="font-size:28px;line-height:1.35">public datasets: Braatz and Rieth et al. 2017, with 10 independent simulations per fault</p>
+</div>
+<div style="border-top:4px solid #5BA8E0;padding:20px 0 0;display:flex;flex-direction:column;gap:8px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;color:#5BA8E0;line-height:1">2</p>
+<p style="font-size:28px;line-height:1.35">models on AMD Token Factory: Gemma-4-31B-IT and Qwen3.8-27B, same prompts and gate</p>
+</div>
+<div style="border-top:4px solid #5BA8E0;padding:20px 0 0;display:flex;flex-direction:column;gap:8px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;color:#5BA8E0;line-height:1">3</p>
+<p style="font-size:28px;line-height:1.35">disguise levels: original names, anonymous tags, full disguise</p>
+</div>
+<div style="border-top:4px solid #F0A23B;padding:20px 0 0;display:flex;flex-direction:column;gap:8px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;color:#F0A23B;line-height:1">off / on</p>
+<p style="font-size:28px;line-height:1.35">thinking, on the same cases</p>
+</div>
+<div style="border-top:4px solid #F0A23B;padding:20px 0 0;display:flex;flex-direction:column;gap:8px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;color:#F0A23B;line-height:1">k = 5</p>
+<p style="font-size:28px;line-height:1.35">samples per case, majority vote, agreement shown on the card</p>
+</div>
+<div style="border-top:4px solid #F0A23B;padding:20px 0 0;display:flex;flex-direction:column;gap:8px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:700;color:#F0A23B;line-height:1">per fault</p>
+<p style="font-size:28px;line-height:1.35">paired comparisons within each fault; bootstrap over whole faults</p>
+</div>
+</div>
+<p style="font-size:30px;line-height:1.4;color:#C9D6DF;width:1600px">The disguised twin is a contamination test other industrial LLMs can be put through. Plus a published baseline (FaultExplainer, reproduced exactly) and every number recomputed from pinned runs.</p>
+<aside>Two datasets, so it isn't one lucky simulation. Two models, so it isn't one lucky model. Three levels of disguise, thinking off and on, five samples per case, and every comparison made inside the same fault. The twin is a contamination test other teams can reuse.</aside>
+</section>

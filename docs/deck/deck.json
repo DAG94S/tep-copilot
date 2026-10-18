@@ -4,12 +4,12 @@
   "lists": "css",
   "title": "TEP Copilot: reasoning, not reciting",
   "cover": "cover",
-  "order": ["cover", "problem", "invariant", "demo", "twin", "reasons", "thinking", "early", "benchmark", "evolus", "audit", "close"],
+  "order": ["cover", "problem", "invariant", "demo", "twin", "method", "reasons", "models", "thinking", "early", "benchmark", "business", "evolus", "audit", "close"],
   "sections": {
     "s1": {"description": "The problem: alarm floods, and copilots nobody checks for recitation", "start": "cover"},
     "s2": {"description": "The product: statistics detect, the LLM proposes, a gate verifies, a human approves", "start": "invariant"},
     "s3": {"description": "The evidence: disguised twin, thinking vs the gate, early warning, benchmark", "start": "twin"},
-    "s4": {"description": "Business layer on Evolus and how every number is audited", "start": "evolus"}
+    "s4": {"description": "Who pays, the business layer on Evolus, and how every number is audited", "start": "business"}
   },
   "faces": {
     "space-grotesk": {"family": "Space Grotesk", "href": "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&display=swap"},

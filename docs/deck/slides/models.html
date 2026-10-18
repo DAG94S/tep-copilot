@@ -1,0 +1,39 @@
+<section id="models" data-transition="fade" style="background:#F3F1EA;color:#13202A;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#B8691A;letter-spacing:3px">TWO MODELS, ONE GATE</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1">Same protocol, two models on AMD Token Factory</h2>
+</div>
+<div style="display:flex;flex-direction:column;font-size:30px">
+<div style="display:flex;gap:32px;padding:0 0 14px;border-bottom:3px solid #13202A;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#66737E">
+<p style="flex:1.5"></p><p style="flex:1">GEMMA-4-31B-IT</p><p style="flex:1">QWEN3.8-27B</p>
+</div>
+<div style="display:flex;gap:32px;align-items:baseline;padding:18px 0;border-bottom:1px solid #C9C2B0">
+<p style="flex:1.5;color:#3D4A55">Evidence the gate rejects, per card</p>
+<p style="flex:1;font-family:'Space Grotesk', Arial, sans-serif;font-size:56px;font-weight:700;color:#1F6FB2">22%</p>
+<p style="flex:1;font-family:'Space Grotesk', Arial, sans-serif;font-size:56px;font-weight:700;color:#B8691A">31%</p>
+</div>
+<div style="display:flex;gap:32px;align-items:baseline;padding:18px 0;border-bottom:1px solid #C9C2B0">
+<p style="flex:1.5;color:#3D4A55">Right cause, top-1 · top-3 (of 12)</p>
+<p style="flex:1">3 · 7</p>
+<p style="flex:1">7 · 9</p>
+</div>
+<div style="display:flex;gap:32px;align-items:baseline;padding:18px 0;border-bottom:1px solid #C9C2B0">
+<p style="flex:1.5;color:#3D4A55">Disguise cost, top-3</p>
+<p style="flex:1">≤ 1 case of 12</p>
+<p style="flex:1">≤ 1 case of 12</p>
+</div>
+<div style="display:flex;gap:32px;align-items:baseline;padding:18px 0;border-bottom:1px solid #C9C2B0">
+<p style="flex:1.5;color:#3D4A55">FaultExplainer protocol, free text (top-3)</p>
+<p style="flex:1">8 / 11</p>
+<p style="flex:1">5 / 11</p>
+</div>
+<div style="display:flex;gap:32px;align-items:baseline;padding:18px 0">
+<p style="flex:1.5;color:#3D4A55">Rejected evidence, thinking off → on</p>
+<p style="flex:1">22% → 36%</p>
+<p style="flex:1">31% → 36%</p>
+</div>
+</div>
+<p style="font-size:30px;line-height:1.4;color:#13202A;width:1640px">Qwen names the top cause more often; Gemma backs more of what it claims (<b>9 of 12 faults</b>, p = 0.04, borderline). One gate decides what reaches the operator.</p>
+<p style="position:absolute;left:128px;bottom:56px;width:1664px;font-size:22px;color:#66737E">Braatz TEP, 12 faults × 3 disguise levels, one run each, k=5, thinking off unless stated; accuracy rows at level 0. FaultExplainer: their data, PCA and prompt, LLM annotator. A consistency check, not a model ranking. Claims combinado_*, qwen_*, qwen_vs_gemma_rechazo_*, replica_*_top3, think_rechazo_medias.</p>
+<aside>Our second model, Kwen, shows no sign of reciting either. It names the top cause more often, but the gate strikes more of its evidence: 31 percent against 22, in 9 of 12 faults. Why Gemma? It backs more of what it claims, and on the published FaultExplainer protocol it scores 8 of 11, between G P T four-oh and oh-one preview. Kwen scores 5 of 11.</aside>
+</section>

@@ -13,7 +13,7 @@
   n=1 por falla. Se replicará tal cual y aparte se reportará una versión robusta (n≥10, con SPE).
 - **Modelo:** Gemma 4 31B (fp8) + 26B-A4B en 1×MI300X; E2B/E4B en local. Apache-2.0, no gated. Modo *thinking* desactivado.
 - **Hosting de la demo:** Streamlit Community Cloud, con Render como respaldo (HF Docker Spaces ya es de pago).
-- **Deadline:** 18 oct 15:00 UTC = **10:00 hora de Ecuador**.
+- **Deadline:** contador de lablab el 18-oct: ~10:00 UTC (05:00 Ecuador). Ver la entrada de las 05:56 UTC.
 - **Viabilidad:** ejecutable con cambios (`docs/VIABILIDAD.md`).
 - **Carpeta:** se borró todo lo de AuditCorp-EC. Respaldo temporal en el scratchpad de la sesión
   (`respaldo_auditcorp_2026-10-09.tgz`). Se creó la estructura nueva.
@@ -591,3 +591,50 @@ Ver `docs/CHECKLIST.md`.
 - 17-oct ~21:55 UTC: la demo pasa a reproducir el agente Evolus con Gemma (`agente_2026-10-16_biblioteca_gemma_v3`, antes `..._qwen_v2`).
   La traducción vieja (`traduccion_it_2026-10-16`) era del documento de Qwen, así que se regeneró sobre los documentos de Gemma v3: `traduccion_it_2026-10-17_gemma_v3`.
   Son 3/3 traducciones sin truncar, por 15,3 créditos de Evolus. Quedan pineadas, con el claim `evolus_traducciones_gemma_v3`. La traducción vieja se conserva como registro.
+- 17-oct 22:01–~22:40 UTC: segunda caída de Gemma en Token Factory, con el mismo error que a las 15:44: `status=500 … self-dploy: 503 … "code":"no_available_workers"`.
+  n0 tiene 5 ERROR_LLM nuevos, en la falla 14, corridas 1–5. n2 no tuvo ninguno. A las 22:43 UTC una llamada de prueba ya responde 200 en 6 s.
+  Recuento: n0 83/100 válidos con 12 ERROR_LLM pendientes de reintento; n2 59/100.
+- 17-oct ~23:25 UTC — CAMBIO DE PRIORIDADES (decisión de Diego). Desde la caída de las 22:01 el servidor genera a ~5,4 tok/s (medido a las 23:22 UTC: 171 tokens en 31,6 s); durante el día los casos iban a 10–40 tok/s.
+  Con ese ritmo n0 y n2 con thinking no terminaban antes de la entrega, y el brazo sin thinking ni empezaba.
+  Se paró n2 con thinking. Los ERROR_LLM pendientes se apartaron a `errores_429.jsonl`: 12 de n0 y 3 de n2.
+  Estado al parar: n0 83/100 (fallas 10, 12 y 14 incompletas); n2 59/100 (completas 1, 2, 5, 6 y 8; la 7 con 8/10; la 10 con 1/10).
+  Hueco A: n0 con thinking hasta 100/100, `AMD_TF_TIMEOUT=3600` por entorno.
+  Hueco B, en este orden:
+    1. `tf_rieth_k5_sd_n0`, completo.
+    2. `tf_rieth_k5_sd_n2`, solo fallas 1, 2, 5, 6, 7 y 8.
+    3. Reintento de n2 con thinking en la falla 7, corridas 2 y 3.
+  Drivers en `data/dev/drivers/rieth_correr.sh` y `rieth_hueco_b.sh`; logs en `data/dev/rieth_a_n0.log` y `rieth_b.log`.
+  n2 con thinking queda sin las fallas 10, 12, 13 y 14: se reportará como parcial (6 fallas). Ojo: `manifiesto.json` de n2 guardará los argumentos de la última pasada (solo `--fallas 7`); `inicio_original` se conserva.
+- 18-oct ~00:00 UTC — DIAGNÓSTICO CORREGIDO. Llamada aparte con thinking en streaming: primer token a los 81,5 s y luego ~42 tok/s.
+  El servidor no genera lento: está saturado y encola cada petición más de un minuto. Los "5,4 tok/s" de las 23:22 mezclaban la espera en cola con la generación.
+  La llamada en curso de n0 con thinking (falla 10, corrida 6) llevaba 38 min abierta, cuando un caso completo de la falla 10 (5 llamadas) tardaba entre 8 y 25 min: se dio por colgada.
+  Se paró y se relanzó con `--continuar` y `AMD_TF_TIMEOUT=1800`. El archivo quedó íntegro (83 líneas, 0 ERROR_LLM).
+- 18-oct ~00:07 UTC — VIGILANTE AUTÓNOMO: `data/dev/drivers/vigilante.py` corre en segundo plano y escribe en `data/dev/vigilante.log`.
+  Además de lo de antes (ERROR_LLM, casos, drivers caídos), mira por socket cuánto lleva abierta la llamada en curso de cada eval.correr. El umbral es 15 min con thinking y 5 min sin thinking.
+  Al superarlo lanza una sonda en streaming de 5 tokens:
+    - Si el primer token llega en menos de 60 s, la llamada está COLGADA: mata ese eval.correr por PID (máximo 3 veces por hora y campaña).
+    - Si no, lo anota como servidor saturado y no toca nada.
+  `rieth_correr.sh` ahora solo termina si eval.correr sale con rc=0 y sin ERROR_LLM; si lo matan, reanuda con `--continuar` a los 20 s (hasta 12 pasadas).
+  Huecos A y B relanzados a las 00:06 UTC con `AMD_TF_TIMEOUT=1800`, sin perder casos.
+- 18-oct ~00:24 UTC: la falla 10, corrida 6 de n0 con thinking se colgó dos veces seguidas. El vigilante la mató a las 00:21 UTC y el caso volvió a empezar en el acto: matar el proceso no avanza.
+  Cambio: n0 con thinking pasa a `AMD_TF_TIMEOUT=900`. Una llamada colgada falla a los 15 min, queda como ERROR_LLM y el proceso sigue con el siguiente caso; los errores se reintentan al final de la pasada.
+  El umbral del vigilante para thinking sube a 20 min, para que el timeout actúe primero.
+  Hipótesis, sin comprobar: con el servidor saturado, las peticiones largas (~10k de prompt + hasta 8k de razonamiento) se pausan y reinician sin terminar, o la pasarela corta conexiones que pasan muchos minutos sin enviar datos (no usamos streaming).
+- 18-oct ~03:25 UTC — Reparto de la falla 14 de n0 con thinking entre los dos huecos (lo pidió Diego):
+  - Hueco A (`tf_rieth_k5_thinkpl_n0`): falla 12, corridas 1-2, y falla 14, corridas 1-5. `parar_a_tras_f14c5.sh` detiene su driver y su eval.correr en cuanto escribe la falla 14, corrida 5.
+  - Hueco B: cuando termina `rieth_hueco_b.sh` (falta la falla 7, corrida 3 de n2), `rieth_hueco_b_f14.sh` corre la falla 14, corridas 6-10, en la carpeta aparte `tf_rieth_k5_thinkpl_n0_f14b` (dos procesos no escriben el mismo registros.jsonl). Mismos parámetros y timeout de 900 s.
+  - Al terminar, los registros de `_f14b` se añaden al registros.jsonl de `tf_rieth_k5_thinkpl_n0`, verificando que no haya pares (falla, corrida) duplicados. La carpeta `_f14b` se conserva con su manifiesto como procedencia.
+- 18-oct 03:33 UTC: la falla 7, corrida 3 de n2 con thinking se colgó dos veces (02:44 y 03:31 UTC) y bloqueaba el hueco B. Se abandona; detenidos rieth_hueco_b.sh, su driver y su eval.correr. n2 con thinking queda en 60 casos, con la falla 7 en 9/10. El hueco B pasa a la falla 14 de n0.
+- 18-oct ~04:55 UTC: `reparto_f14.py` sustituye a `parar_a_tras_f14c5.sh` (Diego pidió pasar a B corridas de A cuando B termine).
+  - A sigue la falla 14 en orden ascendente.
+  - B, al terminar la 6-10, toma de una en una la corrida pendiente más alta de 1-5 que A no está haciendo. Lo hace en `_f14b`, con `--corridas N --continuar`, timeout de 900 s y hasta 4 intentos por corrida.
+  - A se detiene en cuanto su siguiente corrida ya es de B.
+  - El manifiesto de `_f14b` refleja los argumentos de la última invocación y conserva `inicio_original`.
+- 18-oct ~05:00 UTC: deck con slide nueva `models` ("Two models, one gate", entre `reasons` y `thinking`, 13 slides; artifact v11). Compara Gemma y Qwen solo con claims existentes: qwen_vs_gemma_rechazo_* (22% / 31%, 9/2/1 fallas, p=0.04), think_rechazo_medias, qwen_think_rechazo_medias y evolus_v3_*. La frase sobre Qwen pasa de la nota de `reasons` a la narración de `models`.
+- 18-oct ~05:20 UTC — Pitch v2, tras revisar con exa la rúbrica de lablab y guías de jueces:
+  - Rúbrica de lablab (1-5): Presentation, Business value, Application of technology, Originality. El 5 en Presentation exige mercado, ingresos, planes futuros y análisis competitivo.
+  - Slides nuevas `method` ("A controlled experiment") y `business` (coste ASM ≥ $10B al año en petroquímica de EE. UU. + coste por incidente estimado + modelo por consola + competencia). `close` añade NEXT. El deck pasa a 15 slides (artifact v13).
+  - Narración reordenada: gancho → producto en una frase → demo → ¿razona o recita? → método → resultados → dos modelos → thinking → anticipación/benchmark → negocio → Evolus → auditoría → cierre.
+  - Un subagente revisa guion y slides; el video se regenera solo tras la aprobación de Diego.
+- 18-oct ~05:40 UTC — Pitch v3 tras la revisión del subagente (dos pasadas): fuera las frases sin respaldo ("in every training set" → "public since 1993"; "proves" → "is tested against reciting"; "Every team will show you…" → "Plenty of AI can name a fault…"; "every number" → "every result", porque 275 y $10B son citas externas). `models` en paralelo, con cifras de Braatz (rechazo 22/31%, top-1·top-3 3·7 frente a 7·9, FaultExplainer 8/11 frente a 5/11, "p = 0.04, borderline"). `reasons` muestra los dos niveles (7 pp IC [0, 18]; 5 pp [−4, 17]). `business` nombra al comprador, sin precio inventado. El video (4:22, voz edge-tts) usa cover, problem, invariant, demo, twin, method, reasons, models, thinking, business y close; early, benchmark, evolus y audit quedan solo en el PDF. Artifact v15.
+- 18-oct 05:56 UTC — El contador de lablab marcaba "in 4 hours": el cierre real es ~10:00 UTC (05:00 Ecuador), no 15:00 UTC como decía arriba. Entrega enviada a las ~06:10 UTC con el video v3 y el PDF v15 (slide de thinking con cifras de Braatz, ya verificadas). La réplica de thinking en Rieth (n0, falla 14 pendiente) queda como trabajo posterior a la entrega.

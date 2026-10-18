@@ -1,32 +1,33 @@
-# Textos para la entrega en lablab (borrador, 16 oct)
+# Textos para la entrega en lablab (v2, 18 oct)
 
 Todas las cifras salen de `claims.json` (verificadas con `scripts/verify_claims.py`). Si cambia un claim, cambiar aquí.
-Contar caracteres antes de pegar: título ≤ 50, descripción corta ≤ 255, larga ≥ 100 palabras.
+Límites del formulario (guía de lablab): título 5-50, descripción corta 50-255, larga 600-2000 caracteres; video MP4 ≤ 300 MB; slides en PDF.
 
 ## Título (elegido por Diego el 17-oct: opción 3)
 1. `TEP Copilot: an AI that proves it isn't reciting` (48)
 2. `TEP Copilot: gate-verified root-cause cards` (43)
 3. `TEP Copilot: reasoning, not reciting` (36)
 
-## Descripción corta (≤ 255)
-Control-room copilot for the Tennessee Eastman Process: statistics detect, Gemma proposes a root cause, a deterministic gate strikes unsupported evidence, a human approves. A disguised-plant probe shows it reasons instead of reciting.
+## Descripción corta (50-255 caracteres; v2, 18-oct)
+Control-room copilot for refineries and chemical plants: Gemma 4 on AMD proposes the root cause of an alarm flood, a deterministic gate strikes unsupported evidence, a human approves. A disguised twin tests that it reasons, not recites.
 
-(234 caracteres)
+(236 caracteres)
 
-## Descripción larga (≥ 100 palabras)
-In a plant upset, operators face alarm floods: at Milford Haven in 1994 it was 275 alarms in under 11 minutes. LLM copilots can diagnose faults, but on the Tennessee Eastman Process (TEP), a benchmark that sits in every training set, nobody checks whether the model reasons about the plant or recites the textbook.
+## Descripción larga (600-2000 caracteres; v2, 18-oct, alineada con el pitch v3)
+In a plant upset, operators drown in alarms: at Milford Haven in 1994, two operators faced 275 alarms in under 11 minutes. Plants now want AI copilots in that room, but an AI that sounds right and is wrong is one more alarm.
 
-TEP Copilot turns an alarm flood into one root-cause card. Statistics detect (PCA T²), Gemma-4-31B on AMD Token Factory proposes three causes with sensor evidence, a deterministic gate removes every claim the data does not support and blocks control verbs, and a human approves. The LLM has no write access to the process. After approval, an Evolus agent with a Knowledge Library drafts the work order and shift handover, and an Evolus AI Tool translates it for the next shift.
+TEP Copilot turns an alarm flood into one root-cause card the operator can check. Statistics detect the fault (PCA T²); Gemma-4-31B-IT on AMD Token Factory proposes three ranked causes with sensor evidence; a deterministic gate strikes every claim the data does not support and flags control verbs; a human approves. The model has no write access to the process. After approval, an Evolus agent with a Knowledge Library drafts the work order and shift handover, and an Evolus AI Tool translates it.
 
-What we measured, every number recomputed from pinned runs by a script:
-- **Reasoning, not reciting.** A disguised twin renames tags, units, components and equipment while keeping the statistics identical. On 10 faults × 10 independent simulations, top-1 accuracy stays at 45/100 on the original plant and 44/100 fully disguised; only IDV8 seems to lean on memory.
-- **The gate matters more when the model thinks.** With thinking on, Gemma gets more right but the share of its evidence the gate rejects rises from 22% to 36% per case (worse in 9 of 12 faults, p = 0.004).
-- **Early warning.** In 4 of 4 faults that flood, the card arrives before the flood.
-- **Benchmark.** On the FaultExplainer protocol, Gemma-4-31B scores 8/11 vs GPT-4o 7/11 and o1-preview 9/11.
+Does it reason or recite? TEP has been public since 1993, so we tested it as an experiment: 2 public datasets, 2 models, 3 disguise levels, thinking off/on, k=5 samples, comparisons within each fault.
+- A disguised twin renames every tag and unit: Gemma top-1 stays at 45/100 on the original plant and 44/100 fully disguised.
+- Two models: Qwen3.8-27B names the top cause more often, but the gate rejects more of its evidence (31% vs 22%, 9 of 12 faults).
+- Thinking on raises the evidence the gate rejects from 22% to 36% (9 of 12 faults).
+- The card arrives before the alarm flood in 4 of 4 flooding faults.
+- FaultExplainer protocol: Gemma 8/11, between GPT-4o (7/11) and o1-preview (9/11).
 
-A second model (Qwen3.8-27B) confirms that the disguise does not break accuracy. The demo replays recorded runs, so it works offline.
+For refinery and chemical-plant control rooms; estimated inference cost $0.00015 per incident. Every result is recomputed by a script from pinned runs; the demo replays them offline.
 
-(284 palabras)
+(1603 caracteres. La línea de thinking es provisional: se completa con la réplica en Rieth.)
 
 ## Reto y etiquetas
 - Reto: **Intelligent Industry**. Además compite por el premio de Google (Gemma) y por el track de Evolus (Business Agents).
